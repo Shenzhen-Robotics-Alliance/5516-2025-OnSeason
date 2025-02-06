@@ -78,11 +78,7 @@ public class RobotContainer {
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
-        final List<PhotonCameraProperties> camerasProperties =
-                // PhotonCameraProperties.loadCamerasPropertiesFromConfig("5516-2024-OffSeason-Vision"); //
-                // loads camera properties from
-                // deploy/PhotonCamerasProperties/5516-2024-OffSeason-Vision.xml
-                VisionConstants.photonVisionCameras; // load configs stored directly in VisionConstants.java
+        final List<PhotonCameraProperties> camerasProperties = VisionConstants.photonVisionCameras; // load configs stored directly in VisionConstants.java
 
         switch (Robot.CURRENT_ROBOT_MODE) {
             case REAL -> {
