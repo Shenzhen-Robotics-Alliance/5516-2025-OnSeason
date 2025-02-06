@@ -1,0 +1,82 @@
+package frc.robot.subsystems.superstructure.arm;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Voltage;
+import org.littletonrobotics.junction.LogTable;
+import org.littletonrobotics.junction.inputs.LoggableInputs;
+
+import java.util.Optional;
+
+import static edu.wpi.first.units.Units.*;
+
+public interface ArmIO {
+    final class ArmInputs implements LoggableInputs {
+        /**
+         * The (optional) arm absolute encoder angle, already calibrated.
+         * Empty if the Absolute Encoder is disconnected.
+         * */
+        public Optional<Rotation2d> absoluteEncoderAngle;
+
+        /** Whether the CAN communications between the rio and the motor are good. */
+        public boolean motorConnected;
+
+        /**
+         * The relative (final) mechanism angle, measured by the relative encoder.
+         * Gearing is already considered.
+         * */
+        public Angle relativeMechanismAngle;
+
+        /**
+         * The (final) mechanism velocity, measured by the relative encoder.
+         * Gearing is already considered.
+         * */
+        public AngularVelocity mechanismVelocity;
+
+        /** The supply current of the motor. */
+        public Current motorSupplyCurrent;
+
+        /** The actual output voltage of the motor. */
+        public Voltage motorOutputVoltage;
+
+        public ArmInputs() {
+            this.absoluteEncoderAngle = Optional.empty();
+            motorConnected = false;
+            this.relativeMechanismAngle = Rotations.zero();
+            this.mechanismVelocity = RotationsPerSecond.zero();
+            this.motorSupplyCurrent = Amps.zero();
+            this.motorOutputVoltage = Volts.zero();
+        }
+
+        @Override
+        public void toLog(LogTable table) {
+            table.put("absoluteEncoderAnglePresent", absoluteEncoderAngle.isPresent());
+            table.put("absoluteEncoderAngle", absoluteEncoderAngle.orElse(Rotation2d.kZero));
+            table.put("motorConnected", motorConnected);
+            table.put("relativeEncoderAngle", relativeMechanismAngle);
+            table.put("relativeEncoderVelocity", mechanismVelocity);
+            table.put("motorSupplyCurrent", motorSupplyCurrent);
+            table.put("motorOutputVoltage", motorOutputVoltage);
+        }
+
+        @Override
+        public void fromLog(LogTable table) {
+            boolean absoluteEncoderAnglePresent = table.get("absoluteEncoderAnglePresent", false);
+            absoluteEncoderAngle = absoluteEncoderAnglePresent
+                    ? Optional.of(table.get("absoluteEncoderAngle", Rotation2d.kZero))
+                    : Optional.empty();
+            motorConnected = table.get("motorConnected", motorConnected);
+            relativeMechanismAngle = table.get("relativeEncoderAngle", Rotations.zero());
+            motorSupplyCurrent = table.get("motorSupplyCurrent", Amps.zero());
+            motorOutputVoltage = table.get("motorOutputVoltage", Volts.zero());
+        }
+    }
+
+    void updateInputs(ArmInputs armInputs);
+
+    default void setMotorOutput(Voltage voltage) {}
+
+    default void setMotorBrake(boolean brakeModeEnable) {}
+}
