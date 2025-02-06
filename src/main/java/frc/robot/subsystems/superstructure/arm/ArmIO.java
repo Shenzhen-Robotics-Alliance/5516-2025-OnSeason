@@ -1,38 +1,30 @@
 package frc.robot.subsystems.superstructure.arm;
 
+import static edu.wpi.first.units.Units.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import java.util.Optional;
 import org.littletonrobotics.junction.LogTable;
 import org.littletonrobotics.junction.inputs.LoggableInputs;
-
-import java.util.Optional;
-
-import static edu.wpi.first.units.Units.*;
 
 public interface ArmIO {
     final class ArmInputs implements LoggableInputs {
         /**
-         * The (optional) arm absolute encoder angle, already calibrated.
-         * Empty if the Absolute Encoder is disconnected.
-         * */
+         * The (optional) arm absolute encoder angle, already calibrated. Empty if the Absolute Encoder is disconnected.
+         */
         public Optional<Rotation2d> absoluteEncoderAngle;
 
         /** Whether the CAN communications between the rio and the motor are good. */
         public boolean motorConnected;
 
-        /**
-         * The relative (final) mechanism angle, measured by the relative encoder.
-         * Gearing is already considered.
-         * */
+        /** The relative (final) mechanism angle, measured by the relative encoder. Gearing is already considered. */
         public Angle relativeMechanismAngle;
 
-        /**
-         * The (final) mechanism velocity, measured by the relative encoder.
-         * Gearing is already considered.
-         * */
+        /** The (final) mechanism velocity, measured by the relative encoder. Gearing is already considered. */
         public AngularVelocity mechanismVelocity;
 
         /** The supply current of the motor. */

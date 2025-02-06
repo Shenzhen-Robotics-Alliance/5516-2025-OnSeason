@@ -1,5 +1,8 @@
 package frc.robot.subsystems.superstructure.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
+
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
@@ -16,25 +19,20 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
 import java.util.Optional;
-
-import static edu.wpi.first.units.Units.Degrees;
-import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
 
 public class ArmIOReal implements ArmIO {
     /**
-     * The absolute encoder reading when the arm hits the upper limit.
-     * Measure this on "SmartDashboard/Arm/Raw Encoder Reading", which is in rotations.
-     * */
+     * The absolute encoder reading when the arm hits the upper limit. Measure this on "SmartDashboard/Arm/Raw Encoder
+     * Reading", which is in rotations.
+     */
     private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Degrees.of(88);
     /**
-     * The difference between the raw encoder reading angle and actual arm angle.
-     * Real Angle = Encoder Angle - Offset Angle.
-     * Offset Angle = Encoder Angle - Real Angle.
-     * */
-    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET = new Rotation2d(
-            ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT.minus(ARM_UPPER_LIMIT));
+     * The difference between the raw encoder reading angle and actual arm angle. Real Angle = Encoder Angle - Offset
+     * Angle. Offset Angle = Encoder Angle - Real Angle.
+     */
+    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET =
+            new Rotation2d(ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT.minus(ARM_UPPER_LIMIT));
 
     // Hardware
     private final TalonFX armTalon;
@@ -52,19 +50,20 @@ public class ArmIOReal implements ArmIO {
         this.absoluteEncoder = new DutyCycleEncoder(0);
 
         // Configure Motor
-        armTalon.getConfigurator().apply(new MotorOutputConfigs()
-                .withInverted(InvertedValue.CounterClockwise_Positive));
-        armTalon.getConfigurator().apply(new CurrentLimitsConfigs()
-                .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(ARM_CURRENT_LIMIT));
+        armTalon.getConfigurator()
+                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+        armTalon.getConfigurator()
+                .apply(new CurrentLimitsConfigs()
+                        .withSupplyCurrentLimitEnable(true)
+                        .withSupplyCurrentLimit(ARM_CURRENT_LIMIT));
 
         // Obtain Status Signals
         this.relativeEncoderAngle = armTalon.getPosition();
         this.relativeEncoderVelocity = armTalon.getVelocity();
         this.motorSupplyCurrent = armTalon.getSupplyCurrent();
         this.motorOutputVoltage = armTalon.getMotorVoltage();
-        BaseStatusSignal.setUpdateFrequencyForAll(100.0,
-                relativeEncoderAngle, relativeEncoderVelocity, motorSupplyCurrent, motorOutputVoltage);
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                100.0, relativeEncoderAngle, relativeEncoderVelocity, motorSupplyCurrent, motorOutputVoltage);
         armTalon.optimizeBusUtilization();
     }
 

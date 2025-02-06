@@ -1,15 +1,14 @@
 package frc.robot.subsystems.superstructure.arm;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
-import org.ironmaple.simulation.motorsims.SimulatedMotorController;
-
 import java.util.Optional;
-
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
+import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public class ArmIOSim implements ArmIO {
     private final SingleJointedArmSim armSim;
@@ -29,9 +28,9 @@ public class ArmIOSim implements ArmIO {
                 true,
                 ARM_UPPER_LIMIT.in(Radians));
 
-        this.simMotorController = new SimulatedMotorController.GenericMotorController(ARM_GEARBOX)
-                .withCurrentLimit(ARM_CURRENT_LIMIT);
-        this.relativeEncoderOffset = Rotations.of((Math.random()-0.5) * 2);
+        this.simMotorController =
+                new SimulatedMotorController.GenericMotorController(ARM_GEARBOX).withCurrentLimit(ARM_CURRENT_LIMIT);
+        this.relativeEncoderOffset = Rotations.of((Math.random() - 0.5) * 5);
     }
 
     @Override
@@ -44,8 +43,7 @@ public class ArmIOSim implements ArmIO {
 
         armInputs.absoluteEncoderAngle = Optional.of(Rotation2d.fromRadians(armSim.getAngleRads()));
         armInputs.motorConnected = true;
-        armInputs.relativeMechanismAngle = Radians.of(armSim.getAngleRads())
-                .plus(relativeEncoderOffset);
+        armInputs.relativeMechanismAngle = Radians.of(armSim.getAngleRads()).plus(relativeEncoderOffset);
         armInputs.mechanismVelocity = RadiansPerSecond.of(armSim.getVelocityRadPerSec());
         armInputs.motorSupplyCurrent = Amps.of(armSim.getCurrentDrawAmps());
         armInputs.motorOutputVoltage = actualOutputVoltage;
