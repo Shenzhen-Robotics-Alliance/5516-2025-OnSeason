@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -26,16 +25,15 @@ import frc.robot.commands.drive.*;
 import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.MapleSubsystem;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
-import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import frc.robot.subsystems.vision.apriltags.AprilTagVisionIOReal;
 import frc.robot.subsystems.vision.apriltags.ApriltagVisionIOSim;
 import frc.robot.subsystems.vision.apriltags.PhotonCameraProperties;
-import frc.robot.utils.AIRobotInSimulation;
+import frc.robot.utils.AIRobotInSimulation2024;
+import frc.robot.utils.AlertsManager;
 import frc.robot.utils.MapleJoystickDriveInput;
 import java.util.*;
 import java.util.function.IntSupplier;
@@ -66,8 +64,8 @@ public class RobotContainer {
     public final LEDStatusLight ledStatusLight;
 
     // Controller
-    public final DriverMap driver = new DriverMap.LeftHandedPS5(0);
-    // public final OperatorMap operator = new OperatorMap.LeftHandedXbox(0);
+    // public final DriverMap driver = new DriverMap.LeftHandedPS5(0);
+    public final DriverMap driver = new DriverMap.LeftHandedXbox(0);
     public final CommandXboxController operator = new CommandXboxController(1);
 
     private final LoggedDashboardChooser<Auto> autoChooser;
@@ -96,8 +94,8 @@ public class RobotContainer {
                 /* CTRE Chassis: */
                 drive = new SwerveDrive(
                         Objects.equals(TunerConstants.kCANBus.getName(), "rio")
-                                ? SwerveDrive.DriveType.CTRE_ON_CANIVORE
-                                : SwerveDrive.DriveType.CTRE_ON_RIO,
+                                ? SwerveDrive.DriveType.CTRE_ON_RIO
+                                : SwerveDrive.DriveType.CTRE_ON_CANIVORE,
                         new GyroIOPigeon2(TunerConstants.DrivetrainConstants),
                         new CanBusIOReal(TunerConstants.kCANBus),
                         new ModuleIOTalon(TunerConstants.FrontLeft, "FrontLeft"),
@@ -163,7 +161,7 @@ public class RobotContainer {
                         camerasProperties);
 
                 SimulatedArena.getInstance().resetFieldForAuto();
-                AIRobotInSimulation.startOpponentRobotSimulations();
+                AIRobotInSimulation2024.startOpponentRobotSimulations();
             }
 
             default -> {
@@ -205,7 +203,6 @@ public class RobotContainer {
     }
 
     private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {
-
         pathPlannerAuto.event("hello world").onTrue(Commands.runOnce(() -> System.out.println("hello world!!!")));
     }
 
@@ -254,7 +251,7 @@ public class RobotContainer {
             return;
 
         try {
-            this.autonomousCommand = selectedAuto.getAutoCommand(this).finallyDo(MapleSubsystem::disableAllSubsystems);
+            this.autonomousCommand = selectedAuto.getAutoCommand(this);
             configureAutoTriggers(new PathPlannerAuto(autonomousCommand, selectedAuto.getStartingPoseAtBlueAlliance()));
         } catch (Exception e) {
             this.autonomousCommand = Commands.none();
@@ -332,8 +329,12 @@ public class RobotContainer {
         // driver.faceToTargetButton().whileTrue(FaceCoralStation.faceCoralStation(drive, driveInput));
 
         /* auto alignment example, delete it for your project */
-        driver.autoAlignmentButtonLeft().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, false));
-        driver.autoAlignmentButtonRight().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, true));
+        driver.autoAlignmentButtonLeft()
+                .whileTrue(ReefAlignment.alignmentToBranch(
+                        drive, aprilTagVision, ledStatusLight, driver, false, Commands::none));
+        driver.autoAlignmentButtonRight()
+                .whileTrue(ReefAlignment.alignmentToBranch(
+                        drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
 
         //        new Trigger(() -> operator.getRightX() > 0.5).whileTrue(ReefAlignment.previousTargetButton(0.3));
         //        new Trigger(() -> operator.getRightX() < -0.5).whileTrue(ReefAlignment.nextTargetButton(0.3));
@@ -349,10 +350,6 @@ public class RobotContainer {
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-
-        driver.getController()
-                .button(1)
-                .onTrue(ledStatusLight.playAnimation(new LEDAnimation.Charging(Color.kOrange), 1));
     }
 
     /**
@@ -373,16 +370,17 @@ public class RobotContainer {
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-        Logger.recordOutput("FieldSimulation/OpponentRobotPositions", AIRobotInSimulation.getOpponentRobotPoses());
+        Logger.recordOutput("FieldSimulation/OpponentRobotPositions", AIRobotInSimulation2024.getOpponentRobotPoses());
         Logger.recordOutput(
-                "FieldSimulation/AlliancePartnerRobotPositions", AIRobotInSimulation.getAlliancePartnerRobotPoses());
+                "FieldSimulation/AlliancePartnerRobotPositions",
+                AIRobotInSimulation2024.getAlliancePartnerRobotPoses());
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
         Logger.recordOutput(
                 "FieldSimulation/Coral", SimulatedArena.getInstance().getGamePiecesArrayByType("Coral"));
     }
 
-    public void updateDashboardDisplay() {
+    public void updateTelemetryAndLED() {
         field.setRobotPose(
                 Robot.CURRENT_ROBOT_MODE == RobotMode.SIM
                         ? driveSimulation.getSimulatedDriveTrainPose()
@@ -392,12 +390,6 @@ public class RobotContainer {
 
         ReefAlignment.updateDashboard();
 
-        if (drive.hardwareFaultsDetected.getAsBoolean() || aprilTagVision.cameraDisconnected.getAsBoolean())
-            ledStatusLight
-                    .playAnimationPeriodically(new LEDAnimation.Breathe(new Color(255, 0, 0)), 2)
-                    .until(drive.hardwareFaultsDetected.negate().and(aprilTagVision.cameraDisconnected.negate()))
-                    .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
-                    .ignoringDisable(true)
-                    .schedule();
+        AlertsManager.updateLEDAndLog(ledStatusLight);
     }
 }

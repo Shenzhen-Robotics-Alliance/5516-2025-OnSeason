@@ -6,35 +6,37 @@
 package frc.robot.subsystems.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.constants.DriveControlLoops.*;
 import static frc.robot.constants.DriveTrainConstants.*;
 
+import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.util.DriveFeedforwards;
+import com.pathplanner.lib.util.swerve.SwerveSetpoint;
+import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.*;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot;
 import frc.robot.RobotState;
-import frc.robot.subsystems.MapleSubsystem;
 import frc.robot.subsystems.drive.IO.*;
+import frc.robot.utils.AlertsManager;
 import frc.robot.utils.ChassisHeadingController;
-import frc.robot.utils.MapleTimeUtils;
 import java.util.Optional;
 import java.util.OptionalDouble;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
-public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsystem {
+public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsystem {
     public enum DriveType {
         GENERIC,
         CTRE_ON_RIO,
@@ -49,8 +51,12 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
     private final SwerveModule[] swerveModules;
 
     private final OdometryThread odometryThread;
-    private final Alert gyroDisconnectedAlert = new Alert("Gyro Hardware Fault", Alert.AlertType.kError);
-    private final Alert canBusHighUtilization = new Alert("Can Bus Utilization High", Alert.AlertType.kWarning);
+    private final Alert gyroDisconnectedAlert = AlertsManager.create("Gyro Hardware Fault", Alert.AlertType.kError);
+    private final Alert canBusHighUtilization =
+            AlertsManager.create("Can Bus Utilization High", Alert.AlertType.kWarning);
+
+    private final SwerveSetpointGenerator setpointGenerator;
+    private SwerveSetpoint setpoint;
 
     public SwerveDrive(
             DriveType type,
@@ -78,16 +84,16 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
 
         gyroDisconnectedAlert.set(false);
 
+        setpointGenerator = new SwerveSetpointGenerator(defaultPathPlannerRobotConfig(), RPM.of(300));
+        this.setpoint = new SwerveSetpoint(new ChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
+
         startDashboardDisplay();
     }
 
     @Override
-    public void periodic(double dt, boolean enabled) {
-        final double t0 = MapleTimeUtils.getRealTimeSeconds();
+    public void periodic() {
         fetchOdometryInputs();
-        Logger.recordOutput(
-                "SystemPerformance/OdometryFetchingTimeMS", (MapleTimeUtils.getRealTimeSeconds() - t0) * 1000);
-        modulesPeriodic(dt, enabled);
+        modulesPeriodic();
 
         for (int timeStampIndex = 0;
                 timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
@@ -120,8 +126,8 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
         odometryThread.unlockOdometry();
     }
 
-    private void modulesPeriodic(double dt, boolean enabled) {
-        for (var module : swerveModules) module.periodic(dt, enabled);
+    private void modulesPeriodic() {
+        for (var module : swerveModules) module.modulePeriodic();
     }
 
     private void feedSingleOdometryDataToPositionEstimator(int timeStampIndex) {
@@ -143,15 +149,35 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
         return swerveModulePositions;
     }
 
+    private LinearAcceleration accelerationConstrain = ACCELERATION_CONSTRAIN_NORMAL;
+
     @Override
     public void runRobotCentricChassisSpeeds(ChassisSpeeds speeds) {
-        runRobotCentricSpeedsWithFeedforwards(speeds, DriveFeedforwards.zeros(4));
+        if (!USE_SETPOINT_GENERATOR) {
+            runRobotCentricSpeedsWithFeedforwards(speeds, DriveFeedforwards.zeros(4));
+            return;
+        }
+        PathConstraints constraints = new PathConstraints(
+                CHASSIS_MAX_VELOCITY,
+                accelerationConstrain,
+                CHASSIS_MAX_ANGULAR_VELOCITY,
+                CHASSIS_MAX_ANGULAR_ACCELERATION);
+        this.setpoint = setpointGenerator.generateSetpoint(setpoint, speeds, constraints, Robot.defaultPeriodSecs, 13);
+
+        executeSetpoint();
     }
 
     @Override
     public void runRobotCentricSpeedsWithFeedforwards(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+        this.setpoint = new SwerveSetpoint(speeds, getModuleStates(), feedforwards);
+        executeSetpoint();
+    }
+
+    private void executeSetpoint() {
         OptionalDouble angularVelocityOverride =
                 ChassisHeadingController.getInstance().calculate(getMeasuredChassisSpeedsFieldRelative(), getPose());
+        ChassisSpeeds speeds = setpoint.robotRelativeSpeeds();
+
         if (angularVelocityOverride.isPresent()) {
             speeds = new ChassisSpeeds(
                     speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, angularVelocityOverride.getAsDouble());
@@ -166,8 +192,8 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
         for (int i = 0; i < 4; i++)
             optimizedSetpointStates[i] = swerveModules[i].runSetPoint(
                     setPointStates[i],
-                    feedforwards.robotRelativeForcesX()[i],
-                    feedforwards.robotRelativeForcesY()[i]);
+                    setpoint.feedforwards().robotRelativeForcesX()[i],
+                    setpoint.feedforwards().robotRelativeForcesY()[i]);
 
         Logger.recordOutput("SwerveStates/Setpoints", setPointStates);
         Logger.recordOutput("SwerveStates/SetpointsOptimized", optimizedSetpointStates);
@@ -259,6 +285,15 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
         return CHASSIS_MAX_ANGULAR_ACCELERATION.in(RadiansPerSecondPerSecond);
     }
 
+    private Subsystem accelerationConstrainLock = new Subsystem() {};
+
+    public Command withAccelerationConstrain(LinearAcceleration accelerationConstrain) {
+        return Commands.startEnd(
+                () -> this.accelerationConstrain = accelerationConstrain,
+                () -> this.accelerationConstrain = ACCELERATION_CONSTRAIN_NORMAL,
+                accelerationConstrainLock);
+    }
+
     private void startDashboardDisplay() {
         SmartDashboard.putData("Swerve Drive", builder -> {
             builder.setSmartDashboardType("SwerveDrive");
@@ -291,14 +326,6 @@ public class SwerveDrive extends MapleSubsystem implements HolonomicDriveSubsyst
                     null);
         });
     }
-
-    private boolean hasHardwareFaults() {
-        if (!gyroInputs.connected) return true;
-        for (SwerveModule module : swerveModules) if (module.hasHardwareFaults()) return true;
-        return false;
-    }
-
-    public final Trigger hardwareFaultsDetected = new Trigger(this::hasHardwareFaults);
 
     public double getCanBusUtilization() {
         return canBusInputs.utilization;

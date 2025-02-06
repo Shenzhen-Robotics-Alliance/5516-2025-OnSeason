@@ -29,7 +29,6 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
-import frc.robot.Robot;
 import frc.robot.generated.TunerConstants;
 import java.util.Queue;
 
@@ -135,7 +134,7 @@ public class ModuleIOTalon implements ModuleIO {
         // Configure periodic frames
         BaseStatusSignal.setUpdateFrequencyForAll(ODOMETRY_FREQUENCY, driveRotterPosition, steerAbsolutePosition);
         BaseStatusSignal.setUpdateFrequencyForAll(
-                1 / Robot.defaultPeriodSecs,
+                100.0,
                 driveRotterVelocity,
                 driveAppliedVoltage,
                 driveMotorCurrentDrawn,
