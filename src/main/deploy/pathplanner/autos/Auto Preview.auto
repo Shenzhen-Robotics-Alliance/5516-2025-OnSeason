@@ -7,43 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "place first"
+            "pathName": "auto2 - place first"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "grab second"
+            "pathName": "auto2 - grab second"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "place second"
+            "pathName": "auto2 - place second"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "grab third"
+            "pathName": "auto2 - grab third"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "place third"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "grab fourth"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "score fourth"
+            "pathName": "auto2 - place fourth"
           }
         }
       ]
@@ -51,5 +39,5 @@
   },
   "resetOdom": true,
   "folder": null,
-  "choreoAuto": false
+  "choreoAuto": true
 }

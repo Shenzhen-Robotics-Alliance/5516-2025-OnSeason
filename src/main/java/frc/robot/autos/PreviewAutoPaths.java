@@ -11,7 +11,7 @@ import frc.robot.commands.reefscape.ReefAlignment;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
-public class ExampleCustomAutoWithChoreoTrajectories2 implements Auto {
+public class PreviewAutoPaths implements Auto {
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();

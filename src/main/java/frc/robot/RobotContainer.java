@@ -5,12 +5,10 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -105,16 +103,6 @@ public class RobotContainer {
                         new ModuleIOTalon(TunerConstants.BackLeft, "BackLeft"),
                         new ModuleIOTalon(TunerConstants.BackRight, "BackRight"));
 
-                /* REV Chassis */
-                //                drive = new SwerveDrive(
-                //                        SwerveDrive.DriveType.CTRE_ON_CANIVORE,
-                //                        new GyroIOPigeon2(TunerConstants.DrivetrainConstants),
-                //                        new ModuleIOSpark(0),
-                //                        new ModuleIOSpark(1),
-                //                        new ModuleIOSpark(2),
-                //                        new ModuleIOSpark(3)
-                //                );
-
                 aprilTagVision = new AprilTagVision(new AprilTagVisionIOReal(camerasProperties), camerasProperties);
             }
 
@@ -198,32 +186,14 @@ public class RobotContainer {
         SmartDashboard.putData("Field", field);
     }
 
-    private void configureAutoNamedCommands() {
-        // TODO: bind your named commands during auto here
-        NamedCommands.registerCommand(
-                "my named command", Commands.runOnce(() -> System.out.println("my named command executing!!!")));
-    }
+    private void configureAutoNamedCommands() {}
 
-    private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {
-
-        pathPlannerAuto.event("hello world").onTrue(Commands.runOnce(() -> System.out.println("hello world!!!")));
-    }
+    private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
 
     private LoggedDashboardChooser<Auto> buildAutoChooser() {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With PathPlanner Trajectories",
-                new ExampleCustomAutoWithPathPlannerTrajectories());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With Choreo Trajectories", new ExampleCustomAutoWithChoreoTrajectories());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With Choreo Trajectories 2", new ExampleCustomAutoWithChoreoTrajectories2());
-        autoSendableChooser.addOption(
-                "Example Pathplanner GUI Auto", new PathPlannerAutoWrapper("Example Auto PathPlanner"));
-        autoSendableChooser.addOption("Example Face To Target", new ExampleFaceToTarget());
-        autoSendableChooser.addOption("Example Auto Alignment", new ExampleCustomAutoWithAutoAlignment());
-        // TODO: add your autos here
+        autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
@@ -240,7 +210,6 @@ public class RobotContainer {
                 "Drive SysId- Dynamic - Forward", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         testsChooser.addOption(
                 "Drive SysId- Dynamic - Reverse", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        // TODO add your tests here (system identification and etc.)
         return testsChooser;
     }
 
@@ -321,26 +290,10 @@ public class RobotContainer {
         /* lock chassis with x-formation */
         driver.lockChassisWithXFormatButton().whileTrue(drive.lockChassisWithXFormation());
 
-        /* TODO: aim at target and drive example, delete it for your project */
-        Command exampleFaceTargetWhileDriving = JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
-                driveInput,
-                drive,
-                () -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation2d(3.17, 4.15)),
-                null,
-                0.75,
-                false);
-        // driver.faceToTargetButton().whileTrue(FaceCoralStation.faceCoralStation(drive, driveInput));
-
         /* auto alignment example, delete it for your project */
         driver.autoAlignmentButtonLeft().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, false));
         driver.autoAlignmentButtonRight().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, true));
 
-        //        new Trigger(() -> operator.getRightX() > 0.5).whileTrue(ReefAlignment.previousTargetButton(0.3));
-        //        new Trigger(() -> operator.getRightX() < -0.5).whileTrue(ReefAlignment.nextTargetButton(0.3));
-        //        driver.povUp().onTrue(ReefAlignment.selectReefPartButton(3));
-        //        driver.povDown().onTrue(ReefAlignment.selectReefPartButton(0));
-        //        driver.povLeft().whileTrue(ReefAlignment.lefterTargetButton(0.3));
-        //        driver.povRight().whileTrue(ReefAlignment.righterTargetButton(0.3));
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3));
         operator.a().onTrue(ReefAlignment.selectReefPartButton(0));
         operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3));
