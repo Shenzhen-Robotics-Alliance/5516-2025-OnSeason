@@ -9,7 +9,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.RobotMode;
-import frc.robot.subsystems.MapleSubsystem;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -78,9 +77,8 @@ public class Robot extends LoggedRobot {
     /** This function is called periodically during all modes. */
     @Override
     public void robotPeriodic() {
-        MapleSubsystem.checkForOnDisableAndEnable();
         CommandScheduler.getInstance().run();
-        robotContainer.updateDashboardDisplay();
+        robotContainer.updateTelemetryAndLED();
     }
 
     /** This function is called once when the robot is disabled. */

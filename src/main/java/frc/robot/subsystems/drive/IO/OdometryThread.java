@@ -4,10 +4,10 @@ import static frc.robot.constants.DriveTrainConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.Robot;
 import frc.robot.subsystems.drive.OdometryThreadReal;
 import frc.robot.subsystems.drive.SwerveDrive;
-import frc.robot.utils.MapleTimeUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
@@ -34,7 +34,6 @@ public interface OdometryThread {
     List<BaseStatusSignal> registeredStatusSignals = new ArrayList<>();
 
     static <T> Queue<T> registerSignalSignal(StatusSignal<T> signal) {
-        signal.setUpdateFrequency(ODOMETRY_FREQUENCY, ODOMETRY_WAIT_TIMEOUT_SECONDS);
         registeredStatusSignals.add(signal);
         return registerInput(signal.asSupplier());
     }
@@ -73,7 +72,7 @@ public interface OdometryThread {
         @Override
         public void updateInputs(OdometryThreadInputs inputs) {
             inputs.measurementTimeStamps = new double[SIMULATION_TICKS_IN_1_PERIOD];
-            final double robotStartingTimeStamps = MapleTimeUtils.getLogTimeSeconds(),
+            final double robotStartingTimeStamps = Timer.getTimestamp(),
                     iterationPeriodSeconds = Robot.defaultPeriodSecs / SIMULATION_TICKS_IN_1_PERIOD;
             for (int i = 0; i < SIMULATION_TICKS_IN_1_PERIOD; i++)
                 inputs.measurementTimeStamps[i] = robotStartingTimeStamps + i * iterationPeriodSeconds;

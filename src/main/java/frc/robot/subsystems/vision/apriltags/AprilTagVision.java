@@ -11,15 +11,16 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.RobotState;
-import frc.robot.subsystems.MapleSubsystem;
+import frc.robot.utils.AlertsManager;
 import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import org.littletonrobotics.junction.Logger;
 
-public class AprilTagVision extends MapleSubsystem {
+public class AprilTagVision extends SubsystemBase {
     private final AprilTagVisionIO io;
     private final AprilTagVisionIO.VisionInputs inputs;
 
@@ -29,17 +30,16 @@ public class AprilTagVision extends MapleSubsystem {
     private final Debouncer[] camerasNoResultDebouncer;
 
     public AprilTagVision(AprilTagVisionIO io, List<PhotonCameraProperties> camerasProperties) {
-        super("Vision");
         this.io = io;
         this.inputs = new AprilTagVisionIO.VisionInputs(camerasProperties.size());
         this.camerasDisconnectedAlerts = new Alert[camerasProperties.size()];
         this.camerasNoResultAlerts = new Alert[camerasProperties.size()];
         this.camerasNoResultDebouncer = new Debouncer[camerasProperties.size()];
         for (int i = 0; i < camerasProperties.size(); i++) {
-            this.camerasDisconnectedAlerts[i] = new Alert(
+            this.camerasDisconnectedAlerts[i] = AlertsManager.create(
                     "Photon Camera " + i + " '" + camerasProperties.get(i).name + "' disconnected",
                     Alert.AlertType.kError);
-            this.camerasNoResultAlerts[i] = new Alert(
+            this.camerasNoResultAlerts[i] = AlertsManager.create(
                     "Photon Camera " + i + " '" + camerasProperties.get(i).name + "' no result",
                     Alert.AlertType.kWarning);
             this.camerasNoResultDebouncer[i] = new Debouncer(0.5);
@@ -53,7 +53,7 @@ public class AprilTagVision extends MapleSubsystem {
     private Optional<MapleMultiTagPoseEstimator.VisionObservation> result = Optional.empty();
 
     @Override
-    public void periodic(double dt, boolean enabled) {
+    public void periodic() {
         io.updateInputs(inputs);
         Logger.processInputs(APRIL_TAGS_VISION_PATH + "Inputs", inputs);
 

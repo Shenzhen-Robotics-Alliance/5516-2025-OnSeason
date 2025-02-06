@@ -4,6 +4,7 @@ package frc.robot.subsystems.drive;
 import static frc.robot.constants.DriveTrainConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.drive.IO.OdometryThread;
 import frc.robot.utils.MapleTimeUtils;
 import java.util.Queue;
@@ -54,14 +55,14 @@ public class OdometryThreadReal extends Thread implements OdometryThread {
             case GENERIC -> MapleTimeUtils.delay(1.0 / ODOMETRY_FREQUENCY);
             case CTRE_ON_RIO -> {
                 MapleTimeUtils.delay(1.0 / ODOMETRY_FREQUENCY);
-                BaseStatusSignal.refreshAll();
+                BaseStatusSignal.refreshAll(statusSignals);
             }
             case CTRE_ON_CANIVORE -> BaseStatusSignal.waitForAll(ODOMETRY_WAIT_TIMEOUT_SECONDS, statusSignals);
         }
     }
 
     private double estimateAverageTimeStamps() {
-        double currentTime = MapleTimeUtils.getRealTimeSeconds(), totalLatency = 0;
+        double currentTime = Timer.getFPGATimestamp(), totalLatency = 0;
         for (BaseStatusSignal signal : statusSignals)
             totalLatency += signal.getTimestamp().getLatency();
 
