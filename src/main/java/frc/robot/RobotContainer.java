@@ -294,10 +294,10 @@ public class RobotContainer {
         driver.autoAlignmentButtonLeft().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, false));
         driver.autoAlignmentButtonRight().whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, true));
 
-        operator.y().onTrue(ReefAlignment.selectReefPartButton(3));
-        operator.a().onTrue(ReefAlignment.selectReefPartButton(0));
-        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3));
-        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3));
+        operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
+        operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
+        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
+        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3).ignoringDisable(true));
     }
 
     public void configureLEDEffects() {
