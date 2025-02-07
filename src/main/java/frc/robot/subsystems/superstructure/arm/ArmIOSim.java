@@ -38,6 +38,7 @@ public class ArmIOSim implements ArmIO {
         this.requestedVoltage = Volts.zero();
 
         SimulatedBattery.addElectricalAppliances(this::getSupplyCurrent);
+        armSim.update(0.0);
     }
 
     @Override
@@ -51,7 +52,6 @@ public class ArmIOSim implements ArmIO {
 
         armSim.setInputVoltage(actualOutputVoltage.in(Volts));
         armSim.update(Robot.defaultPeriodSecs);
-        System.out.println("arm sim angle: " + Math.toDegrees(armSim.getAngleRads()));
 
         armInputs.absoluteEncoderAngle = Optional.of(Rotation2d.fromRadians(armSim.getAngleRads()));
         armInputs.motorConnected = true;

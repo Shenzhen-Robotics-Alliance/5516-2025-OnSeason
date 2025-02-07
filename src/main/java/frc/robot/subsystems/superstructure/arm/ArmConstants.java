@@ -30,15 +30,13 @@ public final class ArmConstants {
 
     // PID Configuration
     public static final double kS = 0.05;
-    public static final double kG = 0.17;
-    public static final double kV = 1.2;
+    public static final double kG = 0.16;
+    public static final double kV = 1.71;
     public static final double kA = 0.01;
-    public static final double kP_STRONG = 9.0 / Math.toRadians(30);
-    public static final double kP_WEAK = 3.0 / Math.toRadians(30);
+    public static final double kP = 9.0 / Math.toRadians(30);
     public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS =
             new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(500));
     public static final Angle ARM_PID_TOLERANCE = Degrees.of(4);
-    public static final AngularVelocity ARM_MOVING_VELOCITY_THRESHOLD = DegreesPerSecond.of(5);
 
     // Simulation Constants
     public static final Distance ARM_LENGTH = Centimeters.of(25);

@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.utils.AlertsManager;
-import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class Arm extends SubsystemBase {
@@ -27,8 +26,7 @@ public class Arm extends SubsystemBase {
 
     // Controllers
     private final ArmFeedforward feedforwardController;
-    private final PIDController strongFeedbackController;
-    private final PIDController weakFeedbackController;
+    private final PIDController feedbackController;
     private final TrapezoidProfile profile;
 
     // Alerts
@@ -52,15 +50,14 @@ public class Arm extends SubsystemBase {
     private TrapezoidProfile.State currentStateRad;
 
     /** The desired angle. */
-    private Optional<Angle> setpoint;
+    private Angle setpoint;
 
     public Arm(ArmIO io) {
         this.io = io;
         inputs = new ArmIO.ArmInputs();
 
         this.feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
-        this.strongFeedbackController = new PIDController(kP_STRONG, 0, 0);
-        this.weakFeedbackController = new PIDController(kP_WEAK, 0, 0);
+        this.feedbackController = new PIDController(kP, 0, 0);
         this.profile = new TrapezoidProfile(PROFILE_CONSTRAINS);
 
         this.armHardwareFaultsAlert = AlertsManager.create("Arm hardware faults detected!", Alert.AlertType.kError);
@@ -75,7 +72,7 @@ public class Arm extends SubsystemBase {
         this.armAbsoluteEncoderDisconnectedAlert.set(false);
 
         currentStateRad = new TrapezoidProfile.State(ARM_UPPER_LIMIT.in(Radians), 0);
-        setpoint = Optional.empty();
+        setpoint = ArmPosition.IDLE.angle;
 
         hardwareFaultDetected = false;
         encoderCalibrated = false;
@@ -113,7 +110,7 @@ public class Arm extends SubsystemBase {
     private double previousVelocityRadPerSec = 0.0;
 
     /** Runs the control loops on the arm to achieve the setpoint. */
-    private void executeControlLoops(Angle setpoint) {
+    private void executeControlLoops() {
         TrapezoidProfile.State goalState = new TrapezoidProfile.State(setpoint.in(Radians), 0);
         currentStateRad = profile.calculate(Robot.defaultPeriodSecs, currentStateRad, goalState);
 
@@ -121,9 +118,6 @@ public class Arm extends SubsystemBase {
                 (currentStateRad.velocity - previousVelocityRadPerSec) / Robot.defaultPeriodSecs;
         double feedforwardVolts = feedforwardController.calculate(
                 getArmAngle().getRadians(), currentStateRad.velocity, accelerationRadPerSecSq);
-        boolean armRequestedToMove =
-                Math.abs(currentStateRad.velocity) > ARM_MOVING_VELOCITY_THRESHOLD.in(RadiansPerSecond);
-        PIDController feedbackController = armRequestedToMove ? strongFeedbackController : weakFeedbackController;
         double feedbackVolts = feedbackController.calculate(getArmAngle().getRadians(), currentStateRad.position);
 
         Voltage voltage = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
@@ -136,14 +130,15 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
+        if (DriverStation.isEnabled()) executeControlLoops();
+        else executeIdle();
+
         // Calibrates encoder if needed when the robot is disabled and the motor is connected.
         if (!encoderCalibrated && DriverStation.isDisabled() && inputs.motorConnected)
             inputs.absoluteEncoderAngle.ifPresent(this::calibrateEncoders);
 
-        // Disable PID setpoint if the robot is disabled.
-        if (DriverStation.isDisabled()) setpoint = Optional.empty();
         // Run setpoints (or run idle if no setpoint).
-        setpoint.ifPresentOrElse(this::executeControlLoops, this::executeIdle);
+        this.executeControlLoops();
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.motorConnected);
@@ -152,9 +147,8 @@ public class Arm extends SubsystemBase {
         armNotCalibratedAlert.set(!encoderCalibrated);
         armAbsoluteEncoderDisconnectedAlert.set(inputs.absoluteEncoderAngle.isEmpty());
 
-        Logger.recordOutput(
-                "Arm/SetpointDeg", setpoint.map(angle -> angle.in(Degrees)).orElse(-1.0));
-        Logger.recordOutput("Arm/MeasuredAngleDeg", getArmAngle().getDegrees());
+        Logger.recordOutput("Arm/Setpoint (Degrees)", setpoint.in(Degrees));
+        Logger.recordOutput("Arm/MeasuredAngle (Degrees)", getArmAngle().getDegrees());
     }
 
     /**
@@ -163,19 +157,13 @@ public class Arm extends SubsystemBase {
      * @return <code>true</code> if there is a setpoint and the arm is close enough to it, <code>false</code> otherwise.
      */
     public boolean atReference() {
-        if (setpoint.isEmpty()) return false;
-
-        double errorRad = getArmAngle().minus(new Rotation2d(setpoint.get())).getRadians();
+        double errorRad = getArmAngle().minus(new Rotation2d(setpoint)).getRadians();
         return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
     }
 
-    /**
-     * Moves to a given angle, holds there until interrupted, then cancels the setpoint.
-     *
-     * <p><b>Note: This command is NEVER finished, unless interrupted.</b>
-     */
-    public Command moveToAndMaintainPosition(ArmPosition setpoint) {
-        return runEnd(() -> this.setpoint = Optional.of(setpoint.angle), () -> this.setpoint = Optional.empty());
+    /** Request the arm to move to a given setpoint. */
+    public void requestPosition(ArmPosition setpoint) {
+        this.setpoint = setpoint.angle;
     }
 
     /**
@@ -187,7 +175,7 @@ public class Arm extends SubsystemBase {
      * schedule.</b>
      */
     public Command moveToPosition(ArmPosition setpoint) {
-        return moveToAndMaintainPosition(setpoint).until(this::atReference);
+        return run(() -> requestPosition(setpoint)).until(this::atReference);
     }
 
     /** @return the measured arm angle, where zero is horizontally forward. */

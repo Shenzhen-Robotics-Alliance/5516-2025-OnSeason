@@ -35,6 +35,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
         this.simMotorController = new SimulatedMotorController.GenericMotorController(ELEVATOR_GEARBOX);
         SimulatedBattery.addElectricalAppliances(this::getSupplyCurrent);
+        elevatorSim.update(0.0);
     }
 
     @Override
@@ -67,6 +68,6 @@ public class ElevatorIOSim implements ElevatorIO {
 
     @Override
     public void setMotorOutput(Voltage voltage) {
-        ElevatorIO.super.setMotorOutput(voltage);
+        this.requestedVoltage = voltage;
     }
 }

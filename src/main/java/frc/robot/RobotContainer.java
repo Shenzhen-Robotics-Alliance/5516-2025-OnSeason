@@ -323,25 +323,25 @@ public class RobotContainer {
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
         elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
-        arm.setDefaultCommand(arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.IDLE));
+        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
         driver.intakeButton()
-                .whileTrue(coralHolder
-                        .intakeCoralSequence()
-                        .alongWith(
-                                elevator.moveToAndMaintainPosition(Centimeters.of(5)),
-                                arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.INTAKE)));
+                .whileTrue(Commands.sequence(
+                        elevator.moveToPosition(Centimeters.of(5))
+                                .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
+                        coralHolder.intakeCoralSequence()));
         driver.moveToL4Button()
                 .onTrue(Commands.sequence(
-                                arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
-                                elevator.moveToPosition(Meters.of(1.34)),
-                                arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.SCORE_L4)
-                                        .alongWith(coralHolder.shuffleCoralSequence()))
-                        .deadlineFor(Commands.print("moving to L4...").repeatedly()));
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        elevator.moveToPosition(Meters.of(1.34)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4)
+                                .alongWith(coralHolder.shuffleCoralSequence()),
+                        Commands.waitUntil(() -> false)));
         driver.moveToL3Button()
                 .onTrue(Commands.sequence(
                         arm.moveToPosition(ArmConstants.ArmPosition.IDLE),
                         elevator.moveToPosition(Meters.of(0.62)),
-                        arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3)));
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3),
+                        Commands.waitUntil(() -> false)));
         driver.moveToL2Button()
                 .onTrue(Commands.sequence(
                         arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),

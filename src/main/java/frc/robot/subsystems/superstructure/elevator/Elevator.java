@@ -17,7 +17,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.utils.AlertsManager;
-import java.util.Optional;
 import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
@@ -45,7 +44,7 @@ public class Elevator extends SubsystemBase {
     private TrapezoidProfile.State currentStateMeters;
 
     /** The desired height. */
-    private Optional<Distance> heightSetpoint;
+    private Distance heightSetpoint;
 
     public Elevator(ElevatorIO io) {
         this.io = io;
@@ -64,7 +63,7 @@ public class Elevator extends SubsystemBase {
         this.elevatorHardwareFaultsAlert.set(false);
 
         this.currentStateMeters = new TrapezoidProfile.State(0, 0);
-        this.heightSetpoint = Optional.empty();
+        this.heightSetpoint = Meters.zero();
 
         io.setMotorBrake(true);
     }
@@ -85,7 +84,7 @@ public class Elevator extends SubsystemBase {
     private double previousVelocityMPS = 0.0;
 
     /** Runs the control loops on the elevator to achieve the setpoint. */
-    private void executeControlLoops(Distance heightSetpoint) {
+    private void executeControlLoops() {
         TrapezoidProfile.State goalState = new TrapezoidProfile.State(heightSetpoint.in(Meters), 0);
         currentStateMeters = profile.calculate(Robot.defaultPeriodSecs, currentStateMeters, goalState);
 
@@ -124,8 +123,7 @@ public class Elevator extends SubsystemBase {
      *     otherwise.
      */
     public boolean atReference() {
-        if (heightSetpoint.isEmpty()) return false;
-        return getHeight().minus(heightSetpoint.get()).abs(Meters) < ELEVATOR_PID_TOLERANCE.in(Meters);
+        return getHeight().minus(heightSetpoint).abs(Meters) < ELEVATOR_PID_TOLERANCE.in(Meters);
     }
 
     @Override
@@ -135,9 +133,9 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
 
         // Disable PID setpoint if the robot is disabled.
-        if (DriverStation.isDisabled()) heightSetpoint = Optional.empty();
-        // Run setpoints (or run idle if no setpoint).
-        heightSetpoint.ifPresentOrElse(this::executeControlLoops, this::executeIdle);
+        if (DriverStation.isDisabled()) executeIdle();
+        // Run setpoints
+        else this.executeControlLoops();
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
@@ -151,23 +149,23 @@ public class Elevator extends SubsystemBase {
                     "Elevator height exceeds higher limit: " + getHeight().in(Meters) + " Meters");
             elevatorExceedLimitAlert.set(true);
         } else elevatorExceedLimitAlert.set(false);
+
+        Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpoint.in(Meters));
+        Logger.recordOutput("Elevator/Measured Height (Meters)", getHeight().in(Meters));
+    }
+
+    public void requestElevatorHeight(Distance elevatorHeightSetpoint) {
+        this.heightSetpoint = elevatorHeightSetpoint;
     }
 
     /**
-     * Moves to a given height, holds there until interrupted, then cancels the setpoint.
+     * Moves to a given height until target is within tolerance.
      *
-     * <p>When the setpoint is canceled, the elevator will slide down due to gravity.
-     *
-     * <p><b>Note: This command is NEVER finished, unless interrupted.</b>
+     * <p><b>Note: This command finishes when the elevator reaches the setpoint, causing the default command to
+     * schedule.</b>
      */
-    public Command moveToAndMaintainPosition(Distance elevatorHeightSetpoint) {
-        return runEnd(
-                () -> this.heightSetpoint = Optional.of(elevatorHeightSetpoint),
-                () -> this.heightSetpoint = Optional.empty());
-    }
-
     public Command moveToPosition(Distance elevatorHeightSetpoint) {
-        return moveToAndMaintainPosition(elevatorHeightSetpoint).until(this::atReference);
+        return run(() -> requestElevatorHeight(elevatorHeightSetpoint)).until(this::atReference);
     }
 
     /**
