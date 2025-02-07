@@ -140,11 +140,11 @@ public class Elevator extends SubsystemBase {
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
         elevatorHardwareFaultsAlert.set(hardwareFaultDetected);
-        if (getHeight().minus(ELEVATOR_PID_TOLERANCE).lt(Meters.zero())) {
+        if (getHeight().plus(ELEVATOR_PID_TOLERANCE).lt(Meters.zero())) {
             elevatorExceedLimitAlert.setText(
                     "Elevator height exceeds lower limit: " + getHeight().in(Meters) + " Meters");
             elevatorExceedLimitAlert.set(true);
-        } else if (getHeight().plus(ELEVATOR_PID_TOLERANCE).gt(ELEVATOR_MAX_HEIGHT)) {
+        } else if (getHeight().minus(ELEVATOR_PID_TOLERANCE).gt(ELEVATOR_MAX_HEIGHT)) {
             elevatorExceedLimitAlert.setText(
                     "Elevator height exceeds higher limit: " + getHeight().in(Meters) + " Meters");
             elevatorExceedLimitAlert.set(true);

@@ -145,7 +145,7 @@ public class Arm extends SubsystemBase {
         if (hardwareFaultDetected) encoderCalibrated = false;
         armHardwareFaultsAlert.set(hardwareFaultDetected);
         armNotCalibratedAlert.set(!encoderCalibrated);
-        armAbsoluteEncoderDisconnectedAlert.set(inputs.absoluteEncoderAngle.isEmpty());
+        armAbsoluteEncoderDisconnectedAlert.set(encoderCalibrated && inputs.absoluteEncoderAngle.isEmpty());
 
         Logger.recordOutput("Arm/Setpoint (Degrees)", setpoint.in(Degrees));
         Logger.recordOutput("Arm/MeasuredAngle (Degrees)", getArmAngle().getDegrees());

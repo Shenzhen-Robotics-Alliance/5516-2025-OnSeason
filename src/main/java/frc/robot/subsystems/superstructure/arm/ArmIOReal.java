@@ -33,7 +33,7 @@ public class ArmIOReal implements ArmIO {
      * Angle. Offset Angle = Encoder Angle - Real Angle.
      */
     private static final Rotation2d ABSOLUTE_ENCODER_OFFSET =
-            new Rotation2d(ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT.minus(ARM_UPPER_LIMIT));
+            new Rotation2d(ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT).minus(new Rotation2d(ARM_UPPER_LIMIT));
 
     // Hardware
     private final TalonFX armTalon;
@@ -72,8 +72,8 @@ public class ArmIOReal implements ArmIO {
     public void updateInputs(ArmInputs inputs) {
         // Obtain absolute encoder readings
         inputs.absoluteEncoderAngle = absoluteEncoder.isConnected()
-                ? Optional.empty()
-                : Optional.of(Rotation2d.fromRotations(absoluteEncoder.get()).minus(ABSOLUTE_ENCODER_OFFSET));
+                ? Optional.of(Rotation2d.fromRotations(absoluteEncoder.get()).minus(ABSOLUTE_ENCODER_OFFSET))
+                : Optional.empty();
 
         // Refresh signals
         StatusCode statusCode = BaseStatusSignal.refreshAll(
@@ -86,6 +86,7 @@ public class ArmIOReal implements ArmIO {
         inputs.motorOutputVoltage = motorOutputVoltage.getValue();
 
         SmartDashboard.putNumber("Arm/Raw Encoder Reading", absoluteEncoder.get());
+        SmartDashboard.putBoolean("Arm/Absolute Encoder Connected", absoluteEncoder.isConnected());
     }
 
     private VoltageOut voltageOut = new VoltageOut(Volts.zero());
