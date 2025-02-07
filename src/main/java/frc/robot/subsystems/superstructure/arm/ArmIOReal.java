@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure.arm;
 
 import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -68,9 +69,9 @@ public class ArmIOReal implements ArmIO {
     }
 
     @Override
-    public void updateInputs(ArmInputs armInputs) {
+    public void updateInputs(ArmInputs inputs) {
         // Obtain absolute encoder readings
-        armInputs.absoluteEncoderAngle = absoluteEncoder.isConnected()
+        inputs.absoluteEncoderAngle = absoluteEncoder.isConnected()
                 ? Optional.empty()
                 : Optional.of(Rotation2d.fromRotations(absoluteEncoder.get()).minus(ABSOLUTE_ENCODER_OFFSET));
 
@@ -78,18 +79,20 @@ public class ArmIOReal implements ArmIO {
         StatusCode statusCode = BaseStatusSignal.refreshAll(
                 relativeEncoderAngle, relativeEncoderVelocity, motorSupplyCurrent, motorOutputVoltage);
         // Obtain Motor Readings
-        armInputs.motorConnected = statusCode.isOK();
-        armInputs.relativeMechanismAngle = relativeEncoderAngle.getValue().div(ARM_GEARING_REDUCTION);
-        armInputs.mechanismVelocity = relativeEncoderVelocity.getValue().div(ARM_GEARING_REDUCTION);
-        armInputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
-        armInputs.motorOutputVoltage = motorOutputVoltage.getValue();
+        inputs.motorConnected = statusCode.isOK();
+        inputs.relativeEncoderAngle = relativeEncoderAngle.getValue();
+        inputs.encoderVelocity = relativeEncoderVelocity.getValue();
+        inputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
+        inputs.motorOutputVoltage = motorOutputVoltage.getValue();
 
         SmartDashboard.putNumber("Arm/Raw Encoder Reading", absoluteEncoder.get());
     }
 
+    private VoltageOut voltageOut = new VoltageOut(Volts.zero());
+
     @Override
     public void setMotorOutput(Voltage voltage) {
-        VoltageOut voltageOut = new VoltageOut(voltage);
+        voltageOut.withOutput(voltage);
         armTalon.setControl(voltageOut);
     }
 

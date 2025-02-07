@@ -38,6 +38,7 @@ public final class ArmConstants {
     public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS =
             new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(500));
     public static final Angle ARM_PID_TOLERANCE = Degrees.of(4);
+    public static final AngularVelocity ARM_MOVING_VELOCITY_THRESHOLD = DegreesPerSecond.of(5);
 
     // Simulation Constants
     public static final Distance ARM_LENGTH = Centimeters.of(25);

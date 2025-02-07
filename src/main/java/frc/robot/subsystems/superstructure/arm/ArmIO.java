@@ -21,11 +21,11 @@ public interface ArmIO {
         /** Whether the CAN communications between the rio and the motor are good. */
         public boolean motorConnected;
 
-        /** The relative (final) mechanism angle, measured by the relative encoder. Gearing is already considered. */
-        public Angle relativeMechanismAngle;
+        /** The relative encoder angle, measured by the relative encoder. Gearing is NOT considered. */
+        public Angle relativeEncoderAngle;
 
-        /** The (final) mechanism velocity, measured by the relative encoder. Gearing is already considered. */
-        public AngularVelocity mechanismVelocity;
+        /** The relative encoder velocity, measured by the relative encoder. Gearing is NOT considered. */
+        public AngularVelocity encoderVelocity;
 
         /** The supply current of the motor. */
         public Current motorSupplyCurrent;
@@ -36,8 +36,8 @@ public interface ArmIO {
         public ArmInputs() {
             this.absoluteEncoderAngle = Optional.empty();
             motorConnected = false;
-            this.relativeMechanismAngle = Rotations.zero();
-            this.mechanismVelocity = RotationsPerSecond.zero();
+            this.relativeEncoderAngle = Rotations.zero();
+            this.encoderVelocity = RotationsPerSecond.zero();
             this.motorSupplyCurrent = Amps.zero();
             this.motorOutputVoltage = Volts.zero();
         }
@@ -47,8 +47,8 @@ public interface ArmIO {
             table.put("absoluteEncoderAnglePresent", absoluteEncoderAngle.isPresent());
             table.put("absoluteEncoderAngle", absoluteEncoderAngle.orElse(Rotation2d.kZero));
             table.put("motorConnected", motorConnected);
-            table.put("relativeEncoderAngle", relativeMechanismAngle);
-            table.put("relativeEncoderVelocity", mechanismVelocity);
+            table.put("relativeEncoderAngle", relativeEncoderAngle);
+            table.put("encoderVelocity", encoderVelocity);
             table.put("motorSupplyCurrent", motorSupplyCurrent);
             table.put("motorOutputVoltage", motorOutputVoltage);
         }
@@ -60,7 +60,8 @@ public interface ArmIO {
                     ? Optional.of(table.get("absoluteEncoderAngle", Rotation2d.kZero))
                     : Optional.empty();
             motorConnected = table.get("motorConnected", motorConnected);
-            relativeMechanismAngle = table.get("relativeEncoderAngle", Rotations.zero());
+            relativeEncoderAngle = table.get("relativeEncoderAngle", Rotations.zero());
+            encoderVelocity = table.get("encoderVelocity", encoderVelocity);
             motorSupplyCurrent = table.get("motorSupplyCurrent", Amps.zero());
             motorOutputVoltage = table.get("motorOutputVoltage", Volts.zero());
         }

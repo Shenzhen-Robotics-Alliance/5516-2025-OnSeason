@@ -5,9 +5,13 @@ import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
+import frc.robot.Robot;
 import java.util.Optional;
+import org.ironmaple.simulation.motorsims.SimulatedBattery;
 import org.ironmaple.simulation.motorsims.SimulatedMotorController;
 
 public class ArmIOSim implements ArmIO {
@@ -30,23 +34,33 @@ public class ArmIOSim implements ArmIO {
 
         this.simMotorController =
                 new SimulatedMotorController.GenericMotorController(ARM_GEARBOX).withCurrentLimit(ARM_CURRENT_LIMIT);
-        this.relativeEncoderOffset = Rotations.of((Math.random() - 0.5) * 5);
+        this.relativeEncoderOffset = Rotations.of((Math.random() - 0.5) * 10);
+
+        SimulatedBattery.addElectricalAppliances(this::getSupplyCurrent);
     }
 
     @Override
     public void updateInputs(ArmInputs armInputs) {
-        Voltage actualOutputVoltage = simMotorController.constrainOutputVoltage(
-                Radians.of(armSim.getAngleRads() * ARM_GEARING_REDUCTION),
-                RadiansPerSecond.of(armSim.getVelocityRadPerSec() * ARM_GEARING_REDUCTION),
-                requestedVoltage);
+        Angle motorAngle = Radians.of(armSim.getAngleRads() * ARM_GEARING_REDUCTION);
+        AngularVelocity motorAngularVelocity =
+                RadiansPerSecond.of(armSim.getVelocityRadPerSec() * ARM_GEARING_REDUCTION);
+        Voltage actualOutputVoltage =
+                simMotorController.constrainOutputVoltage(motorAngle, motorAngularVelocity, requestedVoltage);
+        actualOutputVoltage = SimulatedBattery.clamp(actualOutputVoltage);
+
         armSim.setInputVoltage(actualOutputVoltage.in(Volts));
+        armSim.update(Robot.defaultPeriodSecs);
 
         armInputs.absoluteEncoderAngle = Optional.of(Rotation2d.fromRadians(armSim.getAngleRads()));
         armInputs.motorConnected = true;
-        armInputs.relativeMechanismAngle = Radians.of(armSim.getAngleRads()).plus(relativeEncoderOffset);
-        armInputs.mechanismVelocity = RadiansPerSecond.of(armSim.getVelocityRadPerSec());
+        armInputs.relativeEncoderAngle = motorAngle.plus(relativeEncoderOffset);
+        armInputs.encoderVelocity = motorAngularVelocity;
         armInputs.motorSupplyCurrent = Amps.of(armSim.getCurrentDrawAmps());
         armInputs.motorOutputVoltage = actualOutputVoltage;
+    }
+
+    private Current getSupplyCurrent() {
+        return Amps.of(armSim.getCurrentDrawAmps());
     }
 
     @Override
