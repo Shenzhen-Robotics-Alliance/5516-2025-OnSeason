@@ -91,6 +91,9 @@ public class Arm extends SubsystemBase {
 
     /** Calibrates the relative encoder offset using the absolute encoder reading. */
     private void calibrateEncoders(Rotation2d absoluteEncoderAngle) {
+        // real = relative - offset
+        // so
+        // offset = relative - real
         relativeEncoderOffset =
                 new Rotation2d(inputs.relativeEncoderAngle.div(ARM_GEARING_REDUCTION)).minus(absoluteEncoderAngle);
         encoderCalibrated = true;
@@ -148,6 +151,10 @@ public class Arm extends SubsystemBase {
         armHardwareFaultsAlert.set(hardwareFaultDetected);
         armNotCalibratedAlert.set(!encoderCalibrated);
         armAbsoluteEncoderDisconnectedAlert.set(inputs.absoluteEncoderAngle.isEmpty());
+
+        Logger.recordOutput(
+                "Arm/SetpointDeg", setpoint.map(angle -> angle.in(Degrees)).orElse(-1.0));
+        Logger.recordOutput("Arm/MeasuredAngleDeg", getArmAngle().getDegrees());
     }
 
     /**
@@ -167,8 +174,8 @@ public class Arm extends SubsystemBase {
      *
      * <p><b>Note: This command is NEVER finished, unless interrupted.</b>
      */
-    public Command moveToAndMaintainPosition(Angle armAngleSetpoint) {
-        return runEnd(() -> this.setpoint = Optional.of(armAngleSetpoint), () -> this.setpoint = Optional.empty());
+    public Command moveToAndMaintainPosition(ArmPosition setpoint) {
+        return runEnd(() -> this.setpoint = Optional.of(setpoint.angle), () -> this.setpoint = Optional.empty());
     }
 
     /**
@@ -179,8 +186,8 @@ public class Arm extends SubsystemBase {
      * <p><b>Note: This command finishes automatically when the setpoint is reached, causing the default command to
      * schedule.</b>
      */
-    public Command moveToPosition(Angle armAngleSetpoint) {
-        return moveToAndMaintainPosition(armAngleSetpoint).until(this::atReference);
+    public Command moveToPosition(ArmPosition setpoint) {
+        return moveToAndMaintainPosition(setpoint).until(this::atReference);
     }
 
     /** @return the measured arm angle, where zero is horizontally forward. */

@@ -1,5 +1,8 @@
 package frc.robot.subsystems.coralholder;
 
+import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
+
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface;
@@ -15,9 +18,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
 
-import static edu.wpi.first.units.Units.*;
-import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
-
 public class CoralHolderIOReal implements CoralHolderIO {
     private final TalonFX rollerTalon;
     private final LaserCan firstSensor;
@@ -31,11 +31,12 @@ public class CoralHolderIOReal implements CoralHolderIO {
 
     public CoralHolderIOReal() {
         this.rollerTalon = new TalonFX(3);
-        this.rollerTalon.getConfigurator().apply(new CurrentLimitsConfigs()
-                .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(ROLLERS_CURRENT_LIMIT));
-        rollerTalon.getConfigurator().apply(new MotorOutputConfigs()
-                .withInverted(InvertedValue.Clockwise_Positive));
+        this.rollerTalon
+                .getConfigurator()
+                .apply(new CurrentLimitsConfigs()
+                        .withSupplyCurrentLimitEnable(true)
+                        .withSupplyCurrentLimit(ROLLERS_CURRENT_LIMIT));
+        rollerTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         this.rollerTalon.setNeutralMode(NeutralModeValue.Brake);
 
         this.rollerMotorCurrent = rollerTalon.getSupplyCurrent();
@@ -50,9 +51,10 @@ public class CoralHolderIOReal implements CoralHolderIO {
     }
 
     /**
-     * <p>Attempts to configure the laser can sensor.</p>
+     * Attempts to configure the laser can sensor.
+     *
      * @return whether the attempt is successful
-     * */
+     */
     private static boolean configureSensor(LaserCan sensor) {
         try {
             sensor.setRangingMode(LaserCanInterface.RangingMode.SHORT);
@@ -64,8 +66,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
     }
 
     private static boolean isTriggered(LaserCanInterface.Measurement measurement) {
-        if (measurement.status != LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT)
-            return false;
+        if (measurement.status != LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) return false;
         return measurement.distance_mm < SENSOR_DISTANCE_THRESHOLD.in(Millimeters);
     }
 
@@ -94,6 +95,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
     }
 
     VoltageOut voltageOut = new VoltageOut(Volts.zero());
+
     @Override
     public void setRollerMotorOutput(Voltage voltage) {
         voltageOut.withOutput(voltage);

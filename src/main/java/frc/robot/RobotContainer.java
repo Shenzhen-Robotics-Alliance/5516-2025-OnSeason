@@ -5,6 +5,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -23,14 +25,23 @@ import frc.robot.commands.drive.*;
 import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.coralholder.CoralHolder;
+import frc.robot.subsystems.coralholder.CoralHolderIOReal;
+import frc.robot.subsystems.coralholder.CoralHolderIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
 import frc.robot.subsystems.led.LEDStatusLight;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
+import frc.robot.subsystems.superstructure.arm.ArmIOReal;
+import frc.robot.subsystems.superstructure.arm.ArmIOSim;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import frc.robot.subsystems.vision.apriltags.AprilTagVisionIOReal;
 import frc.robot.subsystems.vision.apriltags.ApriltagVisionIOSim;
 import frc.robot.subsystems.vision.apriltags.PhotonCameraProperties;
-import frc.robot.utils.AIRobotInSimulation2024;
 import frc.robot.utils.AlertsManager;
 import frc.robot.utils.MapleJoystickDriveInput;
 import java.util.*;
@@ -71,6 +82,9 @@ public class RobotContainer {
 
     // Simulated drive
     private final SwerveDriveSimulation driveSimulation;
+    private final Arm arm;
+    private final Elevator elevator;
+    private final CoralHolder coralHolder;
 
     private final Field2d field = new Field2d();
 
@@ -99,6 +113,10 @@ public class RobotContainer {
                         new ModuleIOTalon(TunerConstants.BackRight, "BackRight"));
 
                 aprilTagVision = new AprilTagVision(new AprilTagVisionIOReal(camerasProperties), camerasProperties);
+
+                arm = new Arm(new ArmIOReal());
+                elevator = new Elevator(new ElevatorIOReal());
+                coralHolder = new CoralHolder(new CoralHolderIOReal());
             }
 
             case SIM -> {
@@ -146,7 +164,13 @@ public class RobotContainer {
                         camerasProperties);
 
                 SimulatedArena.getInstance().resetFieldForAuto();
-                AIRobotInSimulation2024.startOpponentRobotSimulations();
+
+                arm = new Arm(new ArmIOSim());
+                elevator = new Elevator(new ElevatorIOSim());
+                coralHolder = new CoralHolder(new CoralHolderIOSim(
+                        driveSimulation::getSimulatedDriveTrainPose,
+                        () -> arm.getArmAngle().getMeasure(),
+                        elevator::getHeight));
             }
 
             default -> {
@@ -164,6 +188,10 @@ public class RobotContainer {
                         (inputs) -> {});
 
                 aprilTagVision = new AprilTagVision((inputs) -> {}, camerasProperties);
+
+                arm = new Arm(armInputs -> {});
+                elevator = new Elevator(elevatorInputs -> {});
+                coralHolder = new CoralHolder(coralHolderInputs -> {});
             }
         }
 
@@ -293,6 +321,34 @@ public class RobotContainer {
                 .whileTrue(ReefAlignment.alignmentToBranch(
                         drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
 
+        coralHolder.setDefaultCommand(coralHolder.runIdle());
+        elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
+        arm.setDefaultCommand(arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.IDLE));
+        driver.intakeButton()
+                .whileTrue(coralHolder
+                        .intakeCoralSequence()
+                        .alongWith(
+                                elevator.moveToAndMaintainPosition(Centimeters.of(5)),
+                                arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.INTAKE)));
+        driver.moveToL4Button()
+                .onTrue(Commands.sequence(
+                                arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                                elevator.moveToPosition(Meters.of(1.34)),
+                                arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.SCORE_L4)
+                                        .alongWith(coralHolder.shuffleCoralSequence()))
+                        .deadlineFor(Commands.print("moving to L4...").repeatedly()));
+        driver.moveToL3Button()
+                .onTrue(Commands.sequence(
+                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE),
+                        elevator.moveToPosition(Meters.of(0.62)),
+                        arm.moveToAndMaintainPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3)));
+        driver.moveToL2Button()
+                .onTrue(Commands.sequence(
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        elevator.moveToPosition(Meters.of(0)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE)));
+        driver.scoreButton().whileTrue(coralHolder.scoreCoral());
+
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
         operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
         operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
@@ -321,10 +377,6 @@ public class RobotContainer {
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-        Logger.recordOutput("FieldSimulation/OpponentRobotPositions", AIRobotInSimulation2024.getOpponentRobotPoses());
-        Logger.recordOutput(
-                "FieldSimulation/AlliancePartnerRobotPositions",
-                AIRobotInSimulation2024.getAlliancePartnerRobotPoses());
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
         Logger.recordOutput(

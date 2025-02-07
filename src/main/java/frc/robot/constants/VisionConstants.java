@@ -62,7 +62,7 @@ public class VisionConstants {
                     1280,
                     800,
                     new Translation2d(0.14, 0.2),
-                    Meters.of(0.42),
+                    Meters.of(0.43),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-22),
                     Degrees.zero()),
@@ -77,7 +77,7 @@ public class VisionConstants {
                     1280,
                     800,
                     new Translation2d(0.14, -0.2),
-                    Meters.of(0.42),
+                    Meters.of(0.43),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-22),
                     Degrees.zero()));

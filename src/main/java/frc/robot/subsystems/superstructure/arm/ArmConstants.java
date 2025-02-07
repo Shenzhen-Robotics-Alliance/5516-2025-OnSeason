@@ -9,12 +9,12 @@ import edu.wpi.first.units.measure.*;
 public final class ArmConstants {
     public enum ArmPosition {
         IDLE(116),
-        INTAKE(126),
+        INTAKE(120),
         SCORE_L1_L2_L3(116),
         SCORE_L4(70),
-        ELEVATOR_MOVING_UP(55);
+        ELEVATOR_MOVING(55);
 
-        private final Angle angle;
+        public final Angle angle;
 
         ArmPosition(double degrees) {
             this.angle = Degrees.of(degrees);
@@ -42,6 +42,6 @@ public final class ArmConstants {
 
     // Simulation Constants
     public static final Distance ARM_LENGTH = Centimeters.of(25);
-    public static final Mass ARM_MASS = Kilograms.of(8);
+    public static final Mass ARM_MASS = Kilograms.of(5);
     public static final DCMotor ARM_GEARBOX = DCMotor.getKrakenX60(1);
 }
