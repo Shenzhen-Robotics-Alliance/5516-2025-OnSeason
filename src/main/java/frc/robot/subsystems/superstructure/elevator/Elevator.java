@@ -103,8 +103,9 @@ public class Elevator extends SubsystemBase {
     /** @return the measured elevator height, where zero is lowest. */
     public Distance getHeight() {
         // Height = Drum Rotations * Drum Teeth Count * Chain Length
-        return CHAN_LENGTH.times(
-                inputs.encoderAngle.in(Rotations) / ELEVATOR_GEARING_REDUCTION * ELEVATOR_DRUM_WHEEL_TEETH);
+        return CHAN_LENGTH
+                .times(inputs.encoderAngle.in(Rotations) / ELEVATOR_GEARING_REDUCTION * ELEVATOR_DRUM_WHEEL_TEETH)
+                .times(ELEVATOR_STAGES);
     }
 
     /** @return the measured elevator velocity, where positive is up. */

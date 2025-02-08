@@ -9,7 +9,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class SuperStructureVisualizer {
     private static final Translation3d ARM_ZERO_POSITION = new Translation3d(0.265, 0, 0.37);
-    private static final double ARM_ZERO_PITCH_RAD = Math.toRadians(125);
+    private static final double ARM_ZERO_PITCH_RAD = Math.toRadians(130);
 
     public static void visualizeMechanisms(String key, Distance elevatorHeight, Angle armAngle) {
         Translation3d elevatorHeightTranslation = new Translation3d(0, 0, elevatorHeight.in(Meters));

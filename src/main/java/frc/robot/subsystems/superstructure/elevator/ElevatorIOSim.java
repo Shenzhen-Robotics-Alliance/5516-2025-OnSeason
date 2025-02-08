@@ -43,7 +43,7 @@ public class ElevatorIOSim implements ElevatorIO {
         // Drum Rotations * Drum Teeth Count * Chain Length = Height
         // Drum Rotations = Height / Drum Teeth Count / Chain Length
         double drumAngleRotations =
-                elevatorSim.getPositionMeters() / ELEVATOR_DRUM_WHEEL_TEETH / CHAN_LENGTH.in(Meters);
+                elevatorSim.getPositionMeters() / ELEVATOR_STAGES / ELEVATOR_DRUM_WHEEL_TEETH / CHAN_LENGTH.in(Meters);
         Angle motorAngle = Rotations.of(drumAngleRotations * ELEVATOR_GEARING_REDUCTION);
         double drumVelocityRotationsPerSecond =
                 elevatorSim.getVelocityMetersPerSecond() / ELEVATOR_DRUM_WHEEL_TEETH / CHAN_LENGTH.in(Meters);

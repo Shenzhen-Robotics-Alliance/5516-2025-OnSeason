@@ -96,5 +96,7 @@ public class ElevatorIOReal implements ElevatorIO {
     @Override
     public void setMotorBrake(boolean brakeModeEnable) {
         NeutralModeValue value = brakeModeEnable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
+        elevatorTalon1.setNeutralMode(value);
+        elevatorTalon2.setNeutralMode(value);
     }
 }
