@@ -10,6 +10,7 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -116,6 +117,7 @@ public class Arm extends SubsystemBase {
 
         double accelerationRadPerSecSq =
                 (currentStateRad.velocity - previousVelocityRadPerSec) / Robot.defaultPeriodSecs;
+        previousVelocityRadPerSec = currentStateRad.velocity;
         double feedforwardVolts = feedforwardController.calculate(
                 getArmAngle().getRadians(), currentStateRad.velocity, accelerationRadPerSecSq);
         double feedbackVolts = feedbackController.calculate(getArmAngle().getRadians(), currentStateRad.position);
@@ -148,7 +150,12 @@ public class Arm extends SubsystemBase {
         armAbsoluteEncoderDisconnectedAlert.set(encoderCalibrated && inputs.absoluteEncoderAngle.isEmpty());
 
         Logger.recordOutput("Arm/Setpoint (Degrees)", setpoint.in(Degrees));
+        Logger.recordOutput("Arm/Current State Position(Degrees)", Math.toDegrees(currentStateRad.position));
         Logger.recordOutput("Arm/MeasuredAngle (Degrees)", getArmAngle().getDegrees());
+        Logger.recordOutput(
+                "Arm/Current State Velocity (Degrees Per Second)", Math.toDegrees(currentStateRad.velocity));
+        Logger.recordOutput(
+                "Arm/Measured Velocity (Degrees Per Second)", getVelocity().in(DegreesPerSecond));
     }
 
     /**
@@ -181,6 +188,14 @@ public class Arm extends SubsystemBase {
     /** @return the measured arm angle, where zero is horizontally forward. */
     public Rotation2d getArmAngle() {
         return new Rotation2d(inputs.relativeEncoderAngle.div(ARM_GEARING_REDUCTION)).minus(relativeEncoderOffset);
+    }
+
+    public AngularVelocity getVelocity() {
+        return inputs.encoderVelocity.div(ARM_GEARING_REDUCTION);
+    }
+
+    public Rotation2d getProfileCurrentState() {
+        return Rotation2d.fromRadians(currentStateRad.position);
     }
 
     /** Sets the brake mode of the arm motor. */

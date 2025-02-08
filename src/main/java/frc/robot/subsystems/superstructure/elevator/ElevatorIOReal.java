@@ -33,8 +33,9 @@ public class ElevatorIOReal implements ElevatorIO {
     public ElevatorIOReal() {
         this.elevatorTalon1 = new TalonFX(1);
         this.elevatorTalon2 = new TalonFX(2);
-        CurrentLimitsConfigs currentLimitsConfigs =
-                new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(CURRENT_LIMIT);
+        CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(CURRENT_LIMIT.div(2));
         this.elevatorTalon1.getConfigurator().apply(currentLimitsConfigs);
         this.elevatorTalon1
                 .getConfigurator()

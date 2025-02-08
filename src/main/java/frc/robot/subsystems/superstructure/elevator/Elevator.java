@@ -27,7 +27,7 @@ public class Elevator extends SubsystemBase {
     // Controllers
     private final ElevatorFeedforward feedforwardController;
     private final PIDController strongFeedbackController;
-    private final PIDController wearkFeedbackController;
+    private final PIDController weakFeedbackController;
     private final TrapezoidProfile profile;
 
     // Alerts
@@ -52,7 +52,7 @@ public class Elevator extends SubsystemBase {
 
         this.feedforwardController = new ElevatorFeedforward(kS, kG, kV, kA);
         this.strongFeedbackController = new PIDController(kP_STRONG, 0, 0);
-        this.wearkFeedbackController = new PIDController(kP_WEAK, 0, 0);
+        this.weakFeedbackController = new PIDController(kP_WEAK, 0, 0);
         this.profile = new TrapezoidProfile(PROFILE_CONSTRAINS);
 
         this.elevatorExceedLimitAlert = AlertsManager.create("", Alert.AlertType.kError);
@@ -89,14 +89,17 @@ public class Elevator extends SubsystemBase {
         currentStateMeters = profile.calculate(Robot.defaultPeriodSecs, currentStateMeters, goalState);
 
         double accelerationMPSSq = (currentStateMeters.velocity - previousVelocityMPS) / Robot.defaultPeriodSecs;
+        previousVelocityMPS = currentStateMeters.velocity;
         double feedforwardVolts = feedforwardController.calculate(currentStateMeters.velocity, accelerationMPSSq);
         boolean elevatorRequestedToMove =
                 Math.abs(currentStateMeters.velocity) > ELEVATOR_MOVING_VELOCITY_THRESHOLD.in(MetersPerSecond);
-        PIDController feedbackController = elevatorRequestedToMove ? strongFeedbackController : wearkFeedbackController;
+        PIDController feedbackController = elevatorRequestedToMove ? strongFeedbackController : weakFeedbackController;
         double feedbackVolts = feedbackController.calculate(getHeight().in(Meters), currentStateMeters.position);
 
         Voltage voltage = Volts.of(MathUtil.clamp(
                 feedforwardVolts + feedbackVolts, MIN_OUTPUT_VOLTAGE.in(Volts), MAX_OUTPUT_VOLTAGE.in(Volts)));
+
+        if (goalState.position == 0.0 && currentStateMeters.position == 0.0) voltage = Volts.zero();
         io.setMotorOutput(voltage);
     }
 
@@ -108,13 +111,18 @@ public class Elevator extends SubsystemBase {
                 .times(ELEVATOR_STAGES);
     }
 
+    public Distance getProfileCurrentState() {
+        return Meters.of(currentStateMeters.position);
+    }
+
     /** @return the measured elevator velocity, where positive is up. */
     public LinearVelocity getVelocity() {
         return CHAN_LENGTH
                 .times(inputs.encoderVelocity.in(RotationsPerSecond)
                         / ELEVATOR_GEARING_REDUCTION
                         * ELEVATOR_DRUM_WHEEL_TEETH)
-                .per(Seconds);
+                .per(Seconds)
+                .times(ELEVATOR_STAGES);
     }
 
     /**
@@ -152,7 +160,11 @@ public class Elevator extends SubsystemBase {
         } else elevatorExceedLimitAlert.set(false);
 
         Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpoint.in(Meters));
+        Logger.recordOutput("Elevator/Current State Position (Meters)", currentStateMeters.position);
         Logger.recordOutput("Elevator/Measured Height (Meters)", getHeight().in(Meters));
+        Logger.recordOutput(
+                "Elevator/Measured Velocity (Meters Per Second)", getVelocity().in(MetersPerSecond));
+        Logger.recordOutput("Elevator/Current State Velocity (Meters Per Second)", currentStateMeters.velocity);
     }
 
     public void requestElevatorHeight(Distance elevatorHeightSetpoint) {

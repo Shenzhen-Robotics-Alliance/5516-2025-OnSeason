@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.*;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -336,7 +335,7 @@ public class RobotContainer {
         driver.moveToL4Button()
                 .onTrue(Commands.sequence(
                         arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
-                        elevator.moveToPosition(Meters.of(1.34)),
+                        elevator.moveToPosition(Meters.of(1.32)),
                         arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4)
                                 .alongWith(coralHolder.shuffleCoralSequence()),
                         Commands.waitUntil(() -> false)));
@@ -397,9 +396,9 @@ public class RobotContainer {
 
         ReefAlignment.updateDashboard();
 
-        double oscillation = 0.5 * Math.sin(Timer.getTimestamp()) + 0.5;
+        SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
-                "measuredMechanismPoses", Meters.of(oscillation * 1.35), Degrees.of(oscillation * 125));
+                "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }

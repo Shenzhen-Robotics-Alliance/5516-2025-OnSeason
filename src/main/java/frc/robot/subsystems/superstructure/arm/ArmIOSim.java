@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.simulation.SingleJointedArmSim;
 import frc.robot.Robot;
 import java.util.Optional;
@@ -49,9 +50,11 @@ public class ArmIOSim implements ArmIO {
         Voltage actualOutputVoltage =
                 simMotorController.constrainOutputVoltage(motorAngle, motorAngularVelocity, requestedVoltage);
         actualOutputVoltage = SimulatedBattery.clamp(actualOutputVoltage);
-
+        if (DriverStation.isDisabled()) actualOutputVoltage = Volts.zero();
         armSim.setInputVoltage(actualOutputVoltage.in(Volts));
-        armSim.update(Robot.defaultPeriodSecs);
+
+        // Run 10 iterations of the physics simulation to improve accuracy
+        for (int i = 0; i < 10; i++) armSim.update(Robot.defaultPeriodSecs / 10);
 
         armInputs.absoluteEncoderAngle = Optional.of(Rotation2d.fromRadians(armSim.getAngleRads()));
         armInputs.motorConnected = true;
