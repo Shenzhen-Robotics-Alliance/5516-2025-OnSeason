@@ -1,0 +1,95 @@
+{
+  "name": "WCP CC",
+  "sourceUrl": "",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "y",
+      "degrees": 0
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0
+  ],
+  "cameras": [
+    {"name":"FrontCam","position":[0.3,0.0,0.2],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":-29.999999999999996},{"axis":"z","degrees":0.0}],"resolution":[640,480]},
+    {"name":"FrontLeftCam","position":[0.25,0.3,0.2],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":-30.000000000000004},{"axis":"z","degrees":29.999999999999996}],"resolution":[640,480]},
+    {"name":"FrontRightCam","position":[0.25,-0.3,0.2],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":-29.999999999999996},{"axis":"z","degrees":-30.000000000000004}],"resolution":[640,480]},
+    {"name":"BackLeftCam","position":[0.25,0.05,0.2],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":-35.000000000000014},{"axis":"z","degrees":150.0}],"resolution":[640,480]},
+    {"name":"BackRightCam","position":[0.25,-0.05,0.2],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":-35.00000000000001},{"axis":"z","degrees":-150.0}],"resolution":[640,480]}
+  ],
+  "components": [
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        0,
+        0,
+        0
+      ]
+    },
+    {
+      "zeroedRotations": [
+        {
+          "axis": "x",
+          "degrees": 90
+        },
+        {
+          "axis": "y",
+          "degrees": 0
+        },
+        {
+          "axis": "z",
+          "degrees": 90
+        }
+      ],
+      "zeroedPosition": [
+        -0.265,
+        0,
+        -0.37
+      ]
+    }
+  ]
+}

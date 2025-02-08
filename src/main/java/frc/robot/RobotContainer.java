@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
 import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,6 +32,7 @@ import frc.robot.subsystems.coralholder.CoralHolderIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
 import frc.robot.subsystems.led.LEDStatusLight;
+import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.arm.ArmIOReal;
@@ -120,6 +122,8 @@ public class RobotContainer {
             }
 
             case SIM -> {
+                SimulatedArena.overrideSimulationTimings(
+                        Seconds.of(Robot.defaultPeriodSecs), DriveTrainConstants.SIMULATION_TICKS_IN_1_PERIOD);
                 this.driveSimulation = new SwerveDriveSimulation(
                         DriveTrainSimulationConfig.Default()
                                 .withRobotMass(DriveTrainConstants.ROBOT_MASS)
@@ -392,6 +396,10 @@ public class RobotContainer {
             field.getObject("Odometry").setPose(drive.getPose());
 
         ReefAlignment.updateDashboard();
+
+        double oscillation = 0.5 * Math.sin(Timer.getTimestamp()) + 0.5;
+        SuperStructureVisualizer.visualizeMechanisms(
+                "measuredMechanismPoses", Meters.of(oscillation * 1.35), Degrees.of(oscillation * 125));
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
