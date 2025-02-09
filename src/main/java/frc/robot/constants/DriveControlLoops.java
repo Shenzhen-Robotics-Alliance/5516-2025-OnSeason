@@ -33,20 +33,20 @@ public class DriveControlLoops {
                     0.8,
                     Meters.of(1),
                     MetersPerSecond.of(2),
-                    MetersPerSecond.of(1),
+                    MetersPerSecond.of(0.7),
                     Meters.of(0.6),
                     MetersPerSecond.of(0.15),
-                    MetersPerSecondPerSecond.of(2.5));
+                    MetersPerSecondPerSecond.of(1.5));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
                     0.7,
                     Meters.of(1.1),
                     MetersPerSecond.of(2),
-                    MetersPerSecond.of(1),
+                    MetersPerSecond.of(0.7),
                     Meters.of(0.6),
                     MetersPerSecond.of(0.15),
-                    MetersPerSecondPerSecond.of(2.5));
+                    MetersPerSecondPerSecond.of(1.5));
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(

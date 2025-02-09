@@ -330,20 +330,21 @@ public class RobotContainer {
         arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
         driver.intakeButton()
                 .whileTrue(Commands.sequence(
-                        elevator.moveToPosition(Centimeters.of(5))
+                        elevator.moveToPosition(Centimeters.of(3))
                                 .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
                         coralHolder.intakeCoralSequence()));
         driver.moveToL4Button()
                 .onTrue(Commands.sequence(
                         arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
-                        elevator.moveToPosition(Meters.of(1.32)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4)
-                                .alongWith(coralHolder.shuffleCoralSequence()),
+                        elevator.moveToPosition(Meters.of(1.32))
+                                .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4),
                         Commands.waitUntil(() -> false)));
         driver.moveToL3Button()
                 .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE),
-                        elevator.moveToPosition(Meters.of(0.62)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        elevator.moveToPosition(Meters.of(0.62))
+                                .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
                         arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3),
                         Commands.waitUntil(() -> false)));
         driver.moveToL2Button()

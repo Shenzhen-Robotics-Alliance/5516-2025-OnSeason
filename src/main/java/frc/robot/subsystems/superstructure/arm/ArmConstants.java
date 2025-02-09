@@ -10,8 +10,8 @@ public final class ArmConstants {
     public enum ArmPosition {
         IDLE(116),
         INTAKE(126),
-        SCORE_L1_L2_L3(116),
-        SCORE_L4(70),
+        SCORE_L1_L2_L3(105),
+        SCORE_L4(85),
         ELEVATOR_MOVING(55);
 
         public final Angle angle;

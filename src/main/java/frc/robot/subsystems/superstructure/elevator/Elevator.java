@@ -163,6 +163,7 @@ public class Elevator extends SubsystemBase {
         // Tell drivetrain to lower speed if low speed mode enabled
         RobotState.getInstance().setLowSpeedMode(getHeight().gt(HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE));
 
+        Logger.recordOutput("Elevator/Temperature (Degrees Celsius)", inputs.motorTemperature.in(Celsius));
         Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpoint.in(Meters));
         Logger.recordOutput("Elevator/Current State Position (Meters)", currentStateMeters.position);
         Logger.recordOutput("Elevator/Measured Height (Meters)", getHeight().in(Meters));

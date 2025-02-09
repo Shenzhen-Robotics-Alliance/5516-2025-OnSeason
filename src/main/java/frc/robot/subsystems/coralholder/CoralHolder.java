@@ -91,20 +91,25 @@ public class CoralHolder extends SubsystemBase {
         return Commands.sequence(
                         // If the coral is not in place (triggering sensor 2) yet,
                         // we run rollers slowly forward until it triggers sensor 2.
-                        run(() -> setVoltage(1.2, 0.0))
+                        run(() -> setVoltage(0.4, 0.0))
                                 .onlyIf(coralInPlace.negate())
                                 .until(coralInPlace),
                         // Next, run the rollers slowly backwards until it does not trigger sensor 2
-                        run(() -> setVoltage(-0.8, 0.0)).until(coralInPlace.negate()))
+                        run(() -> setVoltage(-0.8, 0.0)).until(coralInPlace.negate()),
+                        run(() -> setVoltage(-0.8, 0.0)).withTimeout(0.3))
                 // Only shuffle the coral if we have a coral.
                 .onlyIf(hasCoral)
+                .withTimeout(1.5)
                 // Stop the intake at the end of the command.
                 .finallyDo(() -> setVoltage(0.0, 0.0));
     }
 
     /** Score the Coral inside the holder. */
     public Command scoreCoral() {
-        return run(() -> setVoltage(3.5, 0.0)).until(hasCoral.negate()).finallyDo(() -> setVoltage(0.0, 0.0));
+        return run(() -> setVoltage(3.5, 0.0))
+                .until(hasCoral.negate())
+                .finallyDo(() -> setVoltage(0.0, 0.0))
+                .withTimeout(1);
     }
 
     public Command runIdle() {

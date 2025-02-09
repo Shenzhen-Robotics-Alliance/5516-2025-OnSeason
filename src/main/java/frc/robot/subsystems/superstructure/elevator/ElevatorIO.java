@@ -2,10 +2,7 @@ package frc.robot.subsystems.superstructure.elevator;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -25,6 +22,8 @@ public interface ElevatorIO {
 
         /** The actual output voltage of the motor. */
         public Voltage motorOutputVoltage = Volts.zero();
+
+        public Temperature motorTemperature = Celsius.of(24);
     }
 
     void updateInputs(ElevatorInputs inputs);
