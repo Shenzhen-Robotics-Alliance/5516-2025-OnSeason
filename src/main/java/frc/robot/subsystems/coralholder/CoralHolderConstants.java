@@ -8,7 +8,6 @@ import edu.wpi.first.units.measure.Distance;
 
 public final class CoralHolderConstants {
     public static final Current ROLLERS_CURRENT_LIMIT = Amps.of(20);
-    public static final Distance SENSOR_DISTANCE_THRESHOLD = Centimeters.of(5);
 
     // Simulation Constants
     public static final DCMotor ROLLER_GEARBOX = DCMotor.getFalcon500(1);

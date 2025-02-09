@@ -14,12 +14,18 @@ public interface CoralHolderIO {
         public boolean secondSensorConnected = false;
         public boolean firstSensorTriggered = false;
         public boolean secondSensorTriggered = false;
+
         public boolean motorConnected = false;
         public Current rollerMotorCurrent = Amps.zero();
         public Voltage rollerMotorOutputVoltage = Volts.zero();
+
+        public Current feederMotorCurrent = Amps.zero();
+        public Voltage feederMotorOutputVoltage = Volts.zero();
     }
 
     void updateInputs(CoralHolderInputs inputs);
 
     default void setRollerMotorOutput(Voltage voltage) {}
+
+    default void setFeederMotorOutput(Voltage voltage) {}
 }

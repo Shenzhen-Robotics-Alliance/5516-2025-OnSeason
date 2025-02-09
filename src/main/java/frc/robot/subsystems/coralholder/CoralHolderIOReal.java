@@ -16,32 +16,58 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
 public class CoralHolderIOReal implements CoralHolderIO {
-    private final TalonFX rollerTalon;
-    private final LaserCan firstSensor;
-    private final LaserCan secondSensor;
+    private final TalonFX rollerTalon, feederTalon1, feederTalon2;
+    private final LaserCan firstSensor, secondSensor;
 
     private final StatusSignal<Current> rollerMotorCurrent;
     private final StatusSignal<Voltage> rollerMotorOutputVoltage;
+
+    private final StatusSignal<Current> feeder1Current, feeder2Current;
+    private final StatusSignal<Voltage> feeder1Output, feeder2Output;
 
     private final boolean firstSensorConfigurationError;
     private final boolean secondSensorConfigurationError;
 
     public CoralHolderIOReal() {
         this.rollerTalon = new TalonFX(3);
-        this.rollerTalon
-                .getConfigurator()
-                .apply(new CurrentLimitsConfigs()
-                        .withSupplyCurrentLimitEnable(true)
-                        .withSupplyCurrentLimit(ROLLERS_CURRENT_LIMIT));
+        CurrentLimitsConfigs rollerCurrentLimit = new CurrentLimitsConfigs()
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(ROLLERS_CURRENT_LIMIT);
+        this.rollerTalon.getConfigurator().apply(rollerCurrentLimit);
         rollerTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         this.rollerTalon.setNeutralMode(NeutralModeValue.Brake);
 
         this.rollerMotorCurrent = rollerTalon.getSupplyCurrent();
         this.rollerMotorOutputVoltage = rollerTalon.getMotorVoltage();
-        BaseStatusSignal.setUpdateFrequencyForAll(100.0, rollerMotorCurrent, rollerMotorOutputVoltage);
+
+        this.feederTalon1 = new TalonFX(5);
+        this.feederTalon2 = new TalonFX(6);
+        CurrentLimitsConfigs feederCurrentLimit =
+                new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(40);
+        feederTalon1.getConfigurator().apply(feederCurrentLimit);
+        feederTalon1.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        feederTalon2.getConfigurator().apply(feederCurrentLimit);
+        feederTalon2
+                .getConfigurator()
+                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+
+        feeder1Current = feederTalon1.getSupplyCurrent();
+        feeder2Current = feederTalon2.getStatorCurrent();
+        feeder1Output = feederTalon1.getMotorVoltage();
+        feeder2Output = feederTalon2.getMotorVoltage();
+
+        BaseStatusSignal.setUpdateFrequencyForAll(
+                100.0,
+                rollerMotorCurrent,
+                rollerMotorOutputVoltage,
+                feeder1Current,
+                feeder2Current,
+                feeder1Output,
+                feeder2Output);
         this.rollerTalon.optimizeBusUtilization();
 
         this.firstSensor = new LaserCan(0);
@@ -65,24 +91,33 @@ public class CoralHolderIOReal implements CoralHolderIO {
         }
     }
 
-    private static boolean isTriggered(LaserCanInterface.Measurement measurement) {
+    private static boolean isTriggered(LaserCanInterface.Measurement measurement, Distance threshold) {
         if (measurement.status != LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT) return false;
-        return measurement.distance_mm < SENSOR_DISTANCE_THRESHOLD.in(Millimeters);
+        return measurement.distance_mm < threshold.in(Millimeters);
     }
 
     @Override
     public void updateInputs(CoralHolderInputs inputs) {
-        StatusCode statusCode = BaseStatusSignal.refreshAll(rollerMotorCurrent, rollerMotorOutputVoltage);
+        StatusCode statusCode = BaseStatusSignal.refreshAll(
+                rollerMotorCurrent,
+                rollerMotorOutputVoltage,
+                feeder1Current,
+                feeder2Current,
+                feeder1Output,
+                feeder2Output);
         inputs.motorConnected = statusCode.isOK();
         inputs.rollerMotorCurrent = rollerMotorCurrent.getValue();
         inputs.rollerMotorOutputVoltage = rollerMotorOutputVoltage.getValue();
+        inputs.feederMotorCurrent = feeder1Current.getValue().plus(feeder2Current.getValue());
+        inputs.feederMotorOutputVoltage =
+                feeder1Output.getValue().plus(feeder2Output.getValue()).div(2);
 
         LaserCanInterface.Measurement firstSensorMeasurement = firstSensor.getMeasurement();
         if (firstSensorMeasurement == null || firstSensorConfigurationError)
             inputs.firstSensorConnected = inputs.firstSensorTriggered = false;
         else {
             inputs.firstSensorConnected = true;
-            inputs.firstSensorTriggered = isTriggered(firstSensorMeasurement);
+            inputs.firstSensorTriggered = isTriggered(firstSensorMeasurement, Centimeter.of(2));
         }
 
         LaserCanInterface.Measurement secondSensorMeasurement = secondSensor.getMeasurement();
@@ -90,7 +125,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
             inputs.secondSensorConnected = inputs.secondSensorTriggered = false;
         else {
             inputs.secondSensorConnected = true;
-            inputs.secondSensorTriggered = isTriggered(secondSensorMeasurement);
+            inputs.secondSensorTriggered = isTriggered(secondSensorMeasurement, Centimeters.of(4));
         }
     }
 
@@ -100,5 +135,12 @@ public class CoralHolderIOReal implements CoralHolderIO {
     public void setRollerMotorOutput(Voltage voltage) {
         voltageOut.withOutput(voltage);
         rollerTalon.setControl(voltageOut);
+    }
+
+    @Override
+    public void setFeederMotorOutput(Voltage voltage) {
+        voltageOut.withOutput(voltage);
+        feederTalon1.setControl(voltageOut);
+        feederTalon2.setControl(voltageOut);
     }
 }
