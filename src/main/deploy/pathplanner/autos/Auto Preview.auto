@@ -1,0 +1,43 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "auto2 - place first"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "auto2 - grab second"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "auto2 - place second"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "auto2 - grab third"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "auto2 - place fourth"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": true
+}

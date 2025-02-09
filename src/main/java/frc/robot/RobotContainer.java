@@ -6,13 +6,12 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
-
 import com.pathplanner.lib.auto.NamedCommands;
+import static edu.wpi.first.units.Units.*;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -27,14 +26,24 @@ import frc.robot.commands.drive.*;
 import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
+import frc.robot.subsystems.coralholder.CoralHolder;
+import frc.robot.subsystems.coralholder.CoralHolderIOReal;
+import frc.robot.subsystems.coralholder.CoralHolderIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
 import frc.robot.subsystems.led.LEDStatusLight;
+import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
+import frc.robot.subsystems.superstructure.arm.ArmIOReal;
+import frc.robot.subsystems.superstructure.arm.ArmIOSim;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOReal;
+import frc.robot.subsystems.superstructure.elevator.ElevatorIOSim;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import frc.robot.subsystems.vision.apriltags.AprilTagVisionIOReal;
 import frc.robot.subsystems.vision.apriltags.ApriltagVisionIOSim;
 import frc.robot.subsystems.vision.apriltags.PhotonCameraProperties;
-import frc.robot.utils.AIRobotInSimulation2024;
 import frc.robot.utils.AlertsManager;
 import frc.robot.utils.MapleJoystickDriveInput;
 import java.util.*;
@@ -75,15 +84,15 @@ public class RobotContainer {
 
     // Simulated drive
     private final SwerveDriveSimulation driveSimulation;
+    private final Arm arm;
+    private final Elevator elevator;
+    private final CoralHolder coralHolder;
 
     private final Field2d field = new Field2d();
 
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         final List<PhotonCameraProperties> camerasProperties =
-                // PhotonCameraProperties.loadCamerasPropertiesFromConfig("5516-2024-OffSeason-Vision"); //
-                // loads camera properties from
-                // deploy/PhotonCamerasProperties/5516-2024-OffSeason-Vision.xml
                 VisionConstants.photonVisionCameras; // load configs stored directly in VisionConstants.java
 
         switch (Robot.CURRENT_ROBOT_MODE) {
@@ -105,17 +114,11 @@ public class RobotContainer {
                         new ModuleIOTalon(TunerConstants.BackLeft, "BackLeft"),
                         new ModuleIOTalon(TunerConstants.BackRight, "BackRight"));
 
-                /* REV Chassis */
-                //                drive = new SwerveDrive(
-                //                        SwerveDrive.DriveType.CTRE_ON_CANIVORE,
-                //                        new GyroIOPigeon2(TunerConstants.DrivetrainConstants),
-                //                        new ModuleIOSpark(0),
-                //                        new ModuleIOSpark(1),
-                //                        new ModuleIOSpark(2),
-                //                        new ModuleIOSpark(3)
-                //                );
-
                 aprilTagVision = new AprilTagVision(new AprilTagVisionIOReal(camerasProperties), camerasProperties);
+
+                arm = new Arm(new ArmIOReal());
+                elevator = new Elevator(new ElevatorIOReal());
+                coralHolder = new CoralHolder(new CoralHolderIOReal());
             }
 
             case SIM -> {
@@ -165,7 +168,13 @@ public class RobotContainer {
                         camerasProperties);
 
                 SimulatedArena.getInstance().resetFieldForAuto();
-                AIRobotInSimulation2024.startOpponentRobotSimulations();
+
+                arm = new Arm(new ArmIOSim());
+                elevator = new Elevator(new ElevatorIOSim());
+                coralHolder = new CoralHolder(new CoralHolderIOSim(
+                        driveSimulation::getSimulatedDriveTrainPose,
+                        () -> arm.getArmAngle().getMeasure(),
+                        elevator::getHeight));
             }
 
             default -> {
@@ -183,6 +192,10 @@ public class RobotContainer {
                         (inputs) -> {});
 
                 aprilTagVision = new AprilTagVision((inputs) -> {}, camerasProperties);
+
+                arm = new Arm(armInputs -> {});
+                elevator = new Elevator(elevatorInputs -> {});
+                coralHolder = new CoralHolder(coralHolderInputs -> {});
             }
         }
 
@@ -200,31 +213,14 @@ public class RobotContainer {
         SmartDashboard.putData("Field", field);
     }
 
-    private void configureAutoNamedCommands() {
-        // TODO: bind your named commands during auto here
-        NamedCommands.registerCommand(
-                "my named command", Commands.runOnce(() -> System.out.println("my named command executing!!!")));
-    }
+    private void configureAutoNamedCommands() {}
 
-    private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {
-        pathPlannerAuto.event("hello world").onTrue(Commands.runOnce(() -> System.out.println("hello world!!!")));
-    }
+    private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
 
     private LoggedDashboardChooser<Auto> buildAutoChooser() {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With PathPlanner Trajectories",
-                new ExampleCustomAutoWithPathPlannerTrajectories());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With Choreo Trajectories", new ExampleCustomAutoWithChoreoTrajectories());
-        autoSendableChooser.addOption(
-                "Example Custom Auto With Choreo Trajectories 2", new ExampleCustomAutoWithChoreoTrajectories2());
-        autoSendableChooser.addOption(
-                "Example Pathplanner GUI Auto", new PathPlannerAutoWrapper("Example Auto PathPlanner"));
-        autoSendableChooser.addOption("Example Face To Target", new ExampleFaceToTarget());
-        autoSendableChooser.addOption("Example Auto Alignment", new ExampleCustomAutoWithAutoAlignment());
-        // TODO: add your autos here
+        autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
@@ -241,7 +237,6 @@ public class RobotContainer {
                 "Drive SysId- Dynamic - Forward", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kForward));
         testsChooser.addOption(
                 "Drive SysId- Dynamic - Reverse", () -> drive.sysIdDynamic(SysIdRoutine.Direction.kReverse));
-        // TODO add your tests here (system identification and etc.)
         return testsChooser;
     }
 
@@ -322,16 +317,6 @@ public class RobotContainer {
         /* lock chassis with x-formation */
         driver.lockChassisWithXFormatButton().whileTrue(drive.lockChassisWithXFormation());
 
-        /* TODO: aim at target and drive example, delete it for your project */
-        Command exampleFaceTargetWhileDriving = JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
-                driveInput,
-                drive,
-                () -> FieldMirroringUtils.toCurrentAllianceTranslation(new Translation2d(3.17, 4.15)),
-                null,
-                0.75,
-                false);
-        // driver.faceToTargetButton().whileTrue(FaceCoralStation.faceCoralStation(drive, driveInput));
-
         /* auto alignment example, delete it for your project */
         driver.autoAlignmentButtonLeft()
                 .whileTrue(ReefAlignment.alignmentToBranch(
@@ -340,16 +325,38 @@ public class RobotContainer {
                 .whileTrue(ReefAlignment.alignmentToBranch(
                         drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
 
-        //        new Trigger(() -> operator.getRightX() > 0.5).whileTrue(ReefAlignment.previousTargetButton(0.3));
-        //        new Trigger(() -> operator.getRightX() < -0.5).whileTrue(ReefAlignment.nextTargetButton(0.3));
-        //        driver.povUp().onTrue(ReefAlignment.selectReefPartButton(3));
-        //        driver.povDown().onTrue(ReefAlignment.selectReefPartButton(0));
-        //        driver.povLeft().whileTrue(ReefAlignment.lefterTargetButton(0.3));
-        //        driver.povRight().whileTrue(ReefAlignment.righterTargetButton(0.3));
-        operator.y().onTrue(ReefAlignment.selectReefPartButton(3));
-        operator.a().onTrue(ReefAlignment.selectReefPartButton(0));
-        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3));
-        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3));
+        coralHolder.setDefaultCommand(coralHolder.runIdle());
+        elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
+        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
+        driver.intakeButton()
+                .whileTrue(Commands.sequence(
+                        elevator.moveToPosition(Centimeters.of(5))
+                                .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
+                        coralHolder.intakeCoralSequence()));
+        driver.moveToL4Button()
+                .onTrue(Commands.sequence(
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        elevator.moveToPosition(Meters.of(1.32)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4)
+                                .alongWith(coralHolder.shuffleCoralSequence()),
+                        Commands.waitUntil(() -> false)));
+        driver.moveToL3Button()
+                .onTrue(Commands.sequence(
+                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE),
+                        elevator.moveToPosition(Meters.of(0.62)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3),
+                        Commands.waitUntil(() -> false)));
+        driver.moveToL2Button()
+                .onTrue(Commands.sequence(
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        elevator.moveToPosition(Meters.of(0)),
+                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE)));
+        driver.scoreButton().whileTrue(coralHolder.scoreCoral());
+
+        operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
+        operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
+        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
+        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3).ignoringDisable(true));
     }
 
     public void configureLEDEffects() {
@@ -374,10 +381,6 @@ public class RobotContainer {
 
         SimulatedArena.getInstance().simulationPeriodic();
         Logger.recordOutput("FieldSimulation/RobotPosition", driveSimulation.getSimulatedDriveTrainPose());
-        Logger.recordOutput("FieldSimulation/OpponentRobotPositions", AIRobotInSimulation2024.getOpponentRobotPoses());
-        Logger.recordOutput(
-                "FieldSimulation/AlliancePartnerRobotPositions",
-                AIRobotInSimulation2024.getAlliancePartnerRobotPoses());
         Logger.recordOutput(
                 "FieldSimulation/Algae", SimulatedArena.getInstance().getGamePiecesArrayByType("Algae"));
         Logger.recordOutput(
@@ -393,6 +396,10 @@ public class RobotContainer {
             field.getObject("Odometry").setPose(drive.getPose());
 
         ReefAlignment.updateDashboard();
+
+        SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
+        SuperStructureVisualizer.visualizeMechanisms(
+                "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
