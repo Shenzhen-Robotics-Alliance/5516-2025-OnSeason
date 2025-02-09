@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.RobotState;
 import frc.robot.utils.AlertsManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -158,6 +159,9 @@ public class Elevator extends SubsystemBase {
                     "Elevator height exceeds higher limit: " + getHeight().in(Meters) + " Meters");
             elevatorExceedLimitAlert.set(true);
         } else elevatorExceedLimitAlert.set(false);
+
+        // Tell drivetrain to lower speed if low speed mode enabled
+        RobotState.getInstance().setLowSpeedMode(getHeight().gt(HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE));
 
         Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpoint.in(Meters));
         Logger.recordOutput("Elevator/Current State Position (Meters)", currentStateMeters.position);
