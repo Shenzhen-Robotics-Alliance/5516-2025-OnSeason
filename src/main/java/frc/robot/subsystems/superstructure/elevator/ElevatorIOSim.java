@@ -35,6 +35,7 @@ public class ElevatorIOSim implements ElevatorIO {
                 0);
 
         this.simMotorController = new SimulatedMotorController.GenericMotorController(ELEVATOR_GEARBOX);
+        simMotorController.withCurrentLimit(STATOR_CURRENT_LIMIT);
         SimulatedBattery.addElectricalAppliances(this::getSupplyCurrent);
         elevatorSim.update(0.0);
     }

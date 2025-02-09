@@ -24,11 +24,16 @@ public final class ElevatorConstants {
     public static final Voltage MAX_OUTPUT_VOLTAGE = Volts.of(12);
     public static final Voltage MIN_OUTPUT_VOLTAGE = Volts.of(-8);
     public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS = new TrapezoidProfile.Constraints(1.8, 4);
-    public static final Current CURRENT_LIMIT = Amps.of(100);
     public static final Distance ELEVATOR_PID_TOLERANCE = Centimeters.of(4);
     public static final LinearVelocity ELEVATOR_MOVING_VELOCITY_THRESHOLD = MetersPerSecond.of(0.05);
 
+    // Current Limits
+    public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(60);
+    public static final Time OVERHEAT_PROTECTION_TIME = Seconds.of(1);
+    public static final Current OVERHEAT_PROTECTION_CURRENT = Amps.of(40);
+    public static final Current STATOR_CURRENT_LIMIT = Amps.of(80);
+
     // Simulation Constants
-    public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getFalcon500(2);
+    public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getKrakenX60(1);
     public static final Mass ELEVATOR_CARRIAGE_WEIGHT = Kilograms.of(10);
 }
