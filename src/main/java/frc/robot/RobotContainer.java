@@ -5,8 +5,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+import com.pathplanner.lib.auto.NamedCommands;
 import static edu.wpi.first.units.Units.*;
-
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -130,8 +131,8 @@ public class RobotContainer {
                                 .withTrackLengthTrackWidth(
                                         DriveTrainConstants.TRACK_LENGTH, DriveTrainConstants.TRACK_WIDTH)
                                 .withSwerveModule(new SwerveModuleSimulationConfig(
-                                        DriveTrainConstants.DRIVE_MOTOR,
-                                        DriveTrainConstants.STEER_MOTOR,
+                                        DriveTrainConstants.DRIVE_MOTOR_MODEL,
+                                        DriveTrainConstants.STEER_MOTOR_MODEL,
                                         DriveTrainConstants.DRIVE_GEAR_RATIO,
                                         DriveTrainConstants.STEER_GEAR_RATIO,
                                         DriveTrainConstants.DRIVE_FRICTION_VOLTAGE,
