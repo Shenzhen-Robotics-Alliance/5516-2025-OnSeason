@@ -5,9 +5,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
-import com.pathplanner.lib.auto.NamedCommands;
 import static edu.wpi.first.units.Units.*;
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
