@@ -405,12 +405,6 @@ public class RobotContainer {
 
         ReefAlignment.updateDashboard();
 
-        SuperStructureVisualizer.visualizeCoralInCoralHolder(
-                "Test Coral",
-                driveSimulation.getSimulatedDriveTrainPose(),
-                elevator.getHeight(),
-                arm.getArmAngle(),
-                Centimeters.of(0));
         SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
                 "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());

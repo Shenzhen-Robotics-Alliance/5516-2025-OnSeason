@@ -109,9 +109,9 @@ public class CoralHolder extends SubsystemBase {
     public Command intakeCoralSequence() {
         return Commands.sequence(
                         // Run the rollers forward quickly until the coral hits the first sensor
-                        run(() -> setVoltage(2.5, 3.5)).until(() -> inputs.firstSensorTriggered),
+                        run(() -> setVoltage(1.5, 3)).until(() -> inputs.firstSensorTriggered),
                         // Run the rollers backwards for 0.1 for a rapid brake
-                        run(() -> setVoltage(-1, 3.5)).withTimeout(0.1),
+                        run(() -> setVoltage(-1, 1)).withTimeout(0.1),
                         // Next, run the rollers forward slowly until the coal hits the second sensor
                         run(() -> setVoltage(0.8, 0.0)).until(coralInPlace))
                 // Only run when the rollers are not in place yet

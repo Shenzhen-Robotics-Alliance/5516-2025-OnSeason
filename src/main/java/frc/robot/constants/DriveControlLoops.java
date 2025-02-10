@@ -9,9 +9,9 @@ import frc.robot.utils.CustomPIDs.MaplePIDController;
 public class DriveControlLoops {
     public static final boolean ENABLE_SOFTWARE_CONSTRAIN = true;
     public static final AngularVelocity ANGULAR_VELOCITY_SOFT_CONSTRAIN = RotationsPerSecond.of(0.75);
-    public static final AngularAcceleration ANGULAR_ACCELERATION_SOFT_CONSTRAIN = RotationsPerSecondPerSecond.of(1);
+    public static final AngularAcceleration ANGULAR_ACCELERATION_SOFT_CONSTRAIN = RotationsPerSecondPerSecond.of(1.5);
     public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN = DriveTrainConstants.CHASSIS_MAX_VELOCITY;
-    public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN = MetersPerSecondPerSecond.of(6);
+    public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN = MetersPerSecondPerSecond.of(7);
     public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW = MetersPerSecond.of(2);
     public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN_LOW = MetersPerSecondPerSecond.of(3);
 
@@ -30,7 +30,6 @@ public class DriveControlLoops {
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    0.8,
                     Meters.of(1),
                     MetersPerSecond.of(2),
                     MetersPerSecond.of(0.7),
@@ -40,7 +39,6 @@ public class DriveControlLoops {
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    0.7,
                     Meters.of(1.1),
                     MetersPerSecond.of(2),
                     MetersPerSecond.of(0.7),
@@ -50,7 +48,6 @@ public class DriveControlLoops {
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    0.75,
                     Meters.of(0.6),
                     MetersPerSecond.of(5),
                     MetersPerSecond.of(2),
