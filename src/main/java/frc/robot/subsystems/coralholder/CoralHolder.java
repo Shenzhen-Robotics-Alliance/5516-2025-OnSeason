@@ -1,13 +1,21 @@
 package frc.robot.subsystems.coralholder;
 
+import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Volts;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose3d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.utils.AlertsManager;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class CoralHolder extends SubsystemBase {
@@ -26,12 +34,23 @@ public class CoralHolder extends SubsystemBase {
     private final Alert sensor1HardwareFaultsAlert;
     private final Alert sensor2HardwareFaultsAlert;
 
-    public CoralHolder(CoralHolderIO io) {
+    private final Supplier<Pose2d> robotPoseSupplier;
+    private final Supplier<Rotation2d> armAngleSupplier;
+    private final Supplier<Distance> elevatorHeightSupplier;
+
+    public CoralHolder(
+            CoralHolderIO io,
+            Supplier<Pose2d> robotPoseSupplier,
+            Supplier<Rotation2d> armAngleSupplier,
+            Supplier<Distance> elevatorHeightSupplier) {
         this.io = io;
         inputs = new CoralHolderInputsAutoLogged();
 
         this.hasCoral = new Trigger(() -> inputs.firstSensorTriggered || inputs.secondSensorTriggered);
         this.coralInPlace = new Trigger(() -> inputs.firstSensorTriggered && inputs.secondSensorTriggered);
+        this.robotPoseSupplier = robotPoseSupplier;
+        this.armAngleSupplier = armAngleSupplier;
+        this.elevatorHeightSupplier = elevatorHeightSupplier;
 
         this.motorHardwareFaultsAlert =
                 AlertsManager.create("Coral Holder roller motor hardware faults detected!", Alert.AlertType.kError);
@@ -48,7 +67,7 @@ public class CoralHolder extends SubsystemBase {
     private void setVoltage(double rollerVolts, double feederVolts) {
         if (!hardwareOK()) rollerVolts = feederVolts = 0;
         io.setRollerMotorOutput(Volts.of(rollerVolts));
-        io.setFeederMotorOutput(Volts.of(feederVolts));
+        io.setCollectorMotorOutput(Volts.of(feederVolts));
     }
 
     @Override
@@ -61,6 +80,25 @@ public class CoralHolder extends SubsystemBase {
         motorHardwareFaultsAlert.set(!inputs.motorConnected);
         sensor1HardwareFaultsAlert.set(!inputs.firstSensorConnected);
         sensor2HardwareFaultsAlert.set(!inputs.secondSensorConnected);
+
+        visualizeCoral();
+    }
+
+    private void visualizeCoral() {
+        String key = "CoralInRobot";
+        Pose2d robotPose = robotPoseSupplier.get();
+        Distance elevatorHeight = elevatorHeightSupplier.get();
+        Rotation2d armAngle = armAngleSupplier.get();
+        if (inputs.firstSensorTriggered && inputs.secondSensorTriggered)
+            SuperStructureVisualizer.visualizeCoralInCoralHolder(
+                    key, robotPose, elevatorHeight, armAngle, Centimeters.of(8));
+        else if (inputs.firstSensorTriggered)
+            SuperStructureVisualizer.visualizeCoralInCoralHolder(
+                    key, robotPose, elevatorHeight, armAngle, Centimeters.zero());
+        else if (inputs.secondSensorTriggered)
+            SuperStructureVisualizer.visualizeCoralInCoralHolder(
+                    key, robotPose, elevatorHeight, armAngle, Centimeters.of(15));
+        else Logger.recordOutput(key, new Pose3d(0, 0, -1, new Rotation3d()));
     }
 
     /**

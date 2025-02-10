@@ -138,7 +138,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
     }
 
     @Override
-    public void setFeederMotorOutput(Voltage voltage) {
+    public void setCollectorMotorOutput(Voltage voltage) {
         voltageOut.withOutput(voltage);
         feederTalon1.setControl(voltageOut);
         feederTalon2.setControl(voltageOut);

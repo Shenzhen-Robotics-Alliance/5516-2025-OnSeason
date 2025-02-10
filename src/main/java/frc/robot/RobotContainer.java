@@ -9,9 +9,7 @@ import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -118,7 +116,11 @@ public class RobotContainer {
 
                 arm = new Arm(new ArmIOReal());
                 elevator = new Elevator(new ElevatorIOReal());
-                coralHolder = new CoralHolder(new CoralHolderIOReal());
+                coralHolder = new CoralHolder(
+                        new CoralHolderIOReal(),
+                        RobotState.getInstance()::getPrimaryEstimatorPose,
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
 
             case SIM -> {
@@ -171,10 +173,11 @@ public class RobotContainer {
 
                 arm = new Arm(new ArmIOSim());
                 elevator = new Elevator(new ElevatorIOSim());
-                coralHolder = new CoralHolder(new CoralHolderIOSim(
+                coralHolder = new CoralHolder(
+                        new CoralHolderIOSim(driveSimulation, arm::getArmAngle, elevator::getHeight),
                         driveSimulation::getSimulatedDriveTrainPose,
-                        () -> arm.getArmAngle().getMeasure(),
-                        elevator::getHeight));
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
 
             default -> {
@@ -195,7 +198,11 @@ public class RobotContainer {
 
                 arm = new Arm(armInputs -> {});
                 elevator = new Elevator(elevatorInputs -> {});
-                coralHolder = new CoralHolder(coralHolderInputs -> {});
+                coralHolder = new CoralHolder(
+                        coralHolderInputs -> {},
+                        RobotState.getInstance()::getPrimaryEstimatorPose,
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
         }
 
@@ -398,6 +405,12 @@ public class RobotContainer {
 
         ReefAlignment.updateDashboard();
 
+        SuperStructureVisualizer.visualizeCoralInCoralHolder(
+                "Test Coral",
+                driveSimulation.getSimulatedDriveTrainPose(),
+                elevator.getHeight(),
+                arm.getArmAngle(),
+                Centimeters.of(0));
         SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
                 "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());

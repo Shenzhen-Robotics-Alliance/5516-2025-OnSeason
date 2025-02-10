@@ -1,6 +1,7 @@
 package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
 
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.Distance;
@@ -22,5 +23,41 @@ public class SuperStructureVisualizer {
             new Pose3d(ARM_ZERO_POSITION.plus(elevatorHeightTranslation), armRotation)
         };
         Logger.recordOutput("SuperStructure/" + key, poses);
+    }
+
+    public static void visualizeCoralInCoralHolder(
+            String key, Pose2d robotPose, Distance elevatorHeight, Rotation2d armAngle, Distance coralDisplacement) {
+        Logger.recordOutput(key, getCoralOnRobotPosition(robotPose, elevatorHeight, armAngle, coralDisplacement));
+    }
+
+    public static Pose3d getCoralOnRobotPosition(
+            Pose2d robotPose, Distance elevatorHeight, Rotation2d armAngle, Distance coralDisplacement) {
+        Pose3d coralPoseOnRobot = getCoralPositionRobotRelative(elevatorHeight, armAngle, coralDisplacement);
+
+        Rotation3d coralOrientation = coralPoseOnRobot
+                .getRotation()
+                .plus(new Rotation3d(0, 0, robotPose.getRotation().getRadians()));
+
+        Translation3d robotPosition = new Translation3d(robotPose.getTranslation());
+        Translation3d coralPosition =
+                robotPosition.plus(coralPoseOnRobot.getTranslation().rotateBy(new Rotation3d(robotPose.getRotation())));
+        return new Pose3d(coralPosition, coralOrientation);
+    }
+
+    public static Pose3d getCoralPositionRobotRelative(
+            Distance elevatorHeight, Rotation2d armAngle, Distance coralDisplacement) {
+        Rotation3d coralOrientationOnRobot = new Rotation3d(
+                0, -armAngle.plus(ARM_ANGLE_TO_CORAL_POINTING_ANGLE).getRadians(), 0);
+        Translation3d coralPositionOnRobot = new Translation3d(0.27, 0, 0.365)
+                .plus(new Translation3d(
+                        CORAL_LENGTH_ON_ARM.in(Meters),
+                        new Rotation3d(
+                                0,
+                                -armAngle.plus(ARM_PINPOINT_TO_CORAL_DIRECTION).getRadians(),
+                                0)))
+                .plus(new Translation3d(0, 0, elevatorHeight.in(Meters)))
+                .plus(new Translation3d(coralDisplacement.in(Meters), coralOrientationOnRobot));
+
+        return new Pose3d(coralPositionOnRobot, coralOrientationOnRobot);
     }
 }

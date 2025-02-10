@@ -27,5 +27,5 @@ public interface CoralHolderIO {
 
     default void setRollerMotorOutput(Voltage voltage) {}
 
-    default void setFeederMotorOutput(Voltage voltage) {}
+    default void setCollectorMotorOutput(Voltage voltage) {}
 }

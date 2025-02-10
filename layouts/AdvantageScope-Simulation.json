@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 1708,
-      "height": 1020,
+      "x": 0,
+      "y": 0,
+      "width": 1706,
+      "height": 1018,
       "state": {
         "sidebar": {
           "width": 342,
@@ -35,17 +35,22 @@
             "/Drive/OdometryThread/MeasurementTimeStamps",
             "/AdvantageKit/RealOutputs/RobotState",
             "/AdvantageKit/RealOutputs/SuperStructure",
-            "/AdvantageKit/RealOutputs/Elevator",
             "/AdvantageKit/Drive/OdometryThread",
-            "/AdvantageKit/RealOutputs/Arm",
             "/AdvantageKit/RealOutputs/FieldSimulation",
             "/AdvantageKit/RealOutputs/Elevator/PID",
             "/AdvantageKit/Arm",
-            "/AdvantageKit/RealOutputs/Arm/PID"
+            "/AdvantageKit/RealOutputs/Arm/PID",
+            "/AdvantageKit/RealOutputs/Sim",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/6",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/6/translation",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/6/rotation",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/5/translation",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/0",
+            "/AdvantageKit/RealOutputs/FieldSimulation/Coral/0/translation"
           ]
         },
         "tabs": {
-          "selected": 6,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -93,6 +98,15 @@
                     "options": {
                       "variant": "Coral"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/CoralInRobot",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -103,14 +117,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -1.852631582736602,
-                  6.862317780396397,
-                  -11.496780894602297
+                  -10.554243906378158,
+                  2.6534634584882064,
+                  0.9469733413394189
                 ],
                 "cameraTarget": [
-                  1.2644594050437197,
-                  0.33067599929079794,
-                  -0.45724288718485084
+                  0,
+                  0.5,
+                  0
                 ]
               },
               "controlsHeight": 200
@@ -239,6 +253,15 @@
                     "options": {
                       "variant": "Coral"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/CoralInRobot",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -246,17 +269,17 @@
               },
               "controllerUUID": "xsrx25f4oj63akofvijnzfcfcqyd3see",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -3.219772076954368,
-                  1.5089127867983276,
-                  -1.0195644639380292
+                  -12.832676085170226,
+                  3.2828744525218605,
+                  1.2022006220768948
                 ],
                 "cameraTarget": [
-                  -0.347813048225159,
-                  1.2534327783560366,
-                  0.09291895084647617
+                  -0.06131905474575397,
+                  0.15598841447115835,
+                  0.033858503315879696
                 ]
               },
               "controlsHeight": 317
@@ -543,6 +566,31 @@
       }
     }
   ],
-  "satellites": [],
+  "satellites": [
+    {
+      "x": -349,
+      "y": -872,
+      "width": 2064,
+      "height": 832,
+      "state": {
+        "type": 3,
+        "visualizer": {
+          "cameraIndex": -1,
+          "orbitFov": 50,
+          "cameraPosition": [
+            -13.009954510939133,
+            2.734073304839584,
+            0.00030314619630892383
+          ],
+          "cameraTarget": [
+            0,
+            0.5,
+            0
+          ]
+        }
+      },
+      "uuid": "5mksczgiclyud8rihcbi5bv3ld4ujof7"
+    }
+  ],
   "version": "4.1.2"
 }
