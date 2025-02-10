@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1708,
-      "height": 1020,
+      "width": 1722,
+      "height": 1034,
       "state": {
         "sidebar": {
           "width": 342,
@@ -41,11 +41,14 @@
             "/AdvantageKit/Arm",
             "/AdvantageKit/RealOutputs/Arm/PID",
             "/AdvantageKit/RealOutputs/SwerveStates",
-            "/AdvantageKit/RealOutputs/Vision"
+            "/AdvantageKit/RealOutputs/Vision",
+            "/AdvantageKit/RealOutputs/LoggedRobot",
+            "/AdvantageKit/Drive",
+            "/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 7,
           "tabs": [
             {
               "type": 0,
@@ -570,10 +573,29 @@
               "type": 6,
               "title": "Statistics",
               "controller": {
-                "sources": [],
+                "sources": [
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps/length",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b"
+                    }
+                  },
+                  {
+                    "type": "independent",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/LoggedRobot/FullCycleMS",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#2b66a2"
+                    }
+                  }
+                ],
                 "timeRange": "visible",
                 "rangeMin": 0,
-                "rangeMax": 10,
+                "rangeMax": 40,
                 "stepSize": 1
               },
               "controllerUUID": "yga77whjea76vr6c6eniolq5te2hi5cv",

@@ -113,19 +113,24 @@ public class CoralHolderIOReal implements CoralHolderIO {
                 feeder1Output.getValue().plus(feeder2Output.getValue()).div(2);
 
         LaserCanInterface.Measurement firstSensorMeasurement = firstSensor.getMeasurement();
-        if (firstSensorMeasurement == null || firstSensorConfigurationError)
-            inputs.firstSensorConnected = inputs.firstSensorTriggered = false;
-        else {
+        if (firstSensorMeasurement == null || firstSensorConfigurationError) {
+            inputs.firstSensorDistanceMM = Double.POSITIVE_INFINITY;
+            inputs.firstSensorConnected = inputs.firstSensorReadingValid = false;
+        } else {
             inputs.firstSensorConnected = true;
-            inputs.firstSensorTriggered = isTriggered(firstSensorMeasurement, Centimeter.of(2));
+            inputs.firstSensorReadingValid =
+                    firstSensorMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+            inputs.firstSensorDistanceMM = firstSensorMeasurement.distance_mm;
         }
 
         LaserCanInterface.Measurement secondSensorMeasurement = secondSensor.getMeasurement();
-        if (secondSensorMeasurement == null || secondSensorConfigurationError)
-            inputs.secondSensorConnected = inputs.secondSensorTriggered = false;
-        else {
+        if (secondSensorMeasurement == null || secondSensorConfigurationError) {
+            inputs.secondSensorConnected = inputs.secondSensorReadingValid = false;
+        } else {
             inputs.secondSensorConnected = true;
-            inputs.secondSensorTriggered = isTriggered(secondSensorMeasurement, Centimeters.of(4));
+            inputs.secondSensorReadingValid =
+                    secondSensorMeasurement.status == LaserCan.LASERCAN_STATUS_VALID_MEASUREMENT;
+            inputs.secondSensorDistanceMM = secondSensorMeasurement.distance_mm;
         }
     }
 

@@ -41,14 +41,17 @@ public class CoralHolderIOSim implements CoralHolderIO {
 
     @Override
     public void updateInputs(CoralHolderInputs inputs) {
-        inputs.motorConnected = inputs.firstSensorConnected = inputs.secondSensorConnected = true;
+        inputs.motorConnected = inputs.firstSensorConnected =
+                inputs.secondSensorConnected = inputs.firstSensorReadingValid = inputs.secondSensorReadingValid = true;
 
         if (!hasCoral && rollerMotorVolts > 1) hasCoral = new XboxController(0).getBackButton();
 
         if (hasCoral) simulateCoralInsideIntake();
 
-        inputs.firstSensorTriggered = hasCoral && coralPosition < 1.6;
-        inputs.secondSensorTriggered = hasCoral && coralPosition > 1.5;
+        boolean firstSensorTriggered = hasCoral && coralPosition < 1.6;
+        boolean secondSensorTriggered = hasCoral && coralPosition > 1.5;
+        inputs.firstSensorDistanceMM = firstSensorTriggered ? 0 : 9999;
+        inputs.secondSensorDistanceMM = secondSensorTriggered ? 0 : 9999;
 
         if (coralPosition >= 2) launchCoral();
         Logger.recordOutput("Sim/coralPosition", coralPosition);

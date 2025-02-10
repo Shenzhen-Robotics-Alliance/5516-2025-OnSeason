@@ -9,6 +9,8 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class CoralHolderConstants {
+    public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);
+    public static final Distance SECOND_SENSOR_THRESHOLD = Centimeters.of(5);
     public static final Current ROLLERS_CURRENT_LIMIT = Amps.of(20);
 
     // Simulation Constants
