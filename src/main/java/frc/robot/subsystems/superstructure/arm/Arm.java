@@ -106,6 +106,7 @@ public class Arm extends SubsystemBase {
         io.setMotorOutput(Volts.zero());
         currentStateRad = new TrapezoidProfile.State(getArmAngle().getRadians(), 0);
         previousVelocityRadPerSec = 0.0;
+        logControlLoops(0, 0, 0);
     }
 
     private double previousVelocityRadPerSec = 0.0;
@@ -122,8 +123,15 @@ public class Arm extends SubsystemBase {
                 getArmAngle().getRadians(), currentStateRad.velocity, accelerationRadPerSecSq);
         double feedbackVolts = feedbackController.calculate(getArmAngle().getRadians(), currentStateRad.position);
 
-        Voltage voltage = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
-        io.setMotorOutput(voltage);
+        Voltage output = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
+        io.setMotorOutput(output);
+        logControlLoops(feedforwardVolts, feedbackVolts, output.in(Volts));
+    }
+
+    private void logControlLoops(double feedforwardVolts, double feedbackVolts, double outputVolts) {
+        Logger.recordOutput("Arm/PID/Feedforward Volts", feedforwardVolts);
+        Logger.recordOutput("Arm/PID/Feedback Volts", feedbackVolts);
+        Logger.recordOutput("Arm/PID/Requested Output Volts", outputVolts);
     }
 
     @Override
@@ -156,6 +164,7 @@ public class Arm extends SubsystemBase {
                 "Arm/Current State Velocity (Degrees Per Second)", Math.toDegrees(currentStateRad.velocity));
         Logger.recordOutput(
                 "Arm/Measured Velocity (Degrees Per Second)", getVelocity().in(DegreesPerSecond));
+        Logger.recordOutput("Arm/At Reference", atReference());
     }
 
     /**

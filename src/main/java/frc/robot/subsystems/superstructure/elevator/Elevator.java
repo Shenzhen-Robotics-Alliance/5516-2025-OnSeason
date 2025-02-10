@@ -80,6 +80,7 @@ public class Elevator extends SubsystemBase {
         io.setMotorOutput(Volts.zero());
         currentStateMeters = new TrapezoidProfile.State(getHeight().in(Meters), 0);
         previousVelocityMPS = getVelocity().in(MetersPerSecond);
+        logControlLoops(0, 0, 0);
     }
 
     private double previousVelocityMPS = 0.0;
@@ -96,12 +97,21 @@ public class Elevator extends SubsystemBase {
                 Math.abs(currentStateMeters.velocity) > ELEVATOR_MOVING_VELOCITY_THRESHOLD.in(MetersPerSecond);
         PIDController feedbackController = elevatorRequestedToMove ? strongFeedbackController : weakFeedbackController;
         double feedbackVolts = feedbackController.calculate(getHeight().in(Meters), currentStateMeters.position);
+        Logger.recordOutput("Elevator/PID/measurement", getHeight().in(Meters));
+        Logger.recordOutput("Elevator/PID/setpoint", currentStateMeters.position);
 
-        Voltage voltage = Volts.of(MathUtil.clamp(
+        Voltage output = Volts.of(MathUtil.clamp(
                 feedforwardVolts + feedbackVolts, MIN_OUTPUT_VOLTAGE.in(Volts), MAX_OUTPUT_VOLTAGE.in(Volts)));
 
-        if (goalState.position == 0.0 && currentStateMeters.position == 0.0) voltage = Volts.zero();
-        io.setMotorOutput(voltage);
+        if (goalState.position == 0.0 && currentStateMeters.position == 0.0 && atReference()) output = Volts.zero();
+        io.setMotorOutput(output);
+        logControlLoops(feedforwardVolts, feedbackVolts, output.in(Volts));
+    }
+
+    private void logControlLoops(double feedforwardVolts, double feedbackVolts, double outputVolts) {
+        Logger.recordOutput("Elevator/PID/Feedforward Volts", feedforwardVolts);
+        Logger.recordOutput("Elevator/PID/Feedback Volts", feedbackVolts);
+        Logger.recordOutput("Elevator/PID/Requested Output Volts", outputVolts);
     }
 
     /** @return the measured elevator height, where zero is lowest. */
@@ -142,10 +152,10 @@ public class Elevator extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Elevator", inputs);
 
-        // Disable PID setpoint if the robot is disabled.
-        if (DriverStation.isDisabled()) executeIdle();
         // Run setpoints
-        else this.executeControlLoops();
+        if (DriverStation.isEnabled()) executeControlLoops();
+        // Disable PID setpoint if the robot is disabled.
+        else executeIdle();
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
@@ -170,6 +180,7 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput(
                 "Elevator/Measured Velocity (Meters Per Second)", getVelocity().in(MetersPerSecond));
         Logger.recordOutput("Elevator/Current State Velocity (Meters Per Second)", currentStateMeters.velocity);
+        Logger.recordOutput("Elevator/At Reference", atReference());
     }
 
     public void requestElevatorHeight(Distance elevatorHeightSetpoint) {
