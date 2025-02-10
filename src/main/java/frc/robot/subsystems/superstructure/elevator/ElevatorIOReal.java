@@ -50,6 +50,7 @@ public class ElevatorIOReal implements ElevatorIO {
                 100.0, motor1Position, motor1Velocity, motorSupplyCurrent, motorOutputVoltage, motorTemperature);
 
         elevatorTalon.optimizeBusUtilization();
+        elevatorTalon.setPosition(0);
     }
 
     @Override

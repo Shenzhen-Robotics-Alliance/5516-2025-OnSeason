@@ -9,7 +9,7 @@ import edu.wpi.first.units.measure.*;
 public final class ArmConstants {
     public enum ArmPosition {
         IDLE(116),
-        INTAKE(126),
+        INTAKE(128),
         SCORE_L1_L2_L3(105),
         SCORE_L4(85),
         ELEVATOR_MOVING(55);
