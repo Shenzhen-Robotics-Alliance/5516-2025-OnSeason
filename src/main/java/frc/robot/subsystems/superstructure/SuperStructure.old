@@ -1,0 +1,143 @@
+package frc.robot.subsystems.superstructure;
+
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Radians;
+import static frc.robot.subsystems.superstructure.SuperStructureNodeGraph.*;
+
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Robot;
+import frc.robot.subsystems.superstructure.arm.Arm;
+import frc.robot.subsystems.superstructure.arm.ArmConstants;
+import frc.robot.subsystems.superstructure.elevator.Elevator;
+import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
+import java.util.*;
+
+public class SuperStructure {
+    /**
+     * Represents a pose of the super structure
+     *
+     * <p>The pose of the super structure is the combination of the elevator height and arm position
+     */
+    public record SuperStructurePose(Distance elevatorHeight, Angle armAngle) {
+        @Override
+        public boolean equals(Object obj) {
+            if (obj instanceof SuperStructurePose pose)
+                return pose.elevatorHeight.equals(this.elevatorHeight) && pose.armAngle.equals(this.armAngle);
+            return false;
+        }
+    }
+
+    /**
+     * Represents a link between two super structure poses
+     *
+     * <p>If two poses are linked, it means that the super structure can move from pose1 to pose2 directly (without
+     * hitting dead-bands).
+     */
+    public record PoseLink(SuperStructurePose pose1, SuperStructurePose pose2) {
+        /**
+         * Calculates the amount of time needed for the super structure to move
+         */
+        public double timeSeconds() {
+            TrapezoidProfile.State elevatorState = new TrapezoidProfile.State(pose1.elevatorHeight.in(Meters), 0);
+            TrapezoidProfile.State armState =
+                    new TrapezoidProfile.State(pose1.armAngle().in(Radians), 0);
+            elevatorProfile.calculate(Robot.defaultPeriodSecs, elevatorState, elevatorState);
+            armProfile.calculate(Robot.defaultPeriodSecs, armState, armState);
+            double elevatorTime = elevatorProfile.timeLeftUntil(pose2.elevatorHeight.in(Meters));
+            double armTime = armProfile.timeLeftUntil(pose2.armAngle().in(Radians));
+            return Math.max(elevatorTime, armTime);
+        }
+
+        public Optional<SuperStructurePose> otherEdge(SuperStructurePose oneEdge) {
+            if (oneEdge.equals(pose1))
+                return Optional.of(pose2);
+            if (oneEdge.equals(pose2))
+                return Optional.of(pose1);
+            else
+                return Optional.empty();
+        }
+    }
+
+    private final Elevator elevator;
+    private final Arm arm;
+    private static final TrapezoidProfile elevatorProfile = new TrapezoidProfile(ElevatorConstants.PROFILE_CONSTRAINS);
+    private static final TrapezoidProfile armProfile = new TrapezoidProfile(ArmConstants.PROFILE_CONSTRAINS);
+
+    public SuperStructure(Elevator elevator, Arm arm) {
+        this.elevator = elevator;
+        this.arm = arm;
+    }
+
+    public Command runPose(SuperStructurePose pose) {
+        return elevator.moveToPosition(pose.elevatorHeight).alongWith(arm.moveToPosition(pose.armAngle()));
+    }
+
+    private static final int loopNumLimit = 20;
+    /**
+     * Finds the minimum-time trajectory to move from a pose to a target pose.
+     *
+     * <p>This uses a shortest path algorithm (Dijkstra) to find the optimal path considering the time to move between
+     * poses.
+     */
+    public Optional<List<SuperStructurePose>> getTrajectory(SuperStructurePose startingPose, SuperStructurePose targetPose) {
+        Set<SuperStructurePose> unvisited = new HashSet<>(KNOWN_POSES);
+        // The path that leads to a node with minimum time
+        Map<SuperStructurePose, PoseLink> minimumTimePathToNode = new HashMap<>();
+        Map<SuperStructurePose, Double> minimumTimeToPose = new HashMap<>();
+        for (SuperStructurePose pose:KNOWN_POSES) minimumTimeToPose.put(pose, Double.POSITIVE_INFINITY);
+        minimumTimeToPose.put(startingPose, 0.0);
+
+        SuperStructurePose currentNode = startingPose;
+        // limit loop time to avoid code crashes
+        for (int i = 0; i < loopNumLimit; i++) {
+            // If we've already reached target
+            if (currentNode.equals(targetPose)) {
+                List<SuperStructurePose> trajectory = new ArrayList<>();
+                SuperStructurePose tmp = currentNode;
+                for (int j = 0; j < loopNumLimit; j++) {
+                    trajectory.add(tmp);
+                    if (tmp == targetPose)
+                        return Optional.of(trajectory);
+                    tmp = minimumTimePathToNode.get(tmp).otherEdge(tmp).get();
+                }
+                DriverStation.reportError("Internal Error Occurred while planning trajectory", true);
+                return Optional.empty();
+            }
+
+            Optional<PoseLink> minimumTimeLink = Optional.empty();
+            for (PoseLink link: LINKS) {
+                Optional<SuperStructurePose> otherNode = link.otherEdge(currentNode);
+                if (otherNode.isEmpty()) continue;
+
+                double newTime = minimumTimeToPose.get(currentNode) + link.timeSeconds();
+                if (newTime < minimumTimeToPose.get(otherNode.get())) {
+                    minimumTimePathToNode.put(otherNode.get(), link);
+                    minimumTimeToPose.put(otherNode.get(), newTime);
+                }
+
+                if (!unvisited.contains(otherNode.get())) continue;
+                if (minimumTimeLink.isEmpty() || minimumTimeLink.get().timeSeconds() > link.timeSeconds())
+                    minimumTimeLink = Optional.of(link);
+            }
+
+            unvisited.remove(currentNode);
+            if (minimumTimeLink.isPresent() && minimumTimeLink.get().otherEdge(currentNode).isPresent())
+                currentNode = minimumTimeLink.get().otherEdge(currentNode).get();
+            else
+                break;
+        }
+
+        DriverStation.reportError("Failed to plan super structure trajectory in " + loopNumLimit + " iterations!", true);
+        return Optional.empty();
+    }
+}
+
+class SuperStructureNodeGraph {
+    public static Set<SuperStructure.SuperStructurePose> KNOWN_POSES = Set.of();
+    public static Set<SuperStructure.PoseLink> LINKS = Set.of();
+}
+

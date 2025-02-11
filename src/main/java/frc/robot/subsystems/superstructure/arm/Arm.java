@@ -178,8 +178,8 @@ public class Arm extends SubsystemBase {
     }
 
     /** Request the arm to move to a given setpoint. */
-    public void requestPosition(ArmPosition setpoint) {
-        this.setpoint = setpoint.angle;
+    public void requestPosition(Angle setpoint) {
+        this.setpoint = setpoint;
     }
 
     /**
@@ -190,7 +190,7 @@ public class Arm extends SubsystemBase {
      * <p><b>Note: This command finishes automatically when the setpoint is reached, causing the default command to
      * schedule.</b>
      */
-    public Command moveToPosition(ArmPosition setpoint) {
+    public Command moveToPosition(Angle setpoint) {
         return run(() -> requestPosition(setpoint)).until(this::atReference);
     }
 

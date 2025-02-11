@@ -336,36 +336,36 @@ public class RobotContainer {
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
         elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
-        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
+        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE.angle));
 
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
                 .whileTrue(Commands.sequence(
                                 elevator.moveToPosition(Centimeters.of(3))
-                                        .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
+                                        .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE.angle)),
                                 Commands.runOnce(flashLEDForIntake::schedule),
                                 coralHolder.intakeCoralSequence())
                         .finallyDo(flashLEDForIntake::cancel));
         driver.moveToL4Button()
                 .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
                         elevator.moveToPosition(Meters.of(1.32))
                                 .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4.angle),
                         Commands.waitUntil(() -> false)));
         driver.moveToL3Button()
                 .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
                         elevator.moveToPosition(Meters.of(0.62))
                                 .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3),
+                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3.angle),
                         Commands.waitUntil(() -> false)));
         driver.moveToL2Button()
                 .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
+                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
                         elevator.moveToPosition(Meters.of(0)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE)));
+                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE.angle)));
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
