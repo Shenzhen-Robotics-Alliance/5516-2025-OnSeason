@@ -99,7 +99,6 @@ public class CoralHolderIOSim implements CoralHolderIO {
         SimulatedArena.getInstance().addGamePieceProjectile(coralOnFly);
         hasCoral = false;
         coralPosition = 0;
-        System.out.println("launching coral: " + coralOnFly.getPose3d());
     }
 
     private static boolean insideIntakeRange(Pose2d simulatedDriveTrainPose, Pose3d coralPositionInAir) {

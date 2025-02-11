@@ -196,9 +196,7 @@ public class ReefAlignment {
     }
 
     private static Command preciseAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight
-                .playAnimation(new LEDAnimation.Charging(Color.kOrange), 0.5)
-                .repeatedly();
+        return statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 3);
     }
 
     private static Command alignmentComplete(LEDStatusLight statusLight, DriverMap driver) {

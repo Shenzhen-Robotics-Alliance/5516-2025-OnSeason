@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -29,6 +30,7 @@ import frc.robot.subsystems.coralholder.CoralHolderIOReal;
 import frc.robot.subsystems.coralholder.CoralHolderIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
+import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.subsystems.superstructure.arm.Arm;
@@ -335,11 +337,16 @@ public class RobotContainer {
         coralHolder.setDefaultCommand(coralHolder.runIdle());
         elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
         arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
+
+        Command flashLEDForIntake =
+                ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
                 .whileTrue(Commands.sequence(
-                        elevator.moveToPosition(Centimeters.of(3))
-                                .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
-                        coralHolder.intakeCoralSequence()));
+                                elevator.moveToPosition(Centimeters.of(3))
+                                        .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
+                                Commands.runOnce(flashLEDForIntake::schedule),
+                                coralHolder.intakeCoralSequence())
+                        .finallyDo(flashLEDForIntake::cancel));
         driver.moveToL4Button()
                 .onTrue(Commands.sequence(
                         arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
@@ -369,6 +376,9 @@ public class RobotContainer {
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
+        coralHolder.hasCoral.onTrue(
+                ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kYellow), 3));
+        coralHolder.coralInPlace.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
     }
 
     /**

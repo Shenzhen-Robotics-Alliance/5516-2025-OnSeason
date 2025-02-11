@@ -48,8 +48,10 @@ public class CoralHolder extends SubsystemBase {
         this.io = io;
         inputs = new CoralHolderInputsAutoLogged();
 
-        this.firstSensor = new Trigger(() -> inputs.firstSensorReadingValid && inputs.firstSensorDistanceMM < FIRST_SENSOR_THRESHOLD.in(Millimeters));
-        this.secondSensor = new Trigger(() -> inputs.secondSensorReadingValid && inputs.secondSensorDistanceMM < SECOND_SENSOR_THRESHOLD.in(Millimeters));
+        this.firstSensor = new Trigger(() -> inputs.firstSensorReadingValid
+                && inputs.firstSensorDistanceMM < FIRST_SENSOR_THRESHOLD.in(Millimeters));
+        this.secondSensor = new Trigger(() -> inputs.secondSensorReadingValid
+                && inputs.secondSensorDistanceMM < SECOND_SENSOR_THRESHOLD.in(Millimeters));
         this.hasCoral = firstSensor.or(secondSensor);
         this.coralInPlace = firstSensor.and(secondSensor);
         this.robotPoseSupplier = robotPoseSupplier;
