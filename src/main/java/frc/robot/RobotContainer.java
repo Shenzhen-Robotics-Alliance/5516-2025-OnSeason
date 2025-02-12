@@ -5,7 +5,6 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.*;
 import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
@@ -233,7 +232,7 @@ public class RobotContainer {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
         autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
-        autoSendableChooser.addOption("[LEFT SIDE] - Four Coral Auto", new FourCoralLeftSide());
+        autoSendableChooser.addOption("[LEFT SIDE] - Four Coral Auto", new ThreeCoralLeftSide());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;

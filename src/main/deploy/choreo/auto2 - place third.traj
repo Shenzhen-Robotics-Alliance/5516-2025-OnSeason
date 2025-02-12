@@ -22,7 +22,7 @@
     {"from":1, "to":1, "data":{"type":"PointAt", "props":{"x":{"exp":"4.047988414764404 m", "val":4.047988414764404}, "y":{"exp":"4.778042793273926 m", "val":4.778042793273926}, "tolerance":{"exp":"1 deg", "val":0.017453292519943295}, "flip":false}}, "enabled":true},
     {"from":1, "to":1, "data":{"type":"MaxVelocity", "props":{"max":{"exp":"0 m / s", "val":0.0}}}, "enabled":true},
     {"from":"first", "to":"last", "data":{"type":"MaxVelocity", "props":{"max":{"exp":"maxvel", "val":3.5}}}, "enabled":true},
-    {"from":"first", "to":"last", "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"maxacc", "val":6.0}}}, "enabled":true}],
+    {"from":"first", "to":"last", "data":{"type":"MaxAcceleration", "props":{"max":{"exp":"maxacc", "val":6.5}}}, "enabled":true}],
   "targetDt":{
    "exp":"0.05 s",
    "val":0.05
