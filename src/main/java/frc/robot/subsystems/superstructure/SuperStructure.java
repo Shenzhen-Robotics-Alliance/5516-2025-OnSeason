@@ -104,6 +104,9 @@ public class SuperStructure {
 
         /** Helper method to calculate time needed for a mechanism to move to a setpoint Author: ChatGPT-o3-mini-high */
         private static double calculateTimeToSetpoint(double difference, double maxAcc, double maxVel) {
+            // Take the absolute value of difference to prevent negative values
+            difference = Math.abs(difference);
+
             // Time to reach max velocity during acceleration phase
             double timeToMaxVel = maxVel / maxAcc;
 
@@ -118,6 +121,7 @@ public class SuperStructure {
             // Time to accelerate and decelerate
             double distanceAtConstantVelocity = difference - 2 * distanceDuringAcc;
             double timeAtConstantVel = distanceAtConstantVelocity / maxVel;
+
             return 2 * timeToMaxVel + timeAtConstantVel;
         }
 
@@ -142,15 +146,15 @@ public class SuperStructure {
 
         atReference = new Trigger(
                 () -> elevator.atReference(currentPose.elevatorHeight) && arm.atReference(currentPose.armAngle));
-
-        for (PoseLink link : LINKS) System.out.println("time: " + link.timeSeconds());
     }
 
     private Command runPose(SuperStructurePose pose) {
         return elevator.moveToPosition(pose.elevatorHeight)
                 .alongWith(arm.moveToPosition(pose.armAngle))
+                .beforeStarting(Commands.print("Super Structure/Moving to pose: " + pose.name()))
                 .finallyDo(interrupted -> {
-                    if (!interrupted) currentPose = pose;
+                    currentPose = pose;
+                    System.out.println("Super Structure/Reached pose: " + pose.name());
                 });
     }
 
@@ -215,17 +219,19 @@ public class SuperStructure {
                     break;
                 }
             }
-            if (linkToExamine == null) {
-                System.out.println("No links left to examine, quiting...");
-            }
+            if (linkToExamine == null) break;
         }
 
         List<SuperStructurePose> trajectory = new ArrayList<>();
         SuperStructurePose tmp = targetPose;
+        System.out.println("<-- tracing trajectory: -->");
         for (int j = 0; j < loopNumLimit; j++) {
-            System.out.println("tmp: " + tmp);
+            System.out.println("    tracing node: " + tmp);
             trajectory.add(0, tmp);
-            if (tmp == startingPose) return Optional.of(trajectory);
+            if (tmp == startingPose) {
+                System.out.println("Successfully planned trajectory: " + printTrajectory(trajectory));
+                return Optional.of(trajectory);
+            }
             if (!minimumTimePathToNode.containsKey(tmp)) {
                 DriverStation.reportError("Internal Error while tracing back trajectory", true);
                 return Optional.empty();
@@ -244,6 +250,15 @@ public class SuperStructure {
                         + " iterations",
                 true);
         return Optional.empty();
+    }
+
+    private static String printTrajectory(List<SuperStructurePose> trajectory) {
+        if (trajectory.isEmpty()) return "(Empty Trajectory)";
+        StringBuilder message = new StringBuilder();
+        for (int i = 0; i < trajectory.size() - 1; i++)
+            message.append(trajectory.get(i).name()).append(" -> ");
+        message.append(trajectory.get(trajectory.size() - 1).name());
+        return message.toString();
     }
 
     public Optional<List<SuperStructurePose>> getTrajectory(SuperStructurePose targetPose) {
