@@ -24,7 +24,6 @@
             "/ReplayOutputs/Alerts/errors",
             "/ReplayOutputs/Alerts/infos",
             "/ReplayOutputs/Alerts/warnings",
-            "/RealOutputs/RobotState",
             "/RealOutputs/SwerveStates",
             "/RealOutputs/Vision",
             "/RealOutputs/Vision/AprilTags",
@@ -39,14 +38,14 @@
             "/Drive/OdometryThread/MeasurementTimeStamps",
             "/ReplayOutputs/Logger",
             "/RealOutputs/Logger",
-            "/Elevator",
             "/RealOutputs",
             "/RealOutputs/Elevator",
-            "/DriverStation"
+            "/DriverStation",
+            "/Elevator"
           ]
         },
         "tabs": {
-          "selected": 5,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -162,6 +161,15 @@
                       "model": "Drivetrain Only",
                       "color": "#ff0000"
                     }
+                  },
+                  {
+                    "type": "gamePiece",
+                    "logKey": "/RealOutputs/CoralInRobot",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
                   }
                 ],
                 "game": "2025 Field",
@@ -172,17 +180,17 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -6.772634214704789,
-                  4.417539550853285,
-                  -7.083737884522104
+                  -11.279703362633859,
+                  5.434562361473012,
+                  -2.3685789069018686
                 ],
                 "cameraTarget": [
-                  -7.125578336622952,
-                  0.5288500264246566,
-                  4.207516824038895
+                  -5.131069079463238,
+                  0.7101974791794106,
+                  -0.3322821442132233
                 ]
               },
-              "controlsHeight": 179
+              "controlsHeight": 434
             },
             {
               "type": 2,
@@ -424,16 +432,16 @@
                     "visible": true,
                     "options": {
                       "color": "#af2437",
-                      "size": "normal"
+                      "size": "bold"
                     }
                   },
                   {
-                    "type": "stepped",
-                    "logKey": "/ReplayOutputs/Elevator/PID/Requested Output Volts",
+                    "type": "smooth",
+                    "logKey": "/Elevator/MotorOutputVoltage",
                     "logType": "Number",
                     "visible": true,
                     "options": {
-                      "color": "#3b875a",
+                      "color": "#e48b32",
                       "size": "bold"
                     }
                   },
@@ -441,7 +449,7 @@
                     "type": "stepped",
                     "logKey": "/RealOutputs/Elevator/Temperature (Degrees Celsius)",
                     "logType": "Number",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#c0b487",
                       "size": "bold"
