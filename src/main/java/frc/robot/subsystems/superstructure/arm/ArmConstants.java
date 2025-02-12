@@ -7,20 +7,6 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.*;
 
 public final class ArmConstants {
-    public enum ArmPosition {
-        IDLE(116),
-        INTAKE(132),
-        SCORE_L1_L2_L3(105),
-        SCORE_L4(85),
-        ELEVATOR_MOVING(55);
-
-        public final Angle angle;
-
-        ArmPosition(double degrees) {
-            this.angle = Degrees.of(degrees);
-        }
-    }
-
     // General Configs
     public static final double ARM_GEARING_REDUCTION = 44.0 / 16.0 * 48.0 / 20.0 * 9.0;
     public static final Current ARM_CURRENT_LIMIT = Amps.of(30.0);

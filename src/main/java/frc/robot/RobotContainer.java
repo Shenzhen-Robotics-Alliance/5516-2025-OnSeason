@@ -32,9 +32,9 @@ import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
 import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
+import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.subsystems.superstructure.arm.Arm;
-import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.arm.ArmIOReal;
 import frc.robot.subsystems.superstructure.arm.ArmIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -86,6 +86,7 @@ public class RobotContainer {
     private final SwerveDriveSimulation driveSimulation;
     private final Arm arm;
     private final Elevator elevator;
+    private final SuperStructure superStructure;
     private final CoralHolder coralHolder;
 
     private final Field2d field = new Field2d();
@@ -208,6 +209,7 @@ public class RobotContainer {
             }
         }
 
+        this.superStructure = new SuperStructure(elevator, arm);
         this.ledStatusLight = new LEDStatusLight(0, 100, false, false);
 
         this.drive.configHolonomicPathPlannerAutoBuilder(field);
@@ -335,37 +337,28 @@ public class RobotContainer {
                         drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
-        elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
-        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE.angle));
 
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
                 .whileTrue(Commands.sequence(
-                                elevator.moveToPosition(Centimeters.of(3))
-                                        .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE.angle)),
+                                superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
                                 Commands.runOnce(flashLEDForIntake::schedule),
                                 coralHolder.intakeCoralSequence())
                         .finallyDo(flashLEDForIntake::cancel));
-        driver.moveToL4Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
-                        elevator.moveToPosition(Meters.of(1.32))
-                                .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4.angle),
-                        Commands.waitUntil(() -> false)));
-        driver.moveToL3Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
-                        elevator.moveToPosition(Meters.of(0.62))
-                                .beforeStarting(coralHolder.shuffleCoralSequence()::schedule),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3.angle),
-                        Commands.waitUntil(() -> false)));
         driver.moveToL2Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING.angle),
-                        elevator.moveToPosition(Meters.of(0)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE.angle)));
+                .onTrue(superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L2)
+                        .alongWith(coralHolder.shuffleCoralSequence()));
+        driver.moveToL3Button()
+                .onTrue(superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L3)
+                        .alongWith(coralHolder.shuffleCoralSequence()));
+        driver.moveToL4Button()
+                .onTrue(superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
+                        .alongWith(coralHolder.shuffleCoralSequence()));
+
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));

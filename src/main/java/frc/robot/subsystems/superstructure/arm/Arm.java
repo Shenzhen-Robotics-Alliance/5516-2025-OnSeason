@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.utils.AlertsManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -73,7 +74,7 @@ public class Arm extends SubsystemBase {
         this.armAbsoluteEncoderDisconnectedAlert.set(false);
 
         currentStateRad = new TrapezoidProfile.State(ARM_UPPER_LIMIT.in(Radians), 0);
-        setpoint = ArmPosition.IDLE.angle;
+        setpoint = SuperStructure.SuperStructurePose.IDLE.armAngle;
 
         hardwareFaultDetected = false;
         encoderCalibrated = false;
@@ -173,6 +174,10 @@ public class Arm extends SubsystemBase {
      * @return <code>true</code> if there is a setpoint and the arm is close enough to it, <code>false</code> otherwise.
      */
     public boolean atReference() {
+        return atReference(this.setpoint);
+    }
+
+    public boolean atReference(Angle setpoint) {
         double errorRad = getArmAngle().minus(new Rotation2d(setpoint)).getRadians();
         return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
     }

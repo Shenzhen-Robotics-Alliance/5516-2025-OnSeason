@@ -143,6 +143,10 @@ public class Elevator extends SubsystemBase {
      *     otherwise.
      */
     public boolean atReference() {
+        return atReference(this.heightSetpoint);
+    }
+
+    public boolean atReference(Distance heightSetpoint) {
         return getHeight().minus(heightSetpoint).abs(Meters) < ELEVATOR_PID_TOLERANCE.in(Meters);
     }
 
