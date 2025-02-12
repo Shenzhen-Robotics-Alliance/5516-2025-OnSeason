@@ -116,6 +116,13 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                 timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
                 timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
 
+        RobotState.getInstance()
+                .addChassisSpeedsObservation(
+                        getModuleStates(),
+                        gyroInputs.connected
+                                ? OptionalDouble.of(gyroInputs.yawVelocityRadPerSec)
+                                : OptionalDouble.empty());
+
         RobotState.getInstance().updateAlerts();
         gyroDisconnectedAlert.set(!gyroInputs.connected);
         canBusHighUtilization.setText(
@@ -131,6 +138,11 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                 "RobotState/PrimaryEstimatorPose", RobotState.getInstance().getPrimaryEstimatorPose());
         Logger.recordOutput(
                 "RobotState/VisionSensitivePose", RobotState.getInstance().getVisionPose());
+        Logger.recordOutput(
+                "RobotState/ControlLoopPose", RobotState.getInstance().getPose());
+        Logger.recordOutput(
+                "RobotState/ControlLoopPoseWithLookAhead",
+                RobotState.getInstance().getPoseWithLookAhead());
     }
 
     private void fetchOdometryInputs() {
@@ -273,8 +285,9 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     }
 
     @Override
+    // Pose is for PID control
     public Pose2d getPose() {
-        return RobotState.getInstance().getPose();
+        return RobotState.getInstance().getPoseWithLookAhead();
     }
 
     @Override
@@ -284,11 +297,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     @Override
     public ChassisSpeeds getMeasuredChassisSpeedsRobotRelative() {
-        ChassisSpeeds wheelSpeeds = DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
-        double angularVelocityRadPerSec =
-                gyroInputs.connected ? gyroInputs.yawVelocityRadPerSec : wheelSpeeds.omegaRadiansPerSecond;
-        return new ChassisSpeeds(
-                wheelSpeeds.vxMetersPerSecond, wheelSpeeds.vyMetersPerSecond, angularVelocityRadPerSec);
+        return RobotState.getInstance().getRobotRelativeSpeeds();
     }
 
     @Override

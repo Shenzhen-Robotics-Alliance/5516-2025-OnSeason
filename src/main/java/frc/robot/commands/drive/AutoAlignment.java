@@ -120,7 +120,7 @@ public class AutoAlignment {
                 ChassisHeadingController.getInstance().setHeadingRequest(new ChassisHeadingController.NullRequest());
 
         PathConstraints normalConstraints = new PathConstraints(
-                MOVEMENT_VELOCITY_SOFT_CONSTRAIN,
+                AUTO_ALIGNMENT_VELOCITY_LIMIT,
                 ACCELERATION_SOFT_CONSTRAIN,
                 ANGULAR_VELOCITY_SOFT_CONSTRAIN,
                 ANGULAR_ACCELERATION_SOFT_CONSTRAIN);

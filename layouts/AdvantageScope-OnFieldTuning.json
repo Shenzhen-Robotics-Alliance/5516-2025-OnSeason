@@ -35,7 +35,6 @@
             "/Drive/OdometryThread/MeasurementTimeStamps",
             "/AdvantageKit/RealOutputs/RobotState",
             "/AdvantageKit/RealOutputs/SuperStructure",
-            "/AdvantageKit/Drive/OdometryThread",
             "/AdvantageKit/RealOutputs/FieldSimulation",
             "/AdvantageKit/RealOutputs/Elevator/PID",
             "/AdvantageKit/Arm",
@@ -44,7 +43,12 @@
             "/AdvantageKit/RealOutputs/Vision",
             "/AdvantageKit/RealOutputs/LoggedRobot",
             "/AdvantageKit/Drive",
-            "/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps"
+            "/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps",
+            "/photonvision/.timesync",
+            "/AdvantageKit/Drive/Gyro",
+            "/AdvantageKit/Drive/Gyro/YawPosition",
+            "/AdvantageKit/Drive/Gyro/OdometryYawPositions",
+            "/AdvantageKit/Drive/Gyro/OdometryYawPositions/6"
           ]
         },
         "tabs": {
@@ -179,7 +183,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/VisionSensitivePose",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/ControlLoopPoseWithLookAhead",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {
@@ -230,9 +234,19 @@
                     "type": "gamePiece",
                     "logKey": "NT:/AdvantageKit/RealOutputs/CoralInRobot",
                     "logType": "Pose3d",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "variant": "Coral"
+                    }
+                  },
+                  {
+                    "type": "ghost",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/TrajectorySetpoint",
+                    "logType": "Pose2d",
+                    "visible": false,
+                    "options": {
+                      "model": "Crab Bot",
+                      "color": "#ffff00"
                     }
                   }
                 ],
@@ -244,14 +258,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -7.076981664736927,
-                  1.7942526476116867,
-                  -0.574952240233596
+                  -6.187476246134381,
+                  3.384287072258902,
+                  2.8980061641256283
                 ],
                 "cameraTarget": [
-                  -2.2869999888552033,
-                  0.9499038204624137,
-                  -0.3519924105100352
+                  -4.309524061345174,
+                  -1.3688386060959243,
+                  1.2183867020897112
                 ]
               },
               "controlsHeight": 317
