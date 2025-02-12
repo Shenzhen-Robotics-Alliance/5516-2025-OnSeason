@@ -2,14 +2,12 @@ package frc.robot.subsystems.superstructure;
 
 import static edu.wpi.first.units.Units.*;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Robot;
 import frc.robot.subsystems.superstructure.arm.Arm;
 import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -17,9 +15,6 @@ import frc.robot.subsystems.superstructure.elevator.ElevatorConstants;
 import java.util.*;
 
 public class SuperStructure {
-    private static final TrapezoidProfile elevatorProfile = new TrapezoidProfile(ElevatorConstants.PROFILE_CONSTRAINS);
-    private static final TrapezoidProfile armProfile = new TrapezoidProfile(ArmConstants.PROFILE_CONSTRAINS);
-
     /**
      * Represents a pose of the super structure
      *
@@ -54,6 +49,29 @@ public class SuperStructure {
         }
     }
 
+    public static List<PoseLink> LINKS = List.of(
+            // We can run to intake / l2 / l3 directly from idle
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.INTAKE),
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L2),
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L3),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.SCORE_L3),
+
+            // From a few swap poses, we can go to idle or score l3
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP),
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_1),
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_2),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_1),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_2),
+            new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.LOW_SWAP_1),
+
+            // From some lower swap poses we can run to the higher swap poses
+            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP, SuperStructurePose.HIGH_SWAP),
+
+            // To run to L4 we must go throw high-swap
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4));
+
     /**
      * Represents a link between two super structure poses
      *
@@ -63,13 +81,44 @@ public class SuperStructure {
     public record PoseLink(SuperStructurePose pose1, SuperStructurePose pose2) {
         /** Calculates the amount of time needed for the super structure to move */
         public double timeSeconds() {
-            TrapezoidProfile.State elevatorState = new TrapezoidProfile.State(pose1.elevatorHeight.in(Meters), 0);
-            TrapezoidProfile.State armState = new TrapezoidProfile.State(pose1.armAngle.in(Radians), 0);
-            elevatorProfile.calculate(Robot.defaultPeriodSecs, elevatorState, elevatorState);
-            armProfile.calculate(Robot.defaultPeriodSecs, armState, armState);
-            double elevatorTime = elevatorProfile.timeLeftUntil(pose2.elevatorHeight.in(Meters));
-            double armTime = armProfile.timeLeftUntil(pose2.armAngle.in(Radians));
-            return Math.max(elevatorTime, armTime);
+            // Differences between the current and target poses
+            double armDifferenceRad = pose2.armAngle.minus(pose1.armAngle).abs(Radians);
+            double elevatorDifferenceM =
+                    pose2.elevatorHeight.minus(pose1.elevatorHeight).in(Meters);
+
+            // Constraints from the constants file
+            double armMaxAcc = ArmConstants.PROFILE_CONSTRAINS.maxAcceleration;
+            double armMaxVel = ArmConstants.PROFILE_CONSTRAINS.maxVelocity;
+            double elevatorAcc = ElevatorConstants.PROFILE_CONSTRAINS.maxAcceleration;
+            double elevatorVel = ElevatorConstants.PROFILE_CONSTRAINS.maxVelocity;
+
+            // Time to move arm
+            double armTime = calculateTimeToSetpoint(armDifferenceRad, armMaxAcc, armMaxVel);
+
+            // Time to move elevator
+            double elevatorTime = calculateTimeToSetpoint(elevatorDifferenceM, elevatorAcc, elevatorVel);
+
+            // The total time is the maximum of the arm and elevator times
+            return Math.max(armTime, elevatorTime);
+        }
+
+        /** Helper method to calculate time needed for a mechanism to move to a setpoint Author: ChatGPT-o3-mini-high */
+        private static double calculateTimeToSetpoint(double difference, double maxAcc, double maxVel) {
+            // Time to reach max velocity during acceleration phase
+            double timeToMaxVel = maxVel / maxAcc;
+
+            // Distance covered during acceleration to max velocity
+            double distanceDuringAcc = 0.5 * maxAcc * timeToMaxVel * timeToMaxVel;
+
+            // If the difference can be covered during acceleration and deceleration
+            if (difference <= 2 * distanceDuringAcc)
+                // We won't reach max velocity, so use the equation for constant acceleration/deceleration
+                return Math.sqrt(2 * difference / maxAcc);
+
+            // Time to accelerate and decelerate
+            double distanceAtConstantVelocity = difference - 2 * distanceDuringAcc;
+            double timeAtConstantVel = distanceAtConstantVelocity / maxVel;
+            return 2 * timeToMaxVel + timeAtConstantVel;
         }
 
         public Optional<SuperStructurePose> otherEdge(SuperStructurePose oneEdge) {
@@ -78,29 +127,6 @@ public class SuperStructure {
             else return Optional.empty();
         }
     }
-
-    public static List<PoseLink> LINKS = List.of(
-            // We can run to intake / l2 / l3 directly from idle
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.INTAKE),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L2),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L3),
-
-            // From Idle we can go to a few swap poses
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_1),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_2),
-
-            // From L2 we can run to a few swap poses
-            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP),
-            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_1),
-            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_2),
-
-            // From some lower swap poses we can run to the higher swap poses
-            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP),
-            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP, SuperStructurePose.HIGH_SWAP),
-
-            // To run to L4 we must go throw high-swap
-            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4));
 
     private final Elevator elevator;
     private final Arm arm;
@@ -121,7 +147,11 @@ public class SuperStructure {
     }
 
     private Command runPose(SuperStructurePose pose) {
-        return elevator.moveToPosition(pose.elevatorHeight).alongWith(arm.moveToPosition(pose.armAngle));
+        return elevator.moveToPosition(pose.elevatorHeight)
+                .alongWith(arm.moveToPosition(pose.armAngle))
+                .finallyDo(interrupted -> {
+                    if (!interrupted) currentPose = pose;
+                });
     }
 
     public Command moveToPose(SuperStructurePose pose) {
@@ -134,7 +164,7 @@ public class SuperStructure {
         return Commands.sequence(trajectory.get().stream().map(this::runPose).toArray(Command[]::new));
     }
 
-    private static final int loopNumLimit = 20;
+    private static final int loopNumLimit = 100;
     /**
      * Finds the minimum-time trajectory to move from a pose to a target pose.
      *
@@ -149,65 +179,70 @@ public class SuperStructure {
         // The path that leads to a node with minimum time
         Map<SuperStructurePose, PoseLink> minimumTimePathToNode = new HashMap<>();
         Map<SuperStructurePose, Double> minimumTimeToPose = new HashMap<>();
+        PriorityQueue<PoseLink> linksToExamine = new PriorityQueue<>(Comparator.comparingDouble(PoseLink::timeSeconds));
         for (SuperStructurePose pose : SuperStructurePose.values())
             minimumTimeToPose.put(pose, Double.POSITIVE_INFINITY);
         minimumTimeToPose.put(startingPose, 0.0);
 
         SuperStructurePose currentNode = startingPose;
-        // limit loop time to avoid code crashes
-        for (int i = 0; i < loopNumLimit; i++) {
-            // If we've already reached target
-            if (currentNode.equals(targetPose)) {
-                List<SuperStructurePose> trajectory = new ArrayList<>();
-                SuperStructurePose tmp = currentNode;
-                for (int j = 0; j < loopNumLimit; j++) {
-                    System.out.println("tmp: " + tmp);
-                    trajectory.add(0, tmp);
-                    if (tmp == startingPose) return Optional.of(trajectory);
-                    if (!minimumTimePathToNode.containsKey(tmp)) {
-                        DriverStation.reportError("Internal Error while tracing back trajectory", true);
-                        return Optional.empty();
-                    }
-                    Optional<SuperStructurePose> otherEdge =
-                            minimumTimePathToNode.get(tmp).otherEdge(tmp);
-                    if (otherEdge.isEmpty()) {
-                        DriverStation.reportError("Internal Error while tracing back trajectory", true);
-                        return Optional.empty();
-                    }
-                    tmp = otherEdge.get();
-                }
-                DriverStation.reportError(
-                        "Internal Error: destination reached, but cannot traceback trajectory in " + loopNumLimit
-                                + " iterations",
-                        true);
-                return Optional.empty();
-            }
 
-            Optional<PoseLink> minimumTimeLink = Optional.empty();
+        int i;
+        // limit loop time to avoid code crashes
+        for (i = 0; i < loopNumLimit; i++) {
             for (PoseLink link : LINKS) {
                 Optional<SuperStructurePose> otherNode = link.otherEdge(currentNode);
                 if (otherNode.isEmpty()) continue;
-                if (!unvisited.contains(otherNode.get())) continue;
+                linksToExamine.add(link);
 
                 double newTime = minimumTimeToPose.get(currentNode) + link.timeSeconds();
                 if (newTime < minimumTimeToPose.get(otherNode.get())) {
                     minimumTimePathToNode.put(otherNode.get(), link);
                     minimumTimeToPose.put(otherNode.get(), newTime);
                 }
-
-                if (minimumTimeLink.isEmpty() || minimumTimeLink.get().timeSeconds() > link.timeSeconds())
-                    minimumTimeLink = Optional.of(link);
             }
 
             unvisited.remove(currentNode);
-            if (minimumTimeLink.isPresent()
-                    && minimumTimeLink.get().otherEdge(currentNode).isPresent())
-                currentNode = minimumTimeLink.get().otherEdge(currentNode).get();
-            else break;
+
+            // select the next
+            PoseLink linkToExamine;
+            while ((linkToExamine = linksToExamine.poll()) != null) {
+                if (unvisited.contains(linkToExamine.pose1)) {
+                    currentNode = linkToExamine.pose1;
+                    break;
+                }
+                if (unvisited.contains(linkToExamine.pose2)) {
+                    currentNode = linkToExamine.pose2;
+                    break;
+                }
+            }
+            if (linkToExamine == null) {
+                System.out.println("No links left to examine, quiting...");
+            }
+        }
+
+        List<SuperStructurePose> trajectory = new ArrayList<>();
+        SuperStructurePose tmp = targetPose;
+        for (int j = 0; j < loopNumLimit; j++) {
+            System.out.println("tmp: " + tmp);
+            trajectory.add(0, tmp);
+            if (tmp == startingPose) return Optional.of(trajectory);
+            if (!minimumTimePathToNode.containsKey(tmp)) {
+                DriverStation.reportError("Internal Error while tracing back trajectory", true);
+                return Optional.empty();
+            }
+            Optional<SuperStructurePose> otherEdge =
+                    minimumTimePathToNode.get(tmp).otherEdge(tmp);
+            if (otherEdge.isEmpty()) {
+                DriverStation.reportError("Internal Error while tracing back trajectory", true);
+                return Optional.empty();
+            }
+            tmp = otherEdge.get();
         }
 
         DriverStation.reportError(
-                "Failed to plan super structure trajectory in " + loopNumLimit + " iterations!", true);
+                "Internal Error: destination reached, but cannot traceback trajectory in " + loopNumLimit
+                        + " iterations",
+                true);
         return Optional.empty();
     }
 
