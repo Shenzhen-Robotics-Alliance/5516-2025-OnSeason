@@ -8,7 +8,7 @@ import edu.wpi.first.units.measure.*;
 
 public final class ElevatorConstants {
     // Low Speed Mode Threshold
-    public static final Distance HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE = Centimeters.of(30);
+    public static final Distance HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE = Centimeters.of(45);
 
     // General Constants
     public static final Distance CHAN_LENGTH = Inches.of(0.25);

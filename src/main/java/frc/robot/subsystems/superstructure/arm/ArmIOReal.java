@@ -27,7 +27,7 @@ public class ArmIOReal implements ArmIO {
      * The absolute encoder reading when the arm hits the upper limit. Measure this on "SmartDashboard/Arm/Raw Encoder
      * Reading", which is in rotations.
      */
-    private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Degrees.of(88);
+    private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Degrees.of(96);
     /**
      * The difference between the raw encoder reading angle and actual arm angle. Real Angle = Encoder Angle - Offset
      * Angle. Offset Angle = Encoder Angle - Real Angle.

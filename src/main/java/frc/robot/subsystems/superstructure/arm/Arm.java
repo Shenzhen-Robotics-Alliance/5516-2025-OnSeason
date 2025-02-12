@@ -169,15 +169,35 @@ public class Arm extends SubsystemBase {
     }
 
     /**
-     * Whether the arm is close enough to its setpoint.
+     * Whether the arm's profile state is close enough to its setpoint.
      *
-     * @return <code>true</code> if there is a setpoint and the arm is close enough to it, <code>false</code> otherwise.
+     * <p>Note that this does not reflect whether the mechanism is actually at its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the profile is close enough to the goal, <code>false</code>
+     *     otherwise.
      */
     public boolean atReference() {
         return atReference(this.setpoint);
     }
 
     public boolean atReference(Angle setpoint) {
+        double errorRad = Rotation2d.fromRadians(currentStateRad.position)
+                .minus(new Rotation2d(setpoint))
+                .getRadians();
+        return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
+    }
+
+    /**
+     * Whether the mechanism is actually close enough to its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the measured arm angle is close enough to the goal, <code>
+     *     false</code> otherwise.
+     */
+    public boolean trulyAtReference() {
+        return trulyAtReference(this.setpoint);
+    }
+
+    public boolean trulyAtReference(Angle setpoint) {
         double errorRad = getArmAngle().minus(new Rotation2d(setpoint)).getRadians();
         return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
     }

@@ -137,9 +137,11 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
-     * Whether the elevator is close enough to its setpoint.
+     * Whether the elevator's profile state is close enough to its setpoint.
      *
-     * @return <code>true</code> if there is a setpoint and the elevator is close enough to it, <code>false</code>
+     * <p>Note that this does not reflect whether the mechanism is actually at its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the profile state is close enough to it, <code>false</code>
      *     otherwise.
      */
     public boolean atReference() {
@@ -147,6 +149,20 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atReference(Distance heightSetpoint) {
+        return Math.abs(currentStateMeters.position - heightSetpoint.in(Meters)) < ELEVATOR_PID_TOLERANCE.in(Meters);
+    }
+
+    /**
+     * Whether the mechanism is actually close enough to its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the measured elevator height is close enough to the goal,
+     *     <code>false</code> otherwise.
+     */
+    public boolean trulyAtReference() {
+        return trulyAtReference(this.heightSetpoint);
+    }
+
+    public boolean trulyAtReference(Distance heightSetpoint) {
         return getHeight().minus(heightSetpoint).abs(Meters) < ELEVATOR_PID_TOLERANCE.in(Meters);
     }
 

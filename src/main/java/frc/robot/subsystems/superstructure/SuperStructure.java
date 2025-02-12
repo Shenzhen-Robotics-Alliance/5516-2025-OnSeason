@@ -25,7 +25,7 @@ public class SuperStructure {
         IDLE(Meters.of(0), Degrees.of(113)),
         INTAKE(Centimeters.of(3.5), Degrees.of(136)),
         SCORE_L2(Meters.of(0.2), Degrees.of(112)),
-        SCORE_L3(Meters.of(0.62), Degrees.of(112)),
+        SCORE_L3(Meters.of(0.64), Degrees.of(112)),
         SCORE_L4(Meters.of(1.32), Degrees.of(85)),
 
         // Swap poses that serve as interior waypoints

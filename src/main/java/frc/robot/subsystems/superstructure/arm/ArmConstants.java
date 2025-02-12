@@ -10,7 +10,7 @@ public final class ArmConstants {
     // General Configs
     public static final double ARM_GEARING_REDUCTION = 44.0 / 16.0 * 48.0 / 20.0 * 9.0;
     public static final Current ARM_CURRENT_LIMIT = Amps.of(30.0);
-    public static final Angle ARM_UPPER_LIMIT = Degrees.of(128);
+    public static final Angle ARM_UPPER_LIMIT = Degrees.of(136);
     public static final Angle ARM_LOWER_LIMIT = Degrees.of(30);
     public static final double ARM_MAX_VOLTS = 8;
 

@@ -345,10 +345,8 @@ public class RobotContainer {
                 .whileTrue(Commands.sequence(
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
-                        .finallyDo(flashLEDForIntake::cancel)
-                        .finallyDo(() -> superStructure
-                                .moveToPose(SuperStructure.SuperStructurePose.IDLE)
-                                .schedule()));
+                        .finallyDo(flashLEDForIntake::cancel))
+                .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
         driver.moveToL2Button()
                 .onTrue(superStructure
                         .moveToPose(SuperStructure.SuperStructurePose.SCORE_L2)
