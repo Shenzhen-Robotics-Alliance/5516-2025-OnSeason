@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.*;
 import frc.robot.commands.drive.*;
@@ -356,11 +357,13 @@ public class RobotContainer {
         driver.moveToL3Button()
                 .onTrue(superStructure
                         .moveToPose(SuperStructure.SuperStructurePose.SCORE_L3)
-                        .alongWith(coralHolder.shuffleCoralSequence()));
+                        .andThen(coralHolder.shuffleCoralSequence()));
         driver.moveToL4Button()
                 .onTrue(superStructure
                         .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                        .alongWith(coralHolder.shuffleCoralSequence()));
+                        .andThen(coralHolder.shuffleCoralSequence()));
+        new Trigger(DriverStation::isTeleopEnabled)
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 

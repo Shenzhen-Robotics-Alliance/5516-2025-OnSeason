@@ -33,8 +33,9 @@ public class FourCoralLeftSide implements Auto {
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
         commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
-        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
+        commandGroup.addCommands(Commands.waitSeconds(0.5));
+        //        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+        //                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score second
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
@@ -48,8 +49,9 @@ public class FourCoralLeftSide implements Auto {
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
         commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
-        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
+        commandGroup.addCommands(Commands.waitSeconds(0.5));
+        //        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+        //                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
@@ -62,8 +64,9 @@ public class FourCoralLeftSide implements Auto {
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
         commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
-        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
+        commandGroup.addCommands(Commands.waitSeconds(0.5));
+        //        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+        //                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score fourth
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(

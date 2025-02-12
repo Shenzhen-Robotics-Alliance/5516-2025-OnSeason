@@ -29,6 +29,7 @@ public class DriveControlLoops {
 
     public static final boolean USE_TORQUE_FEEDFORWARD = true;
 
+    public static final double AUTO_ALIGNMENT_TRANSITION_VELOCITY_FACTOR = 1.8;
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.7),
