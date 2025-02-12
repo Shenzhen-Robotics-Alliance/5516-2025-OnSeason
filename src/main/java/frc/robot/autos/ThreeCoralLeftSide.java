@@ -52,6 +52,7 @@ public class ThreeCoralLeftSide implements Auto {
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score Third
+        commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("auto2 - place third"), 10, moveToL4)
                 .asProxy());
@@ -66,6 +67,7 @@ public class ThreeCoralLeftSide implements Auto {
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score fourth
+        commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("auto2 - place fourth"), 11, moveToL4)
                 .asProxy());

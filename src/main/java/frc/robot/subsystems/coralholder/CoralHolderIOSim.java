@@ -35,8 +35,9 @@ public class CoralHolderIOSim implements CoralHolderIO {
         this.armAngleSupplier = armAngleSupplier;
         this.elevatorHeightSupplier = elevatorHeightSupplier;
 
-        this.hasCoral = false;
-        coralPosition = 0;
+        // preload
+        this.hasCoral = true;
+        coralPosition = 1.5;
     }
 
     XboxController controller = new XboxController(0);
@@ -51,8 +52,8 @@ public class CoralHolderIOSim implements CoralHolderIO {
 
         if (hasCoral) simulateCoralInsideIntake();
 
-        boolean firstSensorTriggered = hasCoral && coralPosition < 1.6;
-        boolean secondSensorTriggered = hasCoral && coralPosition > 1.5;
+        boolean firstSensorTriggered = hasCoral && coralPosition < 1.7;
+        boolean secondSensorTriggered = hasCoral && coralPosition > 1.3;
         inputs.firstSensorDistanceMM = firstSensorTriggered ? 0 : 9999;
         inputs.secondSensorDistanceMM = secondSensorTriggered ? 0 : 9999;
 
