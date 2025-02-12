@@ -84,10 +84,10 @@ public class RobotContainer {
 
     // Simulated drive
     private final SwerveDriveSimulation driveSimulation;
-    private final Arm arm;
-    private final Elevator elevator;
-    private final SuperStructure superStructure;
-    private final CoralHolder coralHolder;
+    public final Arm arm;
+    public final Elevator elevator;
+    public final SuperStructure superStructure;
+    public final CoralHolder coralHolder;
 
     private final Field2d field = new Field2d();
 
@@ -232,6 +232,7 @@ public class RobotContainer {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
         autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
+        autoSendableChooser.addOption("[LEFT SIDE] - Four Coral Auto", new FourCoralLeftSide());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;

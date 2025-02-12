@@ -136,7 +136,7 @@ public class ReefAlignment {
     }
 
     public static Command followPathAndAlign(
-            RobotContainer robot, PathPlannerPath path, int targetId, Supplier<Command> toRunAtPreciseAlignment) {
+            RobotContainer robot, PathPlannerPath path, int targetId, Command toRunAtPreciseAlignment) {
         return Commands.deferredProxy(() -> {
             BranchTarget branchTarget = (FieldMirroringUtils.isSidePresentedAsRed()
                             ? REEF_ALIGNMENT_POSITIONS_RED
@@ -147,9 +147,9 @@ public class ReefAlignment {
                             robot.aprilTagVision,
                             path,
                             branchTarget.autoAlignmentTarget(),
-                            Commands.none(),
-                            preciseAlignmentLight(robot.ledStatusLight).alongWith(toRunAtPreciseAlignment.get()),
-                            DriveControlLoops.REEF_ALIGNMENT_CONFIG_AUTONOMOUS)
+                            DriveControlLoops.REEF_ALIGNMENT_CONFIG_AUTONOMOUS,
+                            preciseAlignmentLight(robot.ledStatusLight),
+                            toRunAtPreciseAlignment)
                     .beforeStarting(() -> {
                         selectedReefPartId = targetId / 2;
                         selectedSide = targetId % 2 == 0 ? SelectedSide.LEFT : SelectedSide.RIGHT;

@@ -154,7 +154,9 @@ public class SuperStructure {
                 .beforeStarting(Commands.print("Super Structure/Moving to pose: " + pose.name()))
                 .finallyDo(interrupted -> {
                     currentPose = pose;
-                    System.out.println("Super Structure/Reached pose: " + pose.name());
+                    if (interrupted)
+                        System.out.println("Super Structure/Interrupted while running to pose: " + pose.name());
+                    else System.out.println("Super Structure/Reached pose: " + pose.name());
                 });
     }
 
