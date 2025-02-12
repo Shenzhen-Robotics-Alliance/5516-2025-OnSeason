@@ -9,6 +9,11 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class CoralHolderConstants {
+    public static final double INTAKE_VOLTS = 1.5;
+    public static final double SHOOT_VOLTS = 3.5;
+    public static final double BRAKE_VOLTS = -1;
+    public static final double SHUFFLE_VOLTS = 0.6;
+
     public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);
     public static final Distance SECOND_SENSOR_THRESHOLD = Centimeters.of(5);
     public static final Current ROLLERS_CURRENT_LIMIT = Amps.of(20);

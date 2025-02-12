@@ -87,6 +87,11 @@ public class CoralHolder extends SubsystemBase {
         sensor1HardwareFaultsAlert.set(!inputs.firstSensorConnected);
         sensor2HardwareFaultsAlert.set(!inputs.secondSensorConnected);
 
+        Logger.recordOutput("CoralHolder/Has Coral", hasCoral.getAsBoolean());
+        Logger.recordOutput("CoralHolder/Coral In Place", coralInPlace.getAsBoolean());
+        Logger.recordOutput("CoralHolder/First Sensor", firstSensor.getAsBoolean());
+        Logger.recordOutput("CoralHolder/Second Sensor", secondSensor.getAsBoolean());
+
         visualizeCoral();
     }
 
@@ -115,11 +120,11 @@ public class CoralHolder extends SubsystemBase {
     public Command intakeCoralSequence() {
         return Commands.sequence(
                         // Run the rollers forward quickly until the coral hits the first sensor
-                        run(() -> setVoltage(1.5, 3)).until(firstSensor),
+                        run(() -> setVoltage(INTAKE_VOLTS, 3)).until(firstSensor),
                         // Run the rollers backwards for 0.1 for a rapid brake
-                        run(() -> setVoltage(-1, 1)).withTimeout(0.1),
+                        run(() -> setVoltage(BRAKE_VOLTS, 1)).withTimeout(0.1),
                         // Next, run the rollers forward slowly until the coal hits the second sensor
-                        run(() -> setVoltage(0.6, 0.0)).until(coralInPlace))
+                        run(() -> setVoltage(SHUFFLE_VOLTS, 0.0)).until(coralInPlace))
                 // Only run when the rollers are not in place yet
                 .onlyIf(coralInPlace.negate())
                 // Stop the intake at the end of the command
@@ -135,12 +140,12 @@ public class CoralHolder extends SubsystemBase {
         return Commands.sequence(
                         // If the coral is not in place (triggering sensor 2) yet,
                         // we run rollers slowly forward until it triggers sensor 2.
-                        run(() -> setVoltage(0.4, 0.0))
+                        run(() -> setVoltage(SHUFFLE_VOLTS, 0.0))
                                 .onlyIf(secondSensor.negate())
                                 .until(secondSensor),
                         // Next, run the rollers slowly backwards until it does not trigger sensor 2
-                        run(() -> setVoltage(-0.8, 0.0)).until(secondSensor.negate()),
-                        run(() -> setVoltage(-0.8, 0.0)).withTimeout(0.3))
+                        run(() -> setVoltage(-SHUFFLE_VOLTS, 0.0)).until(secondSensor.negate()),
+                        run(() -> setVoltage(-SHUFFLE_VOLTS, 0.0)).withTimeout(0.3))
                 // Only shuffle the coral if we have a coral.
                 .onlyIf(hasCoral)
                 .withTimeout(1.5)
@@ -150,7 +155,7 @@ public class CoralHolder extends SubsystemBase {
 
     /** Score the Coral inside the holder. */
     public Command scoreCoral() {
-        return run(() -> setVoltage(3.5, 0.0))
+        return run(() -> setVoltage(SHOOT_VOLTS, 0.0))
                 .until(hasCoral.negate())
                 .finallyDo(() -> setVoltage(0.0, 0.0))
                 .withTimeout(1);
