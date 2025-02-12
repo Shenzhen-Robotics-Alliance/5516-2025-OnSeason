@@ -193,7 +193,7 @@ public class AutoAlignment {
         Translation2d fieldRelativeSpeedsMPS = new Translation2d(
                 measuredSpeedsFieldRelative.vxMetersPerSecond, measuredSpeedsFieldRelative.vyMetersPerSecond);
         Rotation2d startingPathDirection = fieldRelativeSpeedsMPS
-                .times(0.8)
+                .times(1.4)
                 .plus(interiorWaypoint.minus(currentRobotPose.getTranslation()))
                 .getAngle();
 

@@ -26,7 +26,7 @@ public final class ElevatorConstants {
     public static final double kP_WEAK = 3.0 / 0.2;
     public static final Voltage MAX_OUTPUT_VOLTAGE = Volts.of(12);
     public static final Voltage MIN_OUTPUT_VOLTAGE = Volts.of(-8);
-    public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS = new TrapezoidProfile.Constraints(1.8, 4);
+    public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS = new TrapezoidProfile.Constraints(2.3, 5);
     public static final Distance ELEVATOR_PID_TOLERANCE = Centimeters.of(4);
     public static final LinearVelocity ELEVATOR_MOVING_VELOCITY_THRESHOLD = MetersPerSecond.of(0.05);
 

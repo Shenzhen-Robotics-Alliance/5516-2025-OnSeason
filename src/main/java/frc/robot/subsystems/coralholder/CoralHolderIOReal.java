@@ -3,6 +3,7 @@ package frc.robot.subsystems.coralholder;
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
 
+import au.grapplerobotics.CanBridge;
 import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface;
@@ -74,6 +75,8 @@ public class CoralHolderIOReal implements CoralHolderIO {
         this.secondSensor = new LaserCan(1);
         this.firstSensorConfigurationError = !configureSensor(firstSensor);
         this.secondSensorConfigurationError = !configureSensor(secondSensor);
+
+        CanBridge.runTCP();
     }
 
     /**
@@ -85,6 +88,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
         try {
             sensor.setRangingMode(LaserCanInterface.RangingMode.SHORT);
             sensor.setTimingBudget(LaserCanInterface.TimingBudget.TIMING_BUDGET_20MS);
+            sensor.setRegionOfInterest(new LaserCanInterface.RegionOfInterest(8, 8, 6, 6));
             return true;
         } catch (ConfigurationFailedException e) {
             return false;

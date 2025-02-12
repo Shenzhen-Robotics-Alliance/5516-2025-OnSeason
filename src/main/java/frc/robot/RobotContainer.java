@@ -372,8 +372,9 @@ public class RobotContainer {
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-        coralHolder.hasCoral.onTrue(
-                ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kYellow), 3));
+        coralHolder.hasCoral.onTrue(ledStatusLight
+                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kYellow), 3)
+                .withTimeout(1));
         coralHolder.coralInPlace.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
     }
 

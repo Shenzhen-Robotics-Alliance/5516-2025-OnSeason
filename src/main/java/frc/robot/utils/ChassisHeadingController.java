@@ -2,8 +2,8 @@ package frc.robot.utils;
 
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
-import static frc.robot.constants.DriveTrainConstants.CHASSIS_MAX_ANGULAR_ACCELERATION;
-import static frc.robot.constants.DriveTrainConstants.CHASSIS_MAX_ANGULAR_VELOCITY;
+import static frc.robot.constants.DriveControlLoops.*;
+import static frc.robot.constants.DriveTrainConstants.*;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -251,8 +251,8 @@ public class ChassisHeadingController {
         if (instance == null)
             instance = new ChassisHeadingController(
                     new TrapezoidProfile.Constraints(
-                            CHASSIS_MAX_ANGULAR_VELOCITY.in(RadiansPerSecond),
-                            CHASSIS_MAX_ANGULAR_ACCELERATION.in(RadiansPerSecondPerSecond)),
+                            ANGULAR_VELOCITY_SOFT_CONSTRAIN.in(RadiansPerSecond),
+                            ANGULAR_ACCELERATION_SOFT_CONSTRAIN.in(RadiansPerSecondPerSecond)),
                     DriveControlLoops.CHASSIS_ROTATION_CLOSE_LOOP,
                     new Rotation2d());
 

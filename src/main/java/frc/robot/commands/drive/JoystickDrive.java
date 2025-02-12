@@ -46,14 +46,13 @@ public class JoystickDrive extends Command {
         super.addRequirements(driveSubsystem);
         resetSensitivity();
         ChassisHeadingController.getInstance().setHeadingRequest(new ChassisHeadingController.NullRequest());
-
-        this.previousChassisUsageTimer.reset();
-        this.previousRotationalInputTimer.reset();
     }
 
     @Override
     public void initialize() {
         this.currentRotationMaintenanceSetpoint = driveSubsystem.getFacing();
+        this.previousChassisUsageTimer.reset();
+        this.previousRotationalInputTimer.reset();
     }
 
     @Override

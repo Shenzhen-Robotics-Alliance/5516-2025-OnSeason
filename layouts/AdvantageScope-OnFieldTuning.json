@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1722,
-      "height": 1034,
+      "width": 1708,
+      "height": 1020,
       "state": {
         "sidebar": {
           "width": 342,
@@ -48,7 +48,7 @@
           ]
         },
         "tabs": {
-          "selected": 7,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -228,27 +228,9 @@
                   },
                   {
                     "type": "gamePiece",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Algae",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "variant": "Algae"
-                    }
-                  },
-                  {
-                    "type": "gamePiece",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/FieldSimulation/Coral",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "variant": "Coral"
-                    }
-                  },
-                  {
-                    "type": "gamePiece",
                     "logKey": "NT:/AdvantageKit/RealOutputs/CoralInRobot",
                     "logType": "Pose3d",
-                    "visible": true,
+                    "visible": false,
                     "options": {
                       "variant": "Coral"
                     }
@@ -259,17 +241,17 @@
               },
               "controllerUUID": "xsrx25f4oj63akofvijnzfcfcqyd3see",
               "renderer": {
-                "cameraIndex": -2,
+                "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -3.2083065158075676,
-                  1.5520099284712905,
-                  -1.0382162545692637
+                  -7.076981664736927,
+                  1.7942526476116867,
+                  -0.574952240233596
                 ],
                 "cameraTarget": [
-                  -0.347813048225159,
-                  1.2534327783560366,
-                  0.09291895084647617
+                  -2.2869999888552033,
+                  0.9499038204624137,
+                  -0.3519924105100352
                 ]
               },
               "controlsHeight": 317
