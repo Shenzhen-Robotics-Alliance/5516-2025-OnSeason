@@ -27,7 +27,8 @@ public class FourCoralLeftSide implements Auto {
         // Score preloaded
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                        robot, PathPlannerPath.fromChoreoTrajectory("place first"), 9, moveToL4)
+                        robot, PathPlannerPath.fromChoreoTrajectory("place first"), 8, moveToL4)
+                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -43,6 +44,7 @@ public class FourCoralLeftSide implements Auto {
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 10, moveToL4)
+                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -58,6 +60,7 @@ public class FourCoralLeftSide implements Auto {
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 11, moveToL4)
+                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -73,6 +76,7 @@ public class FourCoralLeftSide implements Auto {
         commandGroup.addCommands(Commands.runOnce(prepareToRunL3::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 11, moveToL3)
+                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 

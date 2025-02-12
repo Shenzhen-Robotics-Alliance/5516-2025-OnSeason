@@ -153,6 +153,12 @@ public class CoralHolder extends SubsystemBase {
                 .finallyDo(() -> setVoltage(0.0, 0.0));
     }
 
+    public Command keepCoralShuffledForever() {
+        return Commands.sequence(
+                shuffleCoralSequence(),
+                shuffleCoralSequence().onlyIf(secondSensor).repeatedly());
+    }
+
     /** Score the Coral inside the holder. */
     public Command scoreCoral() {
         return run(() -> setVoltage(SHOOT_VOLTS, 0.0))

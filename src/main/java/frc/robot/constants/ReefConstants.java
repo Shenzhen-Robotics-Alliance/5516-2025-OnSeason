@@ -50,12 +50,12 @@ public class ReefConstants {
         new ReefAlignment.BranchTarget(
                 Rotation2d.fromDegrees(0), new Translation2d(11.1, 2.8), new Translation2d(11.84, 3.83), 10, true),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(60), new Translation2d(11.8, 2.3), new Translation2d(12.28, 3.07), 11, false),
+                Rotation2d.fromDegrees(60), new Translation2d(11.8, 2.3), new Translation2d(12.28, 3.10), 11, false),
         new ReefAlignment.BranchTarget(
                 Rotation2d.fromDegrees(60), new Translation2d(12.3, 2.1), new Translation2d(12.62, 2.88), 11, true),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(120), new Translation2d(13.9, 2.1), new Translation2d(13.50, 2.86), 6, false),
+                Rotation2d.fromDegrees(120), new Translation2d(13.9, 2.1), new Translation2d(13.43, 2.89), 6, false),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(120), new Translation2d(14.3, 2.3), new Translation2d(13.84, 3.06), 6, true)
+                Rotation2d.fromDegrees(120), new Translation2d(14.3, 2.3), new Translation2d(13.84, 3.1), 6, true)
     };
 }
