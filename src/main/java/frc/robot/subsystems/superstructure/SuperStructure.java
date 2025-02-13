@@ -26,19 +26,23 @@ public class SuperStructure {
         INTAKE(Centimeters.of(3.5), Degrees.of(136)),
         SCORE_L2(Meters.of(0.2), Degrees.of(112)),
         SCORE_L3(Meters.of(0.64), Degrees.of(112)),
-        SCORE_L4(Meters.of(1.32), Degrees.of(85)),
+        SCORE_L4(Meters.of(1.28), Degrees.of(102)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
         // Allow Arm to swing down at zero height
-        PREPARE_TO_RUN_UP(Meters.zero(), Degrees.of(55)),
 
         // At 0.3 meters height, allow arm to swing up and down
-        LOW_SWAP_1(Meters.of(0.3), Degrees.of(116)),
+        LOW_SWAP_1(Meters.of(0.3), Degrees.of(112)),
         LOW_SWAP_2(Meters.of(0.3), Degrees.of(55)),
 
-        // At 1.32 Meters there is a swap pose to run to L4
-        HIGH_SWAP(Meters.of(1.32), Degrees.of(55));
+        // Swap pose to run to L4
+        HIGH_SWAP(Meters.of(1), Degrees.of(112)),
+
+        // Legacy L4 Scoring Poses (for dev bot)
+        SCORE_L4_LEGACY(Meters.of(1.32), Degrees.of(85)),
+        HIGH_SWAP_LEGACY(Meters.of(1.32), Degrees.of(55)),
+        PREPARE_TO_RUN_UP_LEGACY(Meters.zero(), Degrees.of(55));
 
         public final Distance elevatorHeight;
         public final Angle armAngle;
@@ -57,20 +61,27 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.SCORE_L3),
 
             // From a few swap poses, we can go to idle or score l3
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP),
             new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_1),
             new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_2),
-            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_1),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_2),
             new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.LOW_SWAP_1),
 
-            // From some lower swap poses we can run to the higher swap poses
-            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP),
-            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP, SuperStructurePose.HIGH_SWAP),
+            // From a few poses can we run to high swap
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.HIGH_SWAP),
+            new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.HIGH_SWAP),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.HIGH_SWAP),
+            new PoseLink(SuperStructurePose.LOW_SWAP_1, SuperStructurePose.HIGH_SWAP),
 
-            // To run to L4 we must go throw high-swap
-            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4));
+            // from high swap we can run to l4
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4),
+
+            // Legacy links (for dev bot)
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
+            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
+            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP_LEGACY),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY, SuperStructurePose.HIGH_SWAP_LEGACY),
+            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY));
 
     /**
      * Represents a link between two super structure poses

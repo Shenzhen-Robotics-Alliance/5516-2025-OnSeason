@@ -24,7 +24,7 @@ public final class CoralHolderConstants {
 
     public static final double COLLECTOR_TIME_SECONDS_AT_6V = 0.6;
     public static final double ROLLER_TIME_SECONDS_AT_6V = 1;
-    public static final LinearVelocity CORAL_LAUNCHING_VELOCITY_6V = MetersPerSecond.of(2.5);
+    public static final LinearVelocity CORAL_LAUNCHING_VELOCITY_6V = MetersPerSecond.of(4);
 
     public static final Distance CORAL_LENGTH_ON_ARM = Centimeters.of(35.2);
     public static final Rotation2d ARM_ANGLE_TO_CORAL_POINTING_ANGLE = Rotation2d.fromDegrees(-148);

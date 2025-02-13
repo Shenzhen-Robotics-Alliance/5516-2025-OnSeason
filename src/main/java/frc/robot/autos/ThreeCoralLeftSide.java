@@ -18,7 +18,7 @@ public class ThreeCoralLeftSide implements Auto {
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-        Command prepareToRunUp = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN_UP);
+        Command prepareToRunUp = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_SWAP_1);
         Command moveToL4 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4);
 
         // Score preloaded

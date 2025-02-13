@@ -18,10 +18,8 @@ public class FourCoralLeftSide implements Auto {
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-        Command prepareToRunUp = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN_UP);
+        Command prepareToRunUp = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_SWAP_1);
         Command moveToL4 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4);
-
-        Command prepareToRunL3 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_SWAP_1);
         Command moveToL3 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3);
 
         // Score preloaded
@@ -73,7 +71,7 @@ public class FourCoralLeftSide implements Auto {
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score fourth
-        commandGroup.addCommands(Commands.runOnce(prepareToRunL3::schedule));
+        commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 11, moveToL3)
                 .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
