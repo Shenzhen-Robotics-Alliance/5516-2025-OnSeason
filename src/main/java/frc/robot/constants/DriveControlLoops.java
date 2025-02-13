@@ -32,9 +32,9 @@ public class DriveControlLoops {
     public static final double AUTO_ALIGNMENT_TRANSITION_VELOCITY_FACTOR = 1.8;
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    Meters.of(1),
+                    Meters.of(1.2),
                     MetersPerSecond.of(0),
-                    MetersPerSecond.of(0.7),
+                    MetersPerSecond.of(0.9),
                     Meters.of(0.6),
                     MetersPerSecond.of(0.1),
                     MetersPerSecondPerSecond.of(1.5));
@@ -43,9 +43,9 @@ public class DriveControlLoops {
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(1.1),
                     MetersPerSecond.of(0),
-                    MetersPerSecond.of(0.7),
+                    MetersPerSecond.of(0.9),
                     Meters.of(0.6),
-                    MetersPerSecond.of(0.1),
+                    MetersPerSecond.of(0.2),
                     MetersPerSecondPerSecond.of(1.5));
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =

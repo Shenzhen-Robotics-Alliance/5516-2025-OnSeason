@@ -87,6 +87,6 @@ public class FourCoralLeftSide implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        return new Pose2d(7.843, 6.16, Rotation2d.fromDegrees(180));
+        return new Pose2d(7.25, 6.20, Rotation2d.fromDegrees(180));
     }
 }
