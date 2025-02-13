@@ -355,11 +355,11 @@ public class RobotContainer {
         driver.moveToL3Button()
                 .onTrue(superStructure
                         .moveToPose(SuperStructure.SuperStructurePose.SCORE_L3)
-                        .andThen(coralHolder.shuffleCoralSequence()));
+                        .deadlineFor(coralHolder.keepCoralShuffledForever()));
         driver.moveToL4Button()
                 .onTrue(superStructure
                         .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                        .andThen(coralHolder.shuffleCoralSequence()));
+                        .deadlineFor(coralHolder.keepCoralShuffledForever()));
         new Trigger(DriverStation::isTeleopEnabled)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
@@ -416,6 +416,7 @@ public class RobotContainer {
         SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
                 "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());
+        Logger.recordOutput("SuperStructure/currentPose", superStructure.currentPose());
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }

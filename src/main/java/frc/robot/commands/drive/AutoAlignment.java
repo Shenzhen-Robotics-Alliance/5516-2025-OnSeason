@@ -121,7 +121,7 @@ public class AutoAlignment {
 
         PathConstraints normalConstraints = new PathConstraints(
                 AUTO_ALIGNMENT_VELOCITY_LIMIT,
-                ACCELERATION_SOFT_CONSTRAIN,
+                AUTO_ALIGNMENT_ACCELERATION_LIMIT,
                 ANGULAR_VELOCITY_SOFT_CONSTRAIN,
                 ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
         PathConstraints lowSpeedConstrain = new PathConstraints(

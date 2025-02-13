@@ -34,7 +34,7 @@ public class ReefConstants {
 
     public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_RED = new ReefAlignment.BranchTarget[] {
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(180), new Translation2d(15, 3.8), new Translation2d(14.29, 3.82), 7, false),
+                Rotation2d.fromDegrees(180), new Translation2d(15, 3.8), new Translation2d(14.24, 3.87), 7, false),
         new ReefAlignment.BranchTarget(
                 Rotation2d.fromDegrees(180), new Translation2d(15, 4.2), new Translation2d(14.28, 4.21), 7, true),
         new ReefAlignment.BranchTarget(

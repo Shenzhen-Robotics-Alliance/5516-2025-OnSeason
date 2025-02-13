@@ -24,20 +24,20 @@ public class SuperStructure {
         // Useful poses
         IDLE(Meters.of(0), Degrees.of(113)),
         INTAKE(Centimeters.of(3.5), Degrees.of(136)),
-        SCORE_L2(Meters.of(0.2), Degrees.of(112)),
-        SCORE_L3(Meters.of(0.64), Degrees.of(112)),
-        SCORE_L4(Meters.of(1.28), Degrees.of(102)),
+        SCORE_L2(Meters.of(0.2), Degrees.of(113)),
+        SCORE_L3(Meters.of(0.64), Degrees.of(113)),
+        SCORE_L4(Meters.of(1.32), Degrees.of(83)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
         // Allow Arm to swing down at zero height
 
         // At 0.3 meters height, allow arm to swing up and down
-        LOW_SWAP_1(Meters.of(0.3), Degrees.of(112)),
+        LOW_SWAP_1(Meters.of(0.3), Degrees.of(113)),
         LOW_SWAP_2(Meters.of(0.3), Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(Meters.of(1), Degrees.of(112)),
+        HIGH_SWAP(Meters.of(1.32), Degrees.of(113)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         SCORE_L4_LEGACY(Meters.of(1.32), Degrees.of(85)),
@@ -157,6 +157,12 @@ public class SuperStructure {
 
         atReference = new Trigger(
                 () -> elevator.atReference(currentPose.elevatorHeight) && arm.atReference(currentPose.armAngle));
+
+        new Trigger(DriverStation::isDisabled)
+                .onTrue(Commands.waitSeconds(2)
+                        .andThen(() -> currentPose = SuperStructurePose.IDLE)
+                        .until(DriverStation::isEnabled)
+                        .ignoringDisable(true));
     }
 
     private Command runPose(SuperStructurePose pose) {
@@ -179,6 +185,10 @@ public class SuperStructure {
         Optional<List<SuperStructurePose>> trajectory = getTrajectory(pose);
         if (trajectory.isEmpty()) return Commands.none();
         return Commands.sequence(trajectory.get().stream().map(this::runPose).toArray(Command[]::new));
+    }
+
+    public SuperStructurePose currentPose() {
+        return currentPose;
     }
 
     private static final int loopNumLimit = 100;

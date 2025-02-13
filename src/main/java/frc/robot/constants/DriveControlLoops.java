@@ -13,8 +13,9 @@ public class DriveControlLoops {
     public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN = DriveTrainConstants.CHASSIS_MAX_VELOCITY;
     public static final LinearVelocity AUTO_ALIGNMENT_VELOCITY_LIMIT = MetersPerSecond.of(3);
     public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN = MetersPerSecondPerSecond.of(7);
+    public static final LinearAcceleration AUTO_ALIGNMENT_ACCELERATION_LIMIT = MetersPerSecondPerSecond.of(5);
     public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW = MetersPerSecond.of(2);
-    public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN_LOW = MetersPerSecondPerSecond.of(3);
+    public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN_LOW = MetersPerSecondPerSecond.of(2);
 
     public static final Time DISCRETIZE_TIME = Seconds.of(0.04);
     public static final LinearVelocity SWERVE_VELOCITY_DEADBAND = MetersPerSecond.of(0.03);
@@ -37,7 +38,7 @@ public class DriveControlLoops {
                     MetersPerSecond.of(0.9),
                     Meters.of(0.6),
                     MetersPerSecond.of(0.1),
-                    MetersPerSecondPerSecond.of(1.5));
+                    MetersPerSecondPerSecond.of(1));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
@@ -46,7 +47,7 @@ public class DriveControlLoops {
                     MetersPerSecond.of(0.9),
                     Meters.of(0.6),
                     MetersPerSecond.of(0.2),
-                    MetersPerSecondPerSecond.of(1.5));
+                    MetersPerSecondPerSecond.of(1));
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(

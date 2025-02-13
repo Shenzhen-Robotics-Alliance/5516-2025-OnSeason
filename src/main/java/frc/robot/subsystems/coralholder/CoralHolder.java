@@ -144,8 +144,7 @@ public class CoralHolder extends SubsystemBase {
                                 .onlyIf(secondSensor.negate())
                                 .until(secondSensor),
                         // Next, run the rollers slowly backwards until it does not trigger sensor 2
-                        run(() -> setVoltage(-SHUFFLE_VOLTS, 0.0)).until(secondSensor.negate()),
-                        run(() -> setVoltage(-SHUFFLE_VOLTS, 0.0)).withTimeout(0.3))
+                        run(() -> setVoltage(-SHUFFLE_VOLTS, 0.0)).until(secondSensor.negate()))
                 // Only shuffle the coral if we have a coral.
                 .onlyIf(hasCoral)
                 .withTimeout(1.5)

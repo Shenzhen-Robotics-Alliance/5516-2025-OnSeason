@@ -9,10 +9,10 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class CoralHolderConstants {
-    public static final double INTAKE_VOLTS = 1.2;
-    public static final double SHOOT_VOLTS = 3.5;
-    public static final double BRAKE_VOLTS = -1;
-    public static final double SHUFFLE_VOLTS = 0.8;
+    public static final double INTAKE_VOLTS = 2.4;
+    public static final double SHOOT_VOLTS = 6;
+    public static final double BRAKE_VOLTS = -1.8;
+    public static final double SHUFFLE_VOLTS = 1.2;
 
     public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);
     public static final Distance SECOND_SENSOR_THRESHOLD = Centimeters.of(5);
@@ -24,7 +24,7 @@ public final class CoralHolderConstants {
 
     public static final double COLLECTOR_TIME_SECONDS_AT_6V = 0.6;
     public static final double ROLLER_TIME_SECONDS_AT_6V = 1;
-    public static final LinearVelocity CORAL_LAUNCHING_VELOCITY_6V = MetersPerSecond.of(4);
+    public static final LinearVelocity CORAL_LAUNCHING_VELOCITY_6V = MetersPerSecond.of(3);
 
     public static final Distance CORAL_LENGTH_ON_ARM = Centimeters.of(35.2);
     public static final Rotation2d ARM_ANGLE_TO_CORAL_POINTING_ANGLE = Rotation2d.fromDegrees(-148);
