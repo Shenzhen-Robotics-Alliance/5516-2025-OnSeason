@@ -349,17 +349,14 @@ public class RobotContainer {
                         .finallyDo(flashLEDForIntake::cancel))
                 .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
         driver.moveToL2Button()
-                .onTrue(superStructure
-                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L2)
-                        .alongWith(coralHolder.shuffleCoralSequence()));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
+                .onTrue(coralHolder.keepCoralShuffledForever());
         driver.moveToL3Button()
-                .onTrue(superStructure
-                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L3)
-                        .deadlineFor(coralHolder.keepCoralShuffledForever()));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
+                .onTrue(coralHolder.keepCoralShuffledForever());
         driver.moveToL4Button()
-                .onTrue(superStructure
-                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                        .deadlineFor(coralHolder.keepCoralShuffledForever()));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
+                .onTrue(coralHolder.keepCoralShuffledForever());
         new Trigger(DriverStation::isTeleopEnabled)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 

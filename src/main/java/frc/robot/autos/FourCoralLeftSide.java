@@ -18,7 +18,8 @@ public class FourCoralLeftSide implements Auto {
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-        Command prepareToRunUp = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_SWAP_1);
+        Command prepareToRunUp = // robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_SWAP_1);
+                Commands.none();
         Command moveToL4 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4);
         Command moveToL3 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3);
 
@@ -85,6 +86,6 @@ public class FourCoralLeftSide implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        return new Pose2d(7.85, 5.52, Rotation2d.fromDegrees(180));
+        return new Pose2d(6.11, 5.86, Rotation2d.fromDegrees(180));
     }
 }
