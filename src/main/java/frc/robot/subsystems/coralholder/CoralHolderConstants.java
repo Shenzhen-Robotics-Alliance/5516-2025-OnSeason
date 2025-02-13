@@ -10,7 +10,7 @@ import edu.wpi.first.units.measure.LinearVelocity;
 
 public final class CoralHolderConstants {
     public static final double INTAKE_VOLTS = 2.4;
-    public static final double SHOOT_VOLTS = 6;
+    public static final double SHOOT_VOLTS = 10;
     public static final double BRAKE_VOLTS = -1.8;
     public static final double SHUFFLE_VOLTS = 1.2;
 

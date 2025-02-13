@@ -163,7 +163,7 @@ public class CoralHolder extends SubsystemBase {
         return run(() -> setVoltage(SHOOT_VOLTS, 0.0))
                 .until(hasCoral.negate())
                 .finallyDo(() -> setVoltage(0.0, 0.0))
-                .withTimeout(1);
+                .withTimeout(1.2);
     }
 
     public Command runIdle() {
