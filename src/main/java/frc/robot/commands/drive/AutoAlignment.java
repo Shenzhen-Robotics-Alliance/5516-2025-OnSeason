@@ -192,9 +192,10 @@ public class AutoAlignment {
                         -config.finalApproachStraightTrajectoryLength.in(Meters), preciseTargetApproachDirection));
         Translation2d fieldRelativeSpeedsMPS = new Translation2d(
                 measuredSpeedsFieldRelative.vxMetersPerSecond, measuredSpeedsFieldRelative.vyMetersPerSecond);
-        Rotation2d startingPathDirection = fieldRelativeSpeedsMPS
-                .times(AUTO_ALIGNMENT_TRANSITION_VELOCITY_FACTOR)
-                .plus(interiorWaypoint.minus(currentRobotPose.getTranslation()))
+        Rotation2d startingPathDirection = interiorWaypoint
+                .minus(currentRobotPose.getTranslation())
+                .times(AUTO_ALIGNMENT_TRANSITION_COMPENSATION_FACTOR)
+                .plus(fieldRelativeSpeedsMPS)
                 .getAngle();
 
         List<Waypoint> waypoints = PathPlannerPath.waypointsFromPoses(

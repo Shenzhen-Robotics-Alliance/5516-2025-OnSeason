@@ -42,7 +42,7 @@ public class FourCoralLeftSide implements Auto {
         // Score second
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                        robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 10, moveToL4)
+                        robot, PathPlannerPath.fromChoreoTrajectory("place second"), 10, moveToL4)
                 .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
@@ -58,7 +58,7 @@ public class FourCoralLeftSide implements Auto {
         // Score Third
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                        robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 11, moveToL4)
+                        robot, PathPlannerPath.fromChoreoTrajectory("place third"), 11, moveToL4)
                 .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
@@ -74,7 +74,7 @@ public class FourCoralLeftSide implements Auto {
         // Score fourth
         commandGroup.addCommands(Commands.runOnce(prepareToRunUp::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                        robot, PathPlannerPath.fromChoreoTrajectory("place low left"), 11, moveToL3)
+                        robot, PathPlannerPath.fromChoreoTrajectory("place fourth"), 11, moveToL3)
                 .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
@@ -86,6 +86,6 @@ public class FourCoralLeftSide implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        return new Pose2d(6.11, 5.86, Rotation2d.fromDegrees(180));
+        return new Pose2d(7.34, 5.66, Rotation2d.fromDegrees(180));
     }
 }

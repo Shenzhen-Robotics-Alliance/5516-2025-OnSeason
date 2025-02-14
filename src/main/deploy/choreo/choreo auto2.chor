@@ -14,8 +14,8 @@
    "maxacc":{
     "dimension":"LinAcc",
     "var":{
-     "exp":"5 m / s ^ 2",
-     "val":5.0
+     "exp":"5.5 m / s ^ 2",
+     "val":5.5
     }
    }
   },

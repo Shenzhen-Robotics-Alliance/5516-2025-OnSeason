@@ -7,6 +7,7 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.*;
@@ -226,7 +227,10 @@ public class RobotContainer {
         setMotorBrake(true);
     }
 
-    private void configureAutoNamedCommands() {}
+    private void configureAutoNamedCommands() {
+        NamedCommands.registerCommand(
+                "Raise Elevator", superStructure.moveToPose(SuperStructure.SuperStructurePose.HIGH_SWAP));
+    }
 
     private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
 
@@ -436,12 +440,12 @@ public class RobotContainer {
         drive.setMotorBrake(brakeModeEnabled);
         arm.setMotorBrake(brakeModeEnabled);
         elevator.setMotorBrake(brakeModeEnabled);
-        if (brakeModeEnabled)
-            ledStatusLight.showEnableDisableState().schedule();
-        else ledStatusLight
-                .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kWhite), 1)
-                .ignoringDisable(true)
-                .schedule();
+        if (brakeModeEnabled) ledStatusLight.showEnableDisableState().schedule();
+        else
+            ledStatusLight
+                    .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kWhite), 1)
+                    .ignoringDisable(true)
+                    .schedule();
 
         this.motorBrakeEnabled = brakeModeEnabled;
     }
