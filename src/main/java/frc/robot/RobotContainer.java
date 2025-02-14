@@ -222,6 +222,8 @@ public class RobotContainer {
         configureLEDEffects();
 
         SmartDashboard.putData("Field", field);
+
+        setMotorBrake(true);
     }
 
     private void configureAutoNamedCommands() {}
@@ -309,6 +311,13 @@ public class RobotContainer {
      * a {@link JoystickButton}.
      */
     public void configureButtonBindings() {
+        SmartDashboard.putData(
+                "Enable Motor Brake",
+                Commands.runOnce(() -> setMotorBrake(true)).ignoringDisable(true));
+        SmartDashboard.putData(
+                "Disable Motor Brake",
+                Commands.runOnce(() -> setMotorBrake(false)).ignoringDisable(true));
+
         /* joystick drive command */
         final MapleJoystickDriveInput driveInput = driver.getDriveInput();
         IntSupplier pov =
@@ -416,5 +425,24 @@ public class RobotContainer {
         Logger.recordOutput("SuperStructure/currentPose", superStructure.currentPose());
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
+    }
+
+    private boolean motorBrakeEnabled = false;
+
+    public void setMotorBrake(boolean brakeModeEnabled) {
+        if (this.motorBrakeEnabled == brakeModeEnabled) return;
+
+        System.out.println("Set motor brake: " + brakeModeEnabled);
+        drive.setMotorBrake(brakeModeEnabled);
+        arm.setMotorBrake(brakeModeEnabled);
+        elevator.setMotorBrake(brakeModeEnabled);
+        if (brakeModeEnabled)
+            ledStatusLight.showEnableDisableState().schedule();
+        else ledStatusLight
+                .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kWhite), 1)
+                .ignoringDisable(true)
+                .schedule();
+
+        this.motorBrakeEnabled = brakeModeEnabled;
     }
 }
