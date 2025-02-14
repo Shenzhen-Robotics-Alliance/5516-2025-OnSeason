@@ -57,8 +57,11 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     private final SwerveModule[] swerveModules;
 
     private final OdometryThread odometryThread;
+
+    // Alerts
     private final Alert gyroDisconnectedAlert =
             AlertsManager.create("Gyro hardware fault detected!", Alert.AlertType.kError);
+    private final Alert gyroConfigurationFailed = AlertsManager.create("Gyro configuration failed! Reboot robot after fixing connection.", Alert.AlertType.kError);
     private final Alert canBusHighUtilization =
             AlertsManager.create("Drivetrain CanBus high utilization!", Alert.AlertType.kError);
     private final Debouncer batteryBrownoutDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
@@ -85,10 +88,10 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         this.canBusInputs = new CanBusIO.CanBusInputs();
         this.gyroInputs = new GyroIOInputsAutoLogged();
         this.swerveModules = new SwerveModule[] {
-            new SwerveModule(frontLeftModuleIO, "FrontLeft"),
-            new SwerveModule(frontRightModuleIO, "FrontRight"),
-            new SwerveModule(backLeftModuleIO, "BackLeft"),
-            new SwerveModule(backRightModuleIO, "BackRight"),
+                new SwerveModule(frontLeftModuleIO, "FrontLeft"),
+                new SwerveModule(frontRightModuleIO, "FrontRight"),
+                new SwerveModule(backLeftModuleIO, "BackLeft"),
+                new SwerveModule(backRightModuleIO, "BackRight"),
         };
 
         this.odometryThread = OdometryThread.createInstance(type);
@@ -113,8 +116,12 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         modulesPeriodic();
 
         for (int timeStampIndex = 0;
-                timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
-                timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
+             timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
+             timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
+
+        RobotState.getInstance().addChassisSpeedsObservation(
+                getModuleStates(),
+                gyroInputs.connected ? OptionalDouble.of(gyroInputs.yawVelocityRadPerSec) : OptionalDouble.empty());
 
         RobotState.getInstance()
                 .addChassisSpeedsObservation(
@@ -124,7 +131,8 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                                 : OptionalDouble.empty());
 
         RobotState.getInstance().updateAlerts();
-        gyroDisconnectedAlert.set(!gyroInputs.connected);
+        gyroConfigurationFailed.set(gyroInputs.configurationFailed);
+        gyroDisconnectedAlert.set(!gyroInputs.configurationFailed && !gyroInputs.connected);
         canBusHighUtilization.setText(
                 "Drivetrain CanBus high utilization: " + (int) (canBusInputs.utilization * 100) + "%");
         canBusHighUtilization.set(canBusInputs.utilization > 0.8);
