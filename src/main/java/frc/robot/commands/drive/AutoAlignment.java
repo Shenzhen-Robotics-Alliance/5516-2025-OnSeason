@@ -1,6 +1,7 @@
 package frc.robot.commands.drive;
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.constants.DriveControlLoops.*;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.*;
@@ -41,7 +42,7 @@ public class AutoAlignment {
             Command toRunDuringPreciseAlignment,
             AutoAlignmentConfigurations config) {
         Command pathFindToRoughTarget = pathFindToPose(
-                        driveSubsystem, target.roughTarget(), target.faceToTargetDuringRoughApproach(), config)
+                        target.roughTarget(), target.faceToTargetDuringRoughApproach(), config)
                 .onlyIf(() -> RobotState.getInstance()
                                 .getVisionPose()
                                 .minus(target.preciseTarget())
@@ -111,10 +112,7 @@ public class AutoAlignment {
     }
 
     public static Command pathFindToPose(
-            HolonomicDriveSubsystem driveSubsystem,
-            Pose2d targetPose,
-            Optional<Translation2d> faceToVisionTarget,
-            AutoAlignmentConfigurations config) {
+            Pose2d targetPose, Optional<Translation2d> faceToVisionTarget, AutoAlignmentConfigurations config) {
         ChassisHeadingController.ChassisHeadingRequest chassisHeadingRequest = faceToVisionTarget.isPresent()
                 ? new ChassisHeadingController.FaceToTargetRequest(faceToVisionTarget::get, null)
                 : new ChassisHeadingController.NullRequest();
@@ -122,12 +120,31 @@ public class AutoAlignment {
                 Commands.runOnce(() -> ChassisHeadingController.getInstance().setHeadingRequest(chassisHeadingRequest));
         Runnable deactivateChassisHeadingController = () ->
                 ChassisHeadingController.getInstance().setHeadingRequest(new ChassisHeadingController.NullRequest());
-        Runnable resetDriveCommandRotationMaintenance = () -> JoystickDrive.instance.ifPresent(
-                joystickDrive -> joystickDrive.setRotationMaintenanceSetpoint(targetPose.getRotation()));
-        return AutoBuilder.pathfindToPose(
-                        targetPose,
-                        driveSubsystem.getChassisConstrains(config.roughApproachSpeedFactor),
-                        config.preciseApproachStartingSpeed())
+
+        PathConstraints normalConstraints = new PathConstraints(
+                MOVEMENT_VELOCITY_SOFT_CONSTRAIN,
+                ACCELERATION_SOFT_CONSTRAIN,
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
+        PathConstraints lowSpeedConstrain = new PathConstraints(
+                MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW,
+                ACCELERATION_SOFT_CONSTRAIN_LOW,
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
+        Command pathFindToPoseNormalConstrains = AutoBuilder.pathfindToPose(
+                        targetPose, normalConstraints, config.preciseApproachStartingSpeed())
+                .onlyIf(() -> !RobotState.getInstance().lowSpeedModeEnabled())
+                .until(RobotState.getInstance()::lowSpeedModeEnabled);
+        Command pathFindToPoseLowConstrains = AutoBuilder.pathfindToPose(
+                        targetPose, lowSpeedConstrain, config.preciseApproachStartingSpeed())
+                .onlyIf(RobotState.getInstance()::lowSpeedModeEnabled);
+        Command pathFindToPose = pathFindToPoseNormalConstrains.andThen(pathFindToPoseLowConstrains);
+
+        Runnable resetDriveCommandRotationMaintenance =
+                () -> JoystickDrive.instance.ifPresent(joystickDrive -> joystickDrive.setRotationMaintenanceSetpoint(
+                        RobotState.getInstance().getRotation()));
+
+        return pathFindToPose
                 .beforeStarting(activateChassisHeadingController)
                 .until(() -> RobotState.getInstance()
                                 .getVisionPose()
@@ -144,9 +161,14 @@ public class AutoAlignment {
             Pose2d preciseTarget,
             Rotation2d preciseTargetApproachDirection,
             AutoAlignmentConfigurations config) {
+        PathConstraints constraints = new PathConstraints(
+                MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW,
+                ACCELERATION_SOFT_CONSTRAIN_LOW,
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
         return Commands.defer(
                         () -> AutoBuilder.followPath(getPreciseAlignmentPath(
-                                driveSubsystem.getChassisConstrains(config.roughApproachSpeedFactor),
+                                constraints,
                                 driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
                                 driveSubsystem.getPose(),
                                 preciseTarget,
@@ -185,8 +207,8 @@ public class AutoAlignment {
         PathConstraints slowDownConstrains = new PathConstraints(
                 config.finalAlignmentSpeed(),
                 config.preciseAlignmentMaxAcceleration,
-                DegreesPerSecond.of(90),
-                DegreesPerSecondPerSecond.of(360));
+                RotationsPerSecond.of(0.5),
+                RotationsPerSecondPerSecond.of(1));
 
         List<RotationTarget> rotationTargets = List.of(new RotationTarget(1.0, preciseTarget.getRotation()));
         List<ConstraintsZone> constraintsZones = List.of(new ConstraintsZone(1.0, 2.0, slowDownConstrains));
@@ -207,7 +229,6 @@ public class AutoAlignment {
     }
 
     public record AutoAlignmentConfigurations(
-            double roughApproachSpeedFactor,
             Distance distanceStartPreciseApproach,
             LinearVelocity preciseApproachStartingSpeed,
             LinearVelocity finalAlignmentSpeed,
@@ -215,7 +236,6 @@ public class AutoAlignment {
             LinearVelocity hitTargetSpeed,
             LinearAcceleration preciseAlignmentMaxAcceleration) {
         public static final AutoAlignmentConfigurations DEFAULT_CONFIG = new AutoAlignmentConfigurations(
-                0.6,
                 Meters.of(0.5),
                 MetersPerSecond.of(3),
                 MetersPerSecond.of(2),

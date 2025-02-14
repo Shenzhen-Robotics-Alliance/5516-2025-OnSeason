@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.RobotController;
@@ -56,8 +57,11 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     private final SwerveModule[] swerveModules;
 
     private final OdometryThread odometryThread;
+
+    // Alerts
     private final Alert gyroDisconnectedAlert =
             AlertsManager.create("Gyro hardware fault detected!", Alert.AlertType.kError);
+    private final Alert gyroConfigurationFailed = AlertsManager.create("Gyro configuration failed! Reboot robot after fixing connection.", Alert.AlertType.kError);
     private final Alert canBusHighUtilization =
             AlertsManager.create("Drivetrain CanBus high utilization!", Alert.AlertType.kError);
     private final Debouncer batteryBrownoutDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
@@ -84,10 +88,10 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         this.canBusInputs = new CanBusIO.CanBusInputs();
         this.gyroInputs = new GyroIOInputsAutoLogged();
         this.swerveModules = new SwerveModule[] {
-            new SwerveModule(frontLeftModuleIO, "FrontLeft"),
-            new SwerveModule(frontRightModuleIO, "FrontRight"),
-            new SwerveModule(backLeftModuleIO, "BackLeft"),
-            new SwerveModule(backRightModuleIO, "BackRight"),
+                new SwerveModule(frontLeftModuleIO, "FrontLeft"),
+                new SwerveModule(frontRightModuleIO, "FrontRight"),
+                new SwerveModule(backLeftModuleIO, "BackLeft"),
+                new SwerveModule(backRightModuleIO, "BackRight"),
         };
 
         this.odometryThread = OdometryThread.createInstance(type);
@@ -112,11 +116,16 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         modulesPeriodic();
 
         for (int timeStampIndex = 0;
-                timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
-                timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
+             timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
+             timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
+
+        RobotState.getInstance().addChassisSpeedsObservation(
+                getModuleStates(),
+                gyroInputs.connected ? OptionalDouble.of(gyroInputs.yawVelocityRadPerSec) : OptionalDouble.empty());
 
         RobotState.getInstance().updateAlerts();
-        gyroDisconnectedAlert.set(!gyroInputs.connected);
+        gyroConfigurationFailed.set(gyroInputs.configurationFailed);
+        gyroDisconnectedAlert.set(!gyroInputs.configurationFailed && !gyroInputs.connected);
         canBusHighUtilization.setText(
                 "Drivetrain CanBus high utilization: " + (int) (canBusInputs.utilization * 100) + "%");
         canBusHighUtilization.set(canBusInputs.utilization > 0.8);
@@ -170,19 +179,23 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         return swerveModulePositions;
     }
 
-    private LinearAcceleration accelerationConstrain = ACCELERATION_CONSTRAIN_NORMAL;
-
     @Override
     public void runRobotCentricChassisSpeeds(ChassisSpeeds speeds) {
-        if (!USE_SETPOINT_GENERATOR) {
+        if (!ENABLE_SOFTWARE_CONSTRAIN) {
             runRobotCentricSpeedsWithFeedforwards(speeds, DriveFeedforwards.zeros(4));
             return;
         }
+
+        boolean lowSpeedMode = RobotState.getInstance().lowSpeedModeEnabled();
+        LinearAcceleration accelerationConstrain =
+                lowSpeedMode ? ACCELERATION_SOFT_CONSTRAIN_LOW : ACCELERATION_SOFT_CONSTRAIN;
+        LinearVelocity velocityConstrain =
+                lowSpeedMode ? MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW : MOVEMENT_VELOCITY_SOFT_CONSTRAIN;
         PathConstraints constraints = new PathConstraints(
-                CHASSIS_MAX_VELOCITY,
+                velocityConstrain,
                 accelerationConstrain,
-                CHASSIS_MAX_ANGULAR_VELOCITY,
-                CHASSIS_MAX_ANGULAR_ACCELERATION);
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
         this.setpoint = setpointGenerator.generateSetpoint(setpoint, speeds, constraints, Robot.defaultPeriodSecs, 13);
 
         executeSetpoint();
@@ -268,8 +281,9 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     }
 
     @Override
+    // Pose is for PID control
     public Pose2d getPose() {
-        return RobotState.getInstance().getPose();
+        return RobotState.getInstance().getPoseWithLookAhead();
     }
 
     @Override
@@ -279,11 +293,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     @Override
     public ChassisSpeeds getMeasuredChassisSpeedsRobotRelative() {
-        ChassisSpeeds wheelSpeeds = DRIVE_KINEMATICS.toChassisSpeeds(getModuleStates());
-        double angularVelocityRadPerSec =
-                gyroInputs.connected ? gyroInputs.yawVelocityRadPerSec : wheelSpeeds.omegaRadiansPerSecond;
-        return new ChassisSpeeds(
-                wheelSpeeds.vxMetersPerSecond, wheelSpeeds.vyMetersPerSecond, angularVelocityRadPerSec);
+        return RobotState.getInstance().getRobotRelativeSpeeds();
     }
 
     @Override
@@ -304,15 +314,6 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     @Override
     public double getChassisMaxAngularAccelerationRadPerSecSq() {
         return CHASSIS_MAX_ANGULAR_ACCELERATION.in(RadiansPerSecondPerSecond);
-    }
-
-    private Subsystem accelerationConstrainLock = new Subsystem() {};
-
-    public Command withAccelerationConstrain(LinearAcceleration accelerationConstrain) {
-        return Commands.startEnd(
-                () -> this.accelerationConstrain = accelerationConstrain,
-                () -> this.accelerationConstrain = ACCELERATION_CONSTRAIN_NORMAL,
-                accelerationConstrainLock);
     }
 
     private void startDashboardDisplay() {
