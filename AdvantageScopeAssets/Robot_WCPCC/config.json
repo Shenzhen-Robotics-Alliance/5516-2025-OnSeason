@@ -21,8 +21,10 @@
     0.038
   ],
   "cameras": [
-    {"name":"FrontLeftCam","position":[0.14,0.2,0.43],"fov":72.0,"rotations":[{"axis":"y","degrees":22.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
-    {"name":"FrontRightCam","position":[0.14,-0.2,0.43],"fov":72.0,"rotations":[{"axis":"y","degrees":22.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]}
+    {"name":"FrontLeftLowerCam","position":[0.14,0.24,0.67],"fov":72.0,"rotations":[{"axis":"y","degrees":42.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontRightLowerCam","position":[0.14,-0.24,0.67],"fov":72.0,"rotations":[{"axis":"y","degrees":42.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontLeftUpperCam","position":[0.14,0.24,0.69],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":25},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontRightUpperCam","position":[0.14,-0.24,0.69],"fov":59.99999999999999,"rotations":[{"axis":"y","degrees":25},{"axis":"z","degrees":0.0}],"resolution":[1280,800]}
   ],
   "components": [
     {
