@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
+import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.utils.AlertsManager;
 import org.littletonrobotics.junction.Logger;
 
@@ -73,7 +74,7 @@ public class Arm extends SubsystemBase {
         this.armAbsoluteEncoderDisconnectedAlert.set(false);
 
         currentStateRad = new TrapezoidProfile.State(ARM_UPPER_LIMIT.in(Radians), 0);
-        setpoint = ArmPosition.IDLE.angle;
+        setpoint = SuperStructure.SuperStructurePose.IDLE.armAngle;
 
         hardwareFaultDetected = false;
         encoderCalibrated = false;
@@ -106,6 +107,7 @@ public class Arm extends SubsystemBase {
         io.setMotorOutput(Volts.zero());
         currentStateRad = new TrapezoidProfile.State(getArmAngle().getRadians(), 0);
         previousVelocityRadPerSec = 0.0;
+        logControlLoops(0, 0, 0);
     }
 
     private double previousVelocityRadPerSec = 0.0;
@@ -122,8 +124,15 @@ public class Arm extends SubsystemBase {
                 getArmAngle().getRadians(), currentStateRad.velocity, accelerationRadPerSecSq);
         double feedbackVolts = feedbackController.calculate(getArmAngle().getRadians(), currentStateRad.position);
 
-        Voltage voltage = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
-        io.setMotorOutput(voltage);
+        Voltage output = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
+        io.setMotorOutput(output);
+        logControlLoops(feedforwardVolts, feedbackVolts, output.in(Volts));
+    }
+
+    private void logControlLoops(double feedforwardVolts, double feedbackVolts, double outputVolts) {
+        Logger.recordOutput("Arm/PID/Feedforward Volts", feedforwardVolts);
+        Logger.recordOutput("Arm/PID/Feedback Volts", feedbackVolts);
+        Logger.recordOutput("Arm/PID/Requested Output Volts", outputVolts);
     }
 
     @Override
@@ -156,21 +165,46 @@ public class Arm extends SubsystemBase {
                 "Arm/Current State Velocity (Degrees Per Second)", Math.toDegrees(currentStateRad.velocity));
         Logger.recordOutput(
                 "Arm/Measured Velocity (Degrees Per Second)", getVelocity().in(DegreesPerSecond));
+        Logger.recordOutput("Arm/At Reference", atReference());
     }
 
     /**
-     * Whether the arm is close enough to its setpoint.
+     * Whether the arm's profile state is close enough to its setpoint.
      *
-     * @return <code>true</code> if there is a setpoint and the arm is close enough to it, <code>false</code> otherwise.
+     * <p>Note that this does not reflect whether the mechanism is actually at its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the profile is close enough to the goal, <code>false</code>
+     *     otherwise.
      */
     public boolean atReference() {
+        return atReference(this.setpoint);
+    }
+
+    public boolean atReference(Angle setpoint) {
+        double errorRad = Rotation2d.fromRadians(currentStateRad.position)
+                .minus(new Rotation2d(setpoint))
+                .getRadians();
+        return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
+    }
+
+    /**
+     * Whether the mechanism is actually close enough to its setpoint.
+     *
+     * @return <code>true</code> if there is a setpoint and the measured arm angle is close enough to the goal, <code>
+     *     false</code> otherwise.
+     */
+    public boolean trulyAtReference() {
+        return trulyAtReference(this.setpoint);
+    }
+
+    public boolean trulyAtReference(Angle setpoint) {
         double errorRad = getArmAngle().minus(new Rotation2d(setpoint)).getRadians();
         return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
     }
 
     /** Request the arm to move to a given setpoint. */
-    public void requestPosition(ArmPosition setpoint) {
-        this.setpoint = setpoint.angle;
+    public void requestPosition(Angle setpoint) {
+        this.setpoint = setpoint;
     }
 
     /**
@@ -181,7 +215,7 @@ public class Arm extends SubsystemBase {
      * <p><b>Note: This command finishes automatically when the setpoint is reached, causing the default command to
      * schedule.</b>
      */
-    public Command moveToPosition(ArmPosition setpoint) {
+    public Command moveToPosition(Angle setpoint) {
         return run(() -> requestPosition(setpoint)).until(this::atReference);
     }
 

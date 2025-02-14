@@ -21,7 +21,7 @@ public class VisionConstants {
     public static final Distance ROBOT_HEIGHT_TOLERANCE = Meters.of(0.15);
     public static final Angle ROBOT_PITCH_TOLERANCE = Degrees.of(10);
     public static final Angle ROBOT_ROLL_TOLERANCE = Degrees.of(10);
-    public static final Distance MAX_TAG_DISTANCE = Meters.of(4);
+    public static final Distance MAX_TAG_DISTANCE = Meters.of(3);
     public static final double MAX_TAG_AMBIGUITY = 0.3;
     public static final Angle MAX_TAG_ANGLE = Degrees.of(65);
 
@@ -62,7 +62,7 @@ public class VisionConstants {
                     1280,
                     800,
                     new Translation2d(0.14, 0.2),
-                    Meters.of(0.43),
+                    Meters.of(0.42),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-22),
                     Degrees.zero()),
@@ -77,7 +77,7 @@ public class VisionConstants {
                     1280,
                     800,
                     new Translation2d(0.14, -0.2),
-                    Meters.of(0.43),
+                    Meters.of(0.42),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-22),
                     Degrees.zero()));

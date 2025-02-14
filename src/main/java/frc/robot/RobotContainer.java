@@ -6,20 +6,19 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
-import com.pathplanner.lib.auto.NamedCommands;
-import static edu.wpi.first.units.Units.*;
+
 import com.pathplanner.lib.commands.PathPlannerAuto;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Transform2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.*;
 import frc.robot.commands.drive.*;
@@ -31,10 +30,11 @@ import frc.robot.subsystems.coralholder.CoralHolderIOReal;
 import frc.robot.subsystems.coralholder.CoralHolderIOSim;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.drive.IO.*;
+import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
+import frc.robot.subsystems.superstructure.SuperStructure;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.subsystems.superstructure.arm.Arm;
-import frc.robot.subsystems.superstructure.arm.ArmConstants;
 import frc.robot.subsystems.superstructure.arm.ArmIOReal;
 import frc.robot.subsystems.superstructure.arm.ArmIOSim;
 import frc.robot.subsystems.superstructure.elevator.Elevator;
@@ -84,9 +84,10 @@ public class RobotContainer {
 
     // Simulated drive
     private final SwerveDriveSimulation driveSimulation;
-    private final Arm arm;
-    private final Elevator elevator;
-    private final CoralHolder coralHolder;
+    public final Arm arm;
+    public final Elevator elevator;
+    public final SuperStructure superStructure;
+    public final CoralHolder coralHolder;
 
     private final Field2d field = new Field2d();
 
@@ -118,7 +119,11 @@ public class RobotContainer {
 
                 arm = new Arm(new ArmIOReal());
                 elevator = new Elevator(new ElevatorIOReal());
-                coralHolder = new CoralHolder(new CoralHolderIOReal());
+                coralHolder = new CoralHolder(
+                        new CoralHolderIOReal(),
+                        RobotState.getInstance()::getPrimaryEstimatorPose,
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
 
             case SIM -> {
@@ -171,10 +176,11 @@ public class RobotContainer {
 
                 arm = new Arm(new ArmIOSim());
                 elevator = new Elevator(new ElevatorIOSim());
-                coralHolder = new CoralHolder(new CoralHolderIOSim(
+                coralHolder = new CoralHolder(
+                        new CoralHolderIOSim(driveSimulation, arm::getArmAngle, elevator::getHeight),
                         driveSimulation::getSimulatedDriveTrainPose,
-                        () -> arm.getArmAngle().getMeasure(),
-                        elevator::getHeight));
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
 
             default -> {
@@ -195,11 +201,16 @@ public class RobotContainer {
 
                 arm = new Arm(armInputs -> {});
                 elevator = new Elevator(elevatorInputs -> {});
-                coralHolder = new CoralHolder(coralHolderInputs -> {});
+                coralHolder = new CoralHolder(
+                        coralHolderInputs -> {},
+                        RobotState.getInstance()::getPrimaryEstimatorPose,
+                        arm::getArmAngle,
+                        elevator::getHeight);
             }
         }
 
-        this.ledStatusLight = new LEDStatusLight(0, 155, true, false);
+        this.superStructure = new SuperStructure(elevator, arm);
+        this.ledStatusLight = new LEDStatusLight(0, 100, false, false);
 
         this.drive.configHolonomicPathPlannerAutoBuilder(field);
 
@@ -221,6 +232,8 @@ public class RobotContainer {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
         autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
+        autoSendableChooser.addOption("[LEFT SIDE 3x Coral] - Three Coral Auto", new ThreeCoralLeftSide());
+        autoSendableChooser.addOption("[LEFT SIDE 4x Coral] - Four Coral Auto", new FourCoralLeftSide());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
@@ -326,31 +339,27 @@ public class RobotContainer {
                         drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
-        elevator.setDefaultCommand(elevator.moveToPosition(Meters.zero()));
-        arm.setDefaultCommand(arm.moveToPosition(ArmConstants.ArmPosition.IDLE));
+
+        Command flashLEDForIntake =
+                ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
                 .whileTrue(Commands.sequence(
-                        elevator.moveToPosition(Centimeters.of(5))
-                                .alongWith(arm.moveToPosition(ArmConstants.ArmPosition.INTAKE)),
-                        coralHolder.intakeCoralSequence()));
-        driver.moveToL4Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
-                        elevator.moveToPosition(Meters.of(1.32)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L4)
-                                .alongWith(coralHolder.shuffleCoralSequence()),
-                        Commands.waitUntil(() -> false)));
-        driver.moveToL3Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE),
-                        elevator.moveToPosition(Meters.of(0.62)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.SCORE_L1_L2_L3),
-                        Commands.waitUntil(() -> false)));
+                                superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
+                                coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
+                        .finallyDo(flashLEDForIntake::cancel))
+                .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
         driver.moveToL2Button()
-                .onTrue(Commands.sequence(
-                        arm.moveToPosition(ArmConstants.ArmPosition.ELEVATOR_MOVING),
-                        elevator.moveToPosition(Meters.of(0)),
-                        arm.moveToPosition(ArmConstants.ArmPosition.IDLE)));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        driver.moveToL3Button()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        driver.moveToL4Button()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        new Trigger(DriverStation::isTeleopEnabled)
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
@@ -361,6 +370,10 @@ public class RobotContainer {
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
+        coralHolder.hasCoral.onTrue(ledStatusLight
+                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kYellow), 3)
+                .withTimeout(1));
+        coralHolder.coralInPlace.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
     }
 
     /**
@@ -400,6 +413,7 @@ public class RobotContainer {
         SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
                 "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());
+        Logger.recordOutput("SuperStructure/currentPose", superStructure.currentPose());
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }

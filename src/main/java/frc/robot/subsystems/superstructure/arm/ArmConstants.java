@@ -7,24 +7,10 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.*;
 
 public final class ArmConstants {
-    public enum ArmPosition {
-        IDLE(116),
-        INTAKE(126),
-        SCORE_L1_L2_L3(116),
-        SCORE_L4(70),
-        ELEVATOR_MOVING(55);
-
-        public final Angle angle;
-
-        ArmPosition(double degrees) {
-            this.angle = Degrees.of(degrees);
-        }
-    }
-
     // General Configs
     public static final double ARM_GEARING_REDUCTION = 44.0 / 16.0 * 48.0 / 20.0 * 9.0;
     public static final Current ARM_CURRENT_LIMIT = Amps.of(30.0);
-    public static final Angle ARM_UPPER_LIMIT = Degrees.of(128);
+    public static final Angle ARM_UPPER_LIMIT = Degrees.of(136);
     public static final Angle ARM_LOWER_LIMIT = Degrees.of(30);
     public static final double ARM_MAX_VOLTS = 8;
 
@@ -35,7 +21,7 @@ public final class ArmConstants {
     public static final double kA = 0.01;
     public static final double kP = 9.0 / Math.toRadians(30);
     public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS =
-            new TrapezoidProfile.Constraints(Math.toRadians(360), Math.toRadians(500));
+            new TrapezoidProfile.Constraints(Math.toRadians(480), Math.toRadians(600));
     public static final Angle ARM_PID_TOLERANCE = Degrees.of(4);
 
     // Simulation Constants
