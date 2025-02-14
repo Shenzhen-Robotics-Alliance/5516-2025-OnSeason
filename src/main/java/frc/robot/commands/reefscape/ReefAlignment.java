@@ -176,7 +176,9 @@ public class ReefAlignment {
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG))
                 .beforeStarting(() -> selectedSide = rightSide ? SelectedSide.RIGHT : SelectedSide.LEFT)
                 .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED)
-                .finallyDo(() -> alignmentComplete(statusLight, driver).schedule());
+                .finallyDo((interrupted) -> {
+                    if (!interrupted) alignmentComplete(statusLight, driver).schedule();
+                });
     }
 
     private enum SelectedSide {
@@ -202,7 +204,7 @@ public class ReefAlignment {
     private static Command alignmentComplete(LEDStatusLight statusLight, DriverMap driver) {
         return statusLight
                 .playAnimation(new LEDAnimation.ShowColor(Color.kGreen), 0.5)
-                .alongWith(driver.rumbleLeftRight(0.25))
+                // .alongWith(driver.rumbleLeftRight(0.25))
                 .ignoringDisable(true);
     }
 }
