@@ -67,9 +67,8 @@ public class AutoAlignment {
             OptionalInt tagIdToFocusAtBlue,
             OptionalInt tagIdToFocusAtRed,
             OptionalInt cameraIdToFocus,
-            Command toRunAtFollowPath,
-            Command toRunAtPreciseAlignment,
-            AutoAlignmentConfigurations config) {
+            AutoAlignmentConfigurations config,
+            Command... toScheduleAtPreciseAlignment) {
         return Commands.deferredProxy(() -> followPathAndAutoAlignStatic(
                 driveSubsystem,
                 vision,
@@ -81,9 +80,8 @@ public class AutoAlignment {
                         FieldMirroringUtils.isSidePresentedAsRed() ? tagIdToFocusAtRed : tagIdToFocusAtBlue,
                         cameraIdToFocus,
                         Optional.empty()),
-                toRunAtFollowPath,
-                toRunAtPreciseAlignment,
-                config));
+                config,
+                toScheduleAtPreciseAlignment));
     }
 
     public static Command followPathAndAutoAlignStatic(
@@ -91,9 +89,8 @@ public class AutoAlignment {
             AprilTagVision vision,
             PathPlannerPath path,
             AutoAlignmentTarget target,
-            Command toRunAtFollowPath,
-            Command toRunAtPreciseAlignment,
-            AutoAlignmentConfigurations config) {
+            AutoAlignmentConfigurations config,
+            Command... toScheduleAtPreciseAlignment) {
         Command followPath = AutoBuilder.followPath(path)
                 .until(() -> RobotState.getInstance()
                                 .getVisionPose()
@@ -104,11 +101,12 @@ public class AutoAlignment {
 
         Command preciseAlignment = preciseAlignment(
                         driveSubsystem, target.preciseTarget(), target.preciseApproachDirection(), config)
-                .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()));
+                .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()))
+                .finallyDo(driveSubsystem::stop);
 
-        return followPath
-                .deadlineFor(toRunAtFollowPath.asProxy())
-                .andThen(preciseAlignment.deadlineFor(toRunAtPreciseAlignment.asProxy()));
+        return followPath.andThen(preciseAlignment.beforeStarting(() -> {
+            for (Command toSchedule : toScheduleAtPreciseAlignment) toSchedule.schedule();
+        }));
     }
 
     public static Command pathFindToPose(
@@ -122,8 +120,8 @@ public class AutoAlignment {
                 ChassisHeadingController.getInstance().setHeadingRequest(new ChassisHeadingController.NullRequest());
 
         PathConstraints normalConstraints = new PathConstraints(
-                MOVEMENT_VELOCITY_SOFT_CONSTRAIN,
-                ACCELERATION_SOFT_CONSTRAIN,
+                AUTO_ALIGNMENT_VELOCITY_LIMIT,
+                AUTO_ALIGNMENT_ACCELERATION_LIMIT,
                 ANGULAR_VELOCITY_SOFT_CONSTRAIN,
                 ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
         PathConstraints lowSpeedConstrain = new PathConstraints(
@@ -195,7 +193,7 @@ public class AutoAlignment {
         Translation2d fieldRelativeSpeedsMPS = new Translation2d(
                 measuredSpeedsFieldRelative.vxMetersPerSecond, measuredSpeedsFieldRelative.vyMetersPerSecond);
         Rotation2d startingPathDirection = fieldRelativeSpeedsMPS
-                .times(0.8)
+                .times(AUTO_ALIGNMENT_TRANSITION_VELOCITY_FACTOR)
                 .plus(interiorWaypoint.minus(currentRobotPose.getTranslation()))
                 .getAngle();
 

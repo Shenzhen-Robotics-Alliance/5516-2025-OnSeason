@@ -28,7 +28,15 @@ public interface DriverMap extends Subsystem {
 
     Trigger autoAlignmentButtonRight();
 
-    Trigger faceToTargetButton();
+    Trigger intakeButton();
+
+    Trigger moveToL2Button();
+
+    Trigger moveToL3Button();
+
+    Trigger moveToL4Button();
+
+    Trigger scoreButton();
 
     DoubleSupplier translationalAxisX();
 
@@ -111,8 +119,28 @@ public interface DriverMap extends Subsystem {
         }
 
         @Override
-        public Trigger faceToTargetButton() {
-            return xboxController.leftBumper();
+        public Trigger intakeButton() {
+            return xboxController.leftTrigger(0.5);
+        }
+
+        @Override
+        public Trigger moveToL2Button() {
+            return xboxController.a();
+        }
+
+        @Override
+        public Trigger moveToL3Button() {
+            return xboxController.b();
+        }
+
+        @Override
+        public Trigger moveToL4Button() {
+            return xboxController.y();
+        }
+
+        @Override
+        public Trigger scoreButton() {
+            return xboxController.rightTrigger(0.5);
         }
 
         @Override
@@ -221,8 +249,28 @@ public interface DriverMap extends Subsystem {
         }
 
         @Override
-        public Trigger faceToTargetButton() {
-            return ps5Controller.L1();
+        public Trigger intakeButton() {
+            return ps5Controller.L2();
+        }
+
+        @Override
+        public Trigger moveToL2Button() {
+            return ps5Controller.cross();
+        }
+
+        @Override
+        public Trigger moveToL3Button() {
+            return ps5Controller.circle();
+        }
+
+        @Override
+        public Trigger moveToL4Button() {
+            return ps5Controller.triangle();
+        }
+
+        @Override
+        public Trigger scoreButton() {
+            return ps5Controller.R2();
         }
 
         @Override

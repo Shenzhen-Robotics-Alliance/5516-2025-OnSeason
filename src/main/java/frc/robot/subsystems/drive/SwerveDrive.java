@@ -123,6 +123,13 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                 getModuleStates(),
                 gyroInputs.connected ? OptionalDouble.of(gyroInputs.yawVelocityRadPerSec) : OptionalDouble.empty());
 
+        RobotState.getInstance()
+                .addChassisSpeedsObservation(
+                        getModuleStates(),
+                        gyroInputs.connected
+                                ? OptionalDouble.of(gyroInputs.yawVelocityRadPerSec)
+                                : OptionalDouble.empty());
+
         RobotState.getInstance().updateAlerts();
         gyroConfigurationFailed.set(gyroInputs.configurationFailed);
         gyroDisconnectedAlert.set(!gyroInputs.configurationFailed && !gyroInputs.connected);
@@ -139,6 +146,11 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                 "RobotState/PrimaryEstimatorPose", RobotState.getInstance().getPrimaryEstimatorPose());
         Logger.recordOutput(
                 "RobotState/VisionSensitivePose", RobotState.getInstance().getVisionPose());
+        Logger.recordOutput(
+                "RobotState/ControlLoopPose", RobotState.getInstance().getPose());
+        Logger.recordOutput(
+                "RobotState/ControlLoopPoseWithLookAhead",
+                RobotState.getInstance().getPoseWithLookAhead());
     }
 
     private void fetchOdometryInputs() {

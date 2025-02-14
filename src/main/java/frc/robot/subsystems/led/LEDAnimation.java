@@ -91,8 +91,9 @@ public sealed interface LEDAnimation {
         @Override
         public void play(Color[] colors, double t) {
             for (int i = 0; i < colors.length; i++) {
+                double brightness = 0.5 + 0.5 * t;
                 colors[i] = i < t * colors.length
-                        ? new Color(color.red * t + 0.2, color.green * t + 0.2, color.blue * t + 0.2)
+                        ? new Color(color.red * brightness, color.green * brightness, color.blue * brightness)
                         : new Color();
             }
         }

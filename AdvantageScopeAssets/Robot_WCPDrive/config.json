@@ -1,0 +1,28 @@
+{
+  "name": "Drivetrain Only",
+  "sourceUrl": "",
+  "rotations": [
+    {
+      "axis": "x",
+      "degrees": 90
+    },
+    {
+      "axis": "y",
+      "degrees": 0
+    },
+    {
+      "axis": "z",
+      "degrees": 90
+    }
+  ],
+  "position": [
+    0,
+    0,
+    0.038
+  ],
+  "cameras": [
+    {"name":"FrontLeftCam","position":[0.14,0.2,0.43],"fov":72.0,"rotations":[{"axis":"y","degrees":22.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontRightCam","position":[0.14,-0.2,0.43],"fov":72.0,"rotations":[{"axis":"y","degrees":22.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]}
+  ],
+  "components": []
+}

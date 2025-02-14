@@ -77,7 +77,6 @@ public class RobotState {
         primaryEstimatorPose = visionSensitivePose = odometryPoseSensorLess = pose;
         poseBuffer.clear();
     }
-
     public void addChassisSpeedsObservation(SwerveModuleState[] measuredModuleStates, OptionalDouble gyroYawVelocityRadPerSec) {
         ChassisSpeeds wheelSpeeds = DRIVE_KINEMATICS.toChassisSpeeds(measuredModuleStates);
         double angularVelocityRadPerSec = gyroYawVelocityRadPerSec.orElse(wheelSpeeds.omegaRadiansPerSecond);
