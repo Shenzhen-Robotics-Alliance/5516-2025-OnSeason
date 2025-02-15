@@ -239,7 +239,6 @@ public class RobotContainer {
         autoSendableChooser.addDefaultOption("None", Auto.none());
         autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
         autoSendableChooser.addOption("[LEFT SIDE 3x Coral] - Three Coral Auto", new ThreeCoralLeftSide());
-        autoSendableChooser.addOption("[LEFT SIDE 4x Coral] - Four Coral Auto", new FourCoralLeftSide());
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
