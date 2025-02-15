@@ -22,10 +22,10 @@ public class SuperStructure {
      */
     public enum SuperStructurePose {
         // Useful poses
-        IDLE(Meters.of(0), Degrees.of(113)),
+        IDLE(Meters.of(0), Degrees.of(110)),
         INTAKE(Centimeters.of(3.5), Degrees.of(136)),
-        SCORE_L2(Meters.of(0.2), Degrees.of(113)),
-        SCORE_L3(Meters.of(0.64), Degrees.of(113)),
+        SCORE_L2(Meters.of(0.2), Degrees.of(110)),
+        SCORE_L3(Meters.of(0.64), Degrees.of(110)),
         SCORE_L4(Meters.of(1.28), Degrees.of(98)),
 
         // Swap poses that serve as interior waypoints
@@ -33,11 +33,11 @@ public class SuperStructure {
         // Allow Arm to swing down at zero height
 
         // At 0.3 meters height, allow arm to swing up and down
-        LOW_SWAP_1(Meters.of(0.3), Degrees.of(113)),
+        LOW_SWAP_1(Meters.of(0.3), Degrees.of(110)),
         LOW_SWAP_2(Meters.of(0.3), Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(Meters.of(1.28), Degrees.of(113)),
+        HIGH_SWAP(Meters.of(1.28), Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         SCORE_L4_LEGACY(Meters.of(1.32), Degrees.of(85)),

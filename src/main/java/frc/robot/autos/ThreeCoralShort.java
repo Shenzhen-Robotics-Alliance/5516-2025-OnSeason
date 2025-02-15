@@ -3,6 +3,7 @@ package frc.robot.autos;
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -20,6 +21,12 @@ public class ThreeCoralShort implements Auto {
         this.isRightSide = isRightSide;
     }
 
+    private static Command runRobotBackwardsSlow(RobotContainer robot) {
+        return robot.drive
+                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.2, 0, 0)))
+                .asProxy();
+    }
+
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
@@ -27,57 +34,72 @@ public class ThreeCoralShort implements Auto {
         Command moveToL4 = robot.superStructure
                 .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
                 .deadlineFor(Commands.waitSeconds(0.1).andThen(robot.coralHolder.keepCoralShuffledForever()));
+        Command intakeCoral = robot.coralHolder
+                .intakeCoralSequence()
+                .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
         int firstGoal = isRightSide ? 5 : 8;
         int secondGoal = isRightSide ? 3 : 10;
         int thirdGoalAndFourthGoal = isRightSide ? 2 : 11;
+        double superStructTimeOutSeconds = 10;
 
         // Score preloaded
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, moveToL4)
                 .asProxy());
+        commandGroup.addCommands(
+                Commands.waitUntil(robot.superStructure.atReference).withTimeout(superStructTimeOutSeconds));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab second
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab second", isRightSide))
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
+        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+                .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, moveToL4)
                 .asProxy());
+        commandGroup.addCommands(
+                Commands.waitUntil(robot.superStructure.atReference).withTimeout(superStructTimeOutSeconds));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab third
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab third", isRightSide))
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
+        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+                .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place third", isRightSide), thirdGoalAndFourthGoal, moveToL4)
                 .asProxy());
+        commandGroup.addCommands(
+                Commands.waitUntil(robot.superStructure.atReference).withTimeout(superStructTimeOutSeconds));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab fourth
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab fourth", isRightSide))
                 .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(robot.coralHolder.intakeCoralSequence()::schedule));
+        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
+                .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
 
         // Score fourth
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place fourth", isRightSide), thirdGoalAndFourthGoal, moveToL3)
                 .asProxy());
+        commandGroup.addCommands(
+                Commands.waitUntil(robot.superStructure.atReference).withTimeout(superStructTimeOutSeconds));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         System.out.println("auto command requires: ");
@@ -87,7 +109,7 @@ public class ThreeCoralShort implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.33, 5.79, Rotation2d.fromDegrees(180));
+        Pose2d poseAtLeft = new Pose2d(7.3, 6.15, Rotation2d.fromDegrees(180));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }

@@ -7,8 +7,8 @@
    "transvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"0.8 m / s",
-     "val":0.8
+     "exp":"1.2 m / s",
+     "val":1.2
     }
    },
    "maxacc":{
@@ -29,12 +29,12 @@
   "poses":{
    "station":{
     "x":{
-     "exp":"1.3 m",
-     "val":1.3
+     "exp":"1.4 m",
+     "val":1.4
     },
     "y":{
-     "exp":"7.35 m",
-     "val":7.35
+     "exp":"7.24 m",
+     "val":7.24
     },
     "heading":{
      "exp":"-53.3 deg",
