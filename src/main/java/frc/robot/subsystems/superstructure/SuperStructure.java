@@ -95,7 +95,7 @@ public class SuperStructure {
             // Differences between the current and target poses
             double armDifferenceRad = pose2.armAngle.minus(pose1.armAngle).abs(Radians);
             double elevatorDifferenceM =
-                    pose2.elevatorHeight.minus(pose1.elevatorHeight).in(Meters);
+                    pose2.elevatorHeight.minus(pose1.elevatorHeight).abs(Meters);
 
             // Constraints from the constants file
             double armMaxAcc = ArmConstants.PROFILE_CONSTRAINS.maxAcceleration;
@@ -127,7 +127,7 @@ public class SuperStructure {
             // If the difference can be covered during acceleration and deceleration
             if (difference <= 2 * distanceDuringAcc)
                 // We won't reach max velocity, so use the equation for constant acceleration/deceleration
-                return Math.sqrt(2 * difference / maxAcc);
+                return 2 * Math.sqrt(difference / maxAcc);
 
             // Time to accelerate and decelerate
             double distanceAtConstantVelocity = difference - 2 * distanceDuringAcc;
