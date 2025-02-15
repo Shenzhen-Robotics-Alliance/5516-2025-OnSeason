@@ -65,8 +65,9 @@ public class SwerveModule {
         if (configurationFailed.get())
             // if there is a configuration failure, we don't care if its currently connected
             this.moduleHardwareDisconnected.set(false);
-        this.moduleHardwareDisconnected.set(
-                !inputs.driveMotorConnected || !inputs.steerMotorConnected || !inputs.steerEncoderConnected);
+        else
+            this.moduleHardwareDisconnected.set(
+                    !inputs.driveMotorConnected || !inputs.steerMotorConnected || !inputs.steerEncoderConnected);
     }
 
     private void updateOdometryPositions() {
