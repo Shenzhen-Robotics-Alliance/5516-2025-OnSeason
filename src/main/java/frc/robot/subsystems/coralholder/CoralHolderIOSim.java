@@ -8,6 +8,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
+import frc.robot.Robot;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +53,7 @@ public class CoralHolderIOSim implements CoralHolderIO {
 
         if (hasCoral) simulateCoralInsideIntake();
 
-        boolean firstSensorTriggered = hasCoral && coralPosition < 1.7;
+        boolean firstSensorTriggered = hasCoral && coralPosition >= 1 && coralPosition < 1.7;
         boolean secondSensorTriggered = hasCoral && coralPosition > 1.3;
         inputs.firstSensorDistanceMM = firstSensorTriggered ? 0 : 9999;
         inputs.secondSensorDistanceMM = secondSensorTriggered ? 0 : 9999;
@@ -80,10 +81,9 @@ public class CoralHolderIOSim implements CoralHolderIO {
     private void simulateCoralInsideIntake() {
         if (DriverStation.isDisabled()) rollerMotorVolts = collectorMotorOutput = 0.0;
         if (coralPosition < 1) {
-            coralPosition += collectorMotorOutput / 6.0 / COLLECTOR_TIME_SECONDS_AT_6V;
-            if (coralPosition > 1) coralPosition = 1;
+            coralPosition += collectorMotorOutput / 6.0 / COLLECTOR_TIME_SECONDS_AT_6V * Robot.defaultPeriodSecs;
         } else {
-            coralPosition += rollerMotorVolts / 6.0 / ROLLER_TIME_SECONDS_AT_6V;
+            coralPosition += rollerMotorVolts / 6.0 / ROLLER_TIME_SECONDS_AT_6V * Robot.defaultPeriodSecs;
             if (coralPosition < 1) coralPosition = 1;
         }
     }

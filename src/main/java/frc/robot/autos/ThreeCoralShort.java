@@ -24,7 +24,9 @@ public class ThreeCoralShort implements Auto {
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         Command moveToL3 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3);
-        Command moveToL4 = robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4);
+        Command moveToL4 = robot.superStructure
+                .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
+                .deadlineFor(Commands.waitSeconds(0.1).andThen(robot.coralHolder.keepCoralShuffledForever()));
 
         int firstGoal = isRightSide ? 5 : 8;
         int secondGoal = isRightSide ? 3 : 10;
@@ -33,7 +35,6 @@ public class ThreeCoralShort implements Auto {
         // Score preloaded
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, moveToL4)
-                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -48,7 +49,6 @@ public class ThreeCoralShort implements Auto {
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, moveToL4)
-                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -63,7 +63,6 @@ public class ThreeCoralShort implements Auto {
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place third", isRightSide), thirdGoalAndFourthGoal, moveToL4)
-                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
@@ -78,7 +77,6 @@ public class ThreeCoralShort implements Auto {
         // Score fourth
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place fourth", isRightSide), thirdGoalAndFourthGoal, moveToL3)
-                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
                 .asProxy());
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 

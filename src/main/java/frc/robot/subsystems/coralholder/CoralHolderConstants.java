@@ -22,8 +22,8 @@ public final class CoralHolderConstants {
     public static final Translation3d COLLECTOR_POSITION_ON_ROBOT = new Translation3d(-0.3, 0, 0.6);
     public static Translation3d COLLECTOR_RANGE = new Translation3d(0.2, 0.3, 0.2);
 
-    public static final double COLLECTOR_TIME_SECONDS_AT_6V = 0.6;
-    public static final double ROLLER_TIME_SECONDS_AT_6V = 1;
+    public static final double COLLECTOR_TIME_SECONDS_AT_6V = 0.1;
+    public static final double ROLLER_TIME_SECONDS_AT_6V = 0.2;
     public static final LinearVelocity CORAL_LAUNCHING_VELOCITY_6V = MetersPerSecond.of(3);
 
     public static final Distance CORAL_LENGTH_ON_ARM = Centimeters.of(35.2);

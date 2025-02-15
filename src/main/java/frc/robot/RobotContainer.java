@@ -229,7 +229,7 @@ public class RobotContainer {
 
     private void configureAutoNamedCommands() {
         NamedCommands.registerCommand(
-                "Raise Elevator", superStructure.moveToPose(SuperStructure.SuperStructurePose.HIGH_SWAP));
+                "Raise Elevator", superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4));
     }
 
     private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
@@ -238,7 +238,8 @@ public class RobotContainer {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
         autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
-        autoSendableChooser.addOption("[LEFT SIDE 3x Coral] - Three Coral Auto", new ThreeCoralLeftSide());
+        autoSendableChooser.addOption("[Three Coral - Short] <-- LEFT SIDE <-- ", new ThreeCoralShort(false));
+        autoSendableChooser.addOption("[Three Coral - Short] --> RIGHT SIDE -->", new ThreeCoralShort(true));
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
