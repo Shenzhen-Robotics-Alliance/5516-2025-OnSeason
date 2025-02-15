@@ -15,7 +15,9 @@ import org.littletonrobotics.junction.AutoLog;
 public interface ModuleIO {
     @AutoLog
     class ModuleIOInputs {
-        public boolean configurationFailed = false;
+        public boolean driveMotorConfigurationFailed = false;
+        public boolean steerMotorConfigurationFailed = false;
+        public boolean steerEncoderConfigurationFailed = false;
         public boolean driveMotorConnected = false;
         public boolean steerMotorConnected = false;
         public boolean steerEncoderConnected = false;

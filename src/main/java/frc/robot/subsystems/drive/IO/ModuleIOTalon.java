@@ -11,8 +11,7 @@ import static frc.robot.utils.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
 import com.ctre.phoenix6.StatusSignal;
-import com.ctre.phoenix6.configs.CANcoderConfiguration;
-import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.controls.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.ParentDevice;
@@ -59,7 +58,9 @@ public class ModuleIOTalon implements ModuleIO {
     private final Debouncer steerConnectedDebounce = new Debouncer(0.5);
     private final Debouncer steerEncoderConnectedDebounce = new Debouncer(0.5);
 
-    private final boolean configurationOK;
+    private final boolean driveConfigurationOK, steerConfigurationOK, canCoderConfigurationOK;
+
+    private static final double timeOutSeconds = 0.2;
 
     public ModuleIOTalon(
             SwerveModuleConstants<TalonFXConfiguration, TalonFXConfiguration, CANcoderConfiguration> moduleConstants,
@@ -71,51 +72,52 @@ public class ModuleIOTalon implements ModuleIO {
         cancoder = new CANcoder(moduleConstants.EncoderId, TunerConstants.DrivetrainConstants.CANBusName);
 
         // Configure drive motor
-        var driveConfig = moduleConstants.DriveMotorInitialConfigs;
-        driveConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        driveConfig.Slot0 = moduleConstants.DriveMotorGains;
-        driveConfig
-                .CurrentLimits
+        var driveCurrentLimit = new CurrentLimitsConfigs()
                 .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(DRIVE_ANTI_SLIP_TORQUE_CURRENT_LIMIT)
                 .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(DRIVE_OVER_CURRENT_PROTECTION)
                 .withSupplyCurrentLowerTime(DRIVE_OVERHEAT_PROTECTION_TIME)
                 .withSupplyCurrentLowerLimit(DRIVE_OVERHEAT_PROTECTION_CURRENT);
-
-        driveConfig.MotorOutput.Inverted = moduleConstants.DriveMotorInverted
-                ? InvertedValue.Clockwise_Positive
-                : InvertedValue.CounterClockwise_Positive;
+        var driveGains = moduleConstants.DriveMotorGains;
+        var driveOutput = new MotorOutputConfigs()
+                .withInverted(
+                        moduleConstants.DriveMotorInverted
+                                ? InvertedValue.Clockwise_Positive
+                                : InvertedValue.CounterClockwise_Positive)
+                .withNeutralMode(NeutralModeValue.Brake);
+        driveConfigurationOK =
+                tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveCurrentLimit, timeOutSeconds))
+                        && tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveGains, timeOutSeconds))
+                        && tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveOutput, timeOutSeconds));
 
         // Configure turn motor
-        var steerConfig = new TalonFXConfiguration();
-        steerConfig.MotorOutput.NeutralMode = NeutralModeValue.Brake;
-        steerConfig.Slot0 = moduleConstants.SteerMotorGains;
-        steerConfig.Feedback.FeedbackRemoteSensorID = moduleConstants.EncoderId;
-        steerConfig.Feedback.FeedbackSensorSource = switch (moduleConstants.FeedbackSource) {
-            case RemoteCANcoder -> FeedbackSensorSourceValue.RemoteCANcoder;
-            case FusedCANcoder -> FeedbackSensorSourceValue.FusedCANcoder;
-            case SyncCANcoder -> FeedbackSensorSourceValue.SyncCANcoder;};
-        steerConfig.Feedback.RotorToSensorRatio = moduleConstants.SteerMotorGearRatio;
-        steerConfig.CurrentLimits.withStatorCurrentLimitEnable(true).withStatorCurrentLimit(STEER_CURRENT_LIMIT);
-        steerConfig.ClosedLoopGeneral.ContinuousWrap = true;
-        steerConfig.MotorOutput.Inverted = moduleConstants.SteerMotorInverted
-                ? InvertedValue.Clockwise_Positive
-                : InvertedValue.CounterClockwise_Positive;
+        var steerOutput = new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInverted(
+                        moduleConstants.SteerMotorInverted
+                                ? InvertedValue.Clockwise_Positive
+                                : InvertedValue.CounterClockwise_Positive);
+        var steerGains = moduleConstants.SteerMotorGains;
+        var steerFeedBack = new FeedbackConfigs()
+                .withFeedbackRemoteSensorID(moduleConstants.EncoderId)
+                .withRotorToSensorRatio(moduleConstants.SteerMotorGearRatio)
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder);
+        var steerCloseLoop = new ClosedLoopGeneralConfigs();
+        steerCloseLoop.ContinuousWrap = true;
+        steerConfigurationOK = tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerOutput, timeOutSeconds))
+                && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerGains, timeOutSeconds))
+                && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerFeedBack, timeOutSeconds))
+                && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerCloseLoop, timeOutSeconds));
 
         // Configure CANCoder
-        var cancoderConfig = moduleConstants.EncoderInitialConfigs;
-        cancoderConfig.MagnetSensor.MagnetOffset = moduleConstants.EncoderOffset;
-        cancoderConfig.MagnetSensor.SensorDirection = moduleConstants.EncoderInverted
-                ? SensorDirectionValue.Clockwise_Positive
-                : SensorDirectionValue.CounterClockwise_Positive;
-
-        // Send configuration to hardware
-        final double timeOutSeconds = 0.2;
-        configurationOK = tryUntilOk(5, () -> driveTalon.getConfigurator().apply(driveConfig, timeOutSeconds))
-                && tryUntilOk(5, () -> driveTalon.setPosition(0.0, timeOutSeconds))
-                && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerConfig, timeOutSeconds))
-                && tryUntilOk(5, () -> cancoder.getConfigurator().apply(cancoderConfig, timeOutSeconds));
+        var cancoderConfig = new MagnetSensorConfigs()
+                .withMagnetOffset(moduleConstants.EncoderOffset)
+                .withSensorDirection(
+                        moduleConstants.EncoderInverted
+                                ? SensorDirectionValue.Clockwise_Positive
+                                : SensorDirectionValue.CounterClockwise_Positive);
+        canCoderConfigurationOK = tryUntilOk(5, () -> cancoder.getConfigurator().apply(cancoderConfig, timeOutSeconds));
 
         // Create drive status signals
         driveRotterPosition = driveTalon.getPosition();
@@ -146,7 +148,9 @@ public class ModuleIOTalon implements ModuleIO {
 
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        inputs.configurationFailed = !configurationOK;
+        inputs.driveMotorConfigurationFailed = !driveConfigurationOK;
+        inputs.steerMotorConfigurationFailed = !steerConfigurationOK;
+        inputs.steerEncoderConfigurationFailed = !canCoderConfigurationOK;
 
         // Refresh all signals
         var driveStatus = BaseStatusSignal.refreshAll(
