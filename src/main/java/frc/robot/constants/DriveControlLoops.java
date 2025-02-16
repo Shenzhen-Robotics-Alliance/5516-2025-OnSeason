@@ -26,7 +26,7 @@ public class DriveControlLoops {
     public static final MaplePIDController.MaplePIDConfig CHASSIS_TRANSLATION_CLOSE_LOOP =
             new MaplePIDController.MaplePIDConfig(3, 0.6, 0, 0.03, 0, false, 0);
 
-    public static final double ROTATIONAL_LOOKAHEAD_TIME = 0.07, TRANSLATIONAL_LOOKAHEAD_TIME = 0.07;
+    public static final double ROTATIONAL_LOOKAHEAD_TIME = 0.05, TRANSLATIONAL_LOOKAHEAD_TIME = 0.05;
 
     public static final boolean USE_TORQUE_FEEDFORWARD = true;
 
@@ -35,8 +35,8 @@ public class DriveControlLoops {
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0),
                     MetersPerSecond.of(0),
-                    MetersPerSecond.of(0.6),
-                    Meters.of(0.4),
+                    MetersPerSecond.of(0.9),
+                    Meters.of(0.3),
                     MetersPerSecond.of(0.15),
                     MetersPerSecondPerSecond.of(1));
 
