@@ -22,9 +22,9 @@ public class VisionConstants {
     public static final Distance ROBOT_HEIGHT_TOLERANCE = Meters.of(0.15);
     public static final Angle ROBOT_PITCH_TOLERANCE = Degrees.of(10);
     public static final Angle ROBOT_ROLL_TOLERANCE = Degrees.of(10);
-    public static final Distance MAX_TAG_DISTANCE = Meters.of(3);
-    public static final double MAX_TAG_AMBIGUITY = 0.3;
-    public static final Angle MAX_TAG_ANGLE = Degrees.of(65);
+    public static final Distance MAX_TAG_DISTANCE = Meters.of(4);
+    public static final double MAX_TAG_AMBIGUITY = 0.2;
+    public static final Angle MAX_TAG_ANGLE = Degrees.of(70);
 
     /** Standard errors for single tag vision observations. */
     public static final Distance TRANSLATIONAL_STANDARD_ERROR_METERS_FOR_SINGLE_OBSERVATION = Meters.of(2);
@@ -42,9 +42,9 @@ public class VisionConstants {
     public static final Angle ROTATIONAL_STANDARD_ERROR_RADIANS_FOR_FOCUSED_TAG = Degrees.of(8);
 
     /** Odometry standard errors for the primary pose estimator */
-    public static final Distance PRIMARY_ESTIMATOR_ODOMETRY_TRANSLATIONAL_STANDARD_ERROR = Meters.of(0.1);
+    public static final Distance PRIMARY_ESTIMATOR_ODOMETRY_TRANSLATIONAL_STANDARD_ERROR = Meters.of(0.2);
 
-    public static final Angle PRIMARY_ESTIMATOR_GYRO_ROTATIONAL_STANDARD_ERROR = Degrees.of(0.2);
+    public static final Angle PRIMARY_ESTIMATOR_GYRO_ROTATIONAL_STANDARD_ERROR = Degrees.of(0.1);
 
     /** Odometry standard errors for the secondary (vision-sensitive) pose estimator */
     public static final Distance VISION_SENSITIVE_ESTIMATOR_ODOMETRY_TRANSLATIONAL_STANDARD_ERROR = Meters.of(0.8);
@@ -62,7 +62,7 @@ public class VisionConstants {
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, 0.24),
+                    new Translation2d(0.14, 0.27),
                     Centimeters.of(57),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-35),
@@ -77,7 +77,7 @@ public class VisionConstants {
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, -0.24),
+                    new Translation2d(0.14, -0.27),
                     Centimeters.of(57),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-35),
@@ -92,7 +92,7 @@ public class VisionConstants {
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, 0.24),
+                    new Translation2d(0.14, 0.27),
                     Centimeters.of(61),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-20),
@@ -107,7 +107,7 @@ public class VisionConstants {
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, -0.24),
+                    new Translation2d(0.14, -0.27),
                     Centimeters.of(61),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-20),
