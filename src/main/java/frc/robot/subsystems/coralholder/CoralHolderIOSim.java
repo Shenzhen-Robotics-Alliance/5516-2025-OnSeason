@@ -58,6 +58,8 @@ public class CoralHolderIOSim implements CoralHolderIO {
         inputs.firstSensorDistanceMM = firstSensorTriggered ? 0 : 9999;
         inputs.secondSensorDistanceMM = secondSensorTriggered ? 0 : 9999;
 
+        inputs.rollerMotorOutputVoltage = Volts.of(rollerMotorVolts);
+        inputs.feederMotorOutputVoltage = Volts.of(collectorMotorOutput);
         if (coralPosition >= 2) launchCoral();
         Logger.recordOutput("Sim/coralPosition", coralPosition);
         Logger.recordOutput("Sim/hasCoral", hasCoral);

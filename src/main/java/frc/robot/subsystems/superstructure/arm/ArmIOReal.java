@@ -100,6 +100,6 @@ public class ArmIOReal implements ArmIO {
     @Override
     public void setMotorBrake(boolean brakeModeEnable) {
         NeutralModeValue value = brakeModeEnable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
-        armTalon.setNeutralMode(value);
+        armTalon.setNeutralMode(value, 0.1);
     }
 }

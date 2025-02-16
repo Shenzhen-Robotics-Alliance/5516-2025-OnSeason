@@ -147,20 +147,20 @@ public class SuperStructure {
     private final Arm arm;
 
     private SuperStructurePose currentPose;
-
+    private SuperStructurePose goal;
     public final Trigger atReference;
 
     public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
-        this.currentPose = SuperStructurePose.IDLE;
+        this.goal = this.currentPose = SuperStructurePose.IDLE;
 
-        atReference = new Trigger(
-                () -> elevator.atReference(currentPose.elevatorHeight) && arm.atReference(currentPose.armAngle));
+        atReference = new Trigger(() -> elevator.atReference(goal.elevatorHeight) && arm.atReference(goal.armAngle));
+        atReference.onTrue(Commands.runOnce(() -> currentPose = goal));
 
         new Trigger(DriverStation::isDisabled)
                 .onTrue(Commands.waitSeconds(2)
-                        .andThen(() -> currentPose = SuperStructurePose.IDLE)
+                        .andThen(() -> goal = currentPose = SuperStructurePose.IDLE)
                         .until(DriverStation::isEnabled)
                         .ignoringDisable(true));
     }
@@ -178,7 +178,8 @@ public class SuperStructure {
     }
 
     public Command moveToPose(SuperStructurePose pose) {
-        return Commands.defer(() -> generateMoveToPoseCommand(pose), Set.of(elevator, arm));
+        return Commands.defer(() -> generateMoveToPoseCommand(pose), Set.of(elevator, arm))
+                .beforeStarting(() -> goal = pose);
     }
 
     private Command generateMoveToPoseCommand(SuperStructurePose pose) {
