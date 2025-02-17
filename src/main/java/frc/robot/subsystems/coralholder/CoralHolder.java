@@ -7,7 +7,6 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -15,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import frc.robot.utils.AlertsManager;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
@@ -38,13 +38,13 @@ public class CoralHolder extends SubsystemBase {
 
     private final Supplier<Pose2d> robotPoseSupplier;
     private final Supplier<Rotation2d> armAngleSupplier;
-    private final Supplier<Distance> elevatorHeightSupplier;
+    private final DoubleSupplier elevatorHeightSupplier;
 
     public CoralHolder(
             CoralHolderIO io,
             Supplier<Pose2d> robotPoseSupplier,
             Supplier<Rotation2d> armAngleSupplier,
-            Supplier<Distance> elevatorHeightSupplier) {
+            DoubleSupplier elevatorHeightSupplier) {
         this.io = io;
         inputs = new CoralHolderInputsAutoLogged();
 
@@ -98,7 +98,7 @@ public class CoralHolder extends SubsystemBase {
     private void visualizeCoral() {
         String key = "CoralInRobot";
         Pose2d robotPose = robotPoseSupplier.get();
-        Distance elevatorHeight = elevatorHeightSupplier.get();
+        double elevatorHeight = elevatorHeightSupplier.getAsDouble();
         Rotation2d armAngle = armAngleSupplier.get();
         if (coralInPlace.getAsBoolean())
             SuperStructureVisualizer.visualizeCoralInCoralHolder(

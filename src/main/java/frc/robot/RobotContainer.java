@@ -124,7 +124,7 @@ public class RobotContainer {
                         new CoralHolderIOReal(),
                         RobotState.getInstance()::getPrimaryEstimatorPose,
                         arm::getArmAngle,
-                        elevator::getHeight);
+                        elevator::getHeightMeters);
             }
 
             case SIM -> {
@@ -178,10 +178,10 @@ public class RobotContainer {
                 arm = new Arm(new ArmIOSim());
                 elevator = new Elevator(new ElevatorIOSim());
                 coralHolder = new CoralHolder(
-                        new CoralHolderIOSim(driveSimulation, arm::getArmAngle, elevator::getHeight),
+                        new CoralHolderIOSim(driveSimulation, arm::getArmAngle, elevator::getHeightMeters),
                         driveSimulation::getSimulatedDriveTrainPose,
                         arm::getArmAngle,
-                        elevator::getHeight);
+                        elevator::getHeightMeters);
             }
 
             default -> {
@@ -206,7 +206,7 @@ public class RobotContainer {
                         coralHolderInputs -> {},
                         RobotState.getInstance()::getPrimaryEstimatorPose,
                         arm::getArmAngle,
-                        elevator::getHeight);
+                        elevator::getHeightMeters);
             }
         }
 
@@ -429,9 +429,10 @@ public class RobotContainer {
 
         ReefAlignment.updateDashboard();
 
-        SuperStructureVisualizer.visualizeMechanisms("measuredMechanismPoses", elevator.getHeight(), arm.getArmAngle());
         SuperStructureVisualizer.visualizeMechanisms(
-                "profileCurrentStatePoses", elevator.getProfileCurrentState(), arm.getProfileCurrentState());
+                "measuredMechanismPoses", elevator.getHeightMeters(), arm.getArmAngle());
+        SuperStructureVisualizer.visualizeMechanisms(
+                "profileCurrentStatePoses", elevator.getProfileCurrentStateMeters(), arm.getProfileCurrentState());
         Logger.recordOutput("SuperStructure/currentPose", superStructure.currentPose());
 
         Pose2d autoStartingPose =

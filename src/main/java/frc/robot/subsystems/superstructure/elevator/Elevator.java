@@ -8,9 +8,7 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -45,7 +43,7 @@ public class Elevator extends SubsystemBase {
     private TrapezoidProfile.State currentStateMeters;
 
     /** The desired height. */
-    private Distance heightSetpoint;
+    private double heightSetpointMeters;
 
     public Elevator(ElevatorIO io) {
         this.io = io;
@@ -64,7 +62,7 @@ public class Elevator extends SubsystemBase {
         this.elevatorHardwareFaultsAlert.set(false);
 
         this.currentStateMeters = new TrapezoidProfile.State(0, 0);
-        this.heightSetpoint = Meters.zero();
+        this.heightSetpointMeters = 0.0;
 
         io.setMotorBrake(true);
     }
@@ -77,9 +75,9 @@ public class Elevator extends SubsystemBase {
      * <p><b>Caution: The elevator will hit the basement really hard if brake mode is off.</b>
      */
     private void executeIdle() {
-        io.setMotorOutput(Volts.zero());
-        currentStateMeters = new TrapezoidProfile.State(getHeight().in(Meters), 0);
-        previousVelocityMPS = getVelocity().in(MetersPerSecond);
+        io.setMotorOutput(0.0);
+        currentStateMeters = new TrapezoidProfile.State(getHeightMeters(), 0);
+        previousVelocityMPS = getMeasuredVelocityMPS();
         logControlLoops(0, 0, 0);
     }
 
@@ -87,7 +85,7 @@ public class Elevator extends SubsystemBase {
 
     /** Runs the control loops on the elevator to achieve the setpoint. */
     private void executeControlLoops() {
-        TrapezoidProfile.State goalState = new TrapezoidProfile.State(heightSetpoint.in(Meters), 0);
+        TrapezoidProfile.State goalState = new TrapezoidProfile.State(heightSetpointMeters, 0);
         currentStateMeters = profile.calculate(Robot.defaultPeriodSecs, currentStateMeters, goalState);
 
         double accelerationMPSSq = (currentStateMeters.velocity - previousVelocityMPS) / Robot.defaultPeriodSecs;
@@ -96,16 +94,16 @@ public class Elevator extends SubsystemBase {
         boolean elevatorRequestedToMove =
                 Math.abs(currentStateMeters.velocity) > ELEVATOR_MOVING_VELOCITY_THRESHOLD.in(MetersPerSecond);
         PIDController feedbackController = elevatorRequestedToMove ? strongFeedbackController : weakFeedbackController;
-        double feedbackVolts = feedbackController.calculate(getHeight().in(Meters), currentStateMeters.position);
-        Logger.recordOutput("Elevator/PID/measurement", getHeight().in(Meters));
+        double feedbackVolts = feedbackController.calculate(getHeightMeters(), currentStateMeters.position);
+        Logger.recordOutput("Elevator/PID/measurement", getHeightMeters());
         Logger.recordOutput("Elevator/PID/setpoint", currentStateMeters.position);
 
-        Voltage output = Volts.of(MathUtil.clamp(
-                feedforwardVolts + feedbackVolts, MIN_OUTPUT_VOLTAGE.in(Volts), MAX_OUTPUT_VOLTAGE.in(Volts)));
+        double outputVolts = MathUtil.clamp(
+                feedforwardVolts + feedbackVolts, MIN_OUTPUT_VOLTAGE.in(Volts), MAX_OUTPUT_VOLTAGE.in(Volts));
 
-        if (goalState.position == 0.0 && currentStateMeters.position == 0.0 && atReference()) output = Volts.zero();
-        io.setMotorOutput(output);
-        logControlLoops(feedforwardVolts, feedbackVolts, output.in(Volts));
+        if (goalState.position == 0.0 && currentStateMeters.position == 0.0 && atReference()) outputVolts = 0.0;
+        io.setMotorOutput(outputVolts);
+        logControlLoops(feedforwardVolts, feedbackVolts, outputVolts);
     }
 
     private void logControlLoops(double feedforwardVolts, double feedbackVolts, double outputVolts) {
@@ -115,25 +113,28 @@ public class Elevator extends SubsystemBase {
     }
 
     /** @return the measured elevator height, where zero is lowest. */
-    public Distance getHeight() {
+    private static final double CHAIN_LENGTH_METERS = CHAIN_LENGTH.in(Meters);
+
+    public double getHeightMeters() {
         // Height = Drum Rotations * Drum Teeth Count * Chain Length
-        return CHAN_LENGTH
-                .times(inputs.encoderAngle.in(Rotations) / ELEVATOR_GEARING_REDUCTION * ELEVATOR_DRUM_WHEEL_TEETH)
-                .times(ELEVATOR_STAGES);
+        return CHAIN_LENGTH_METERS
+                * Units.radiansToRotations(inputs.encoderAngleRad)
+                / ELEVATOR_GEARING_REDUCTION
+                * ELEVATOR_DRUM_WHEEL_TEETH
+                * ELEVATOR_STAGES;
     }
 
-    public Distance getProfileCurrentState() {
-        return Meters.of(currentStateMeters.position);
+    public double getProfileCurrentStateMeters() {
+        return currentStateMeters.position;
     }
 
     /** @return the measured elevator velocity, where positive is up. */
-    public LinearVelocity getVelocity() {
-        return CHAN_LENGTH
-                .times(inputs.encoderVelocity.in(RotationsPerSecond)
-                        / ELEVATOR_GEARING_REDUCTION
-                        * ELEVATOR_DRUM_WHEEL_TEETH)
-                .per(Seconds)
-                .times(ELEVATOR_STAGES);
+    public double getMeasuredVelocityMPS() {
+        return CHAIN_LENGTH_METERS
+                * Units.radiansToRotations(inputs.encoderVelocityRadPerSec)
+                / ELEVATOR_GEARING_REDUCTION
+                * ELEVATOR_DRUM_WHEEL_TEETH
+                * ELEVATOR_STAGES;
     }
 
     /**
@@ -145,11 +146,11 @@ public class Elevator extends SubsystemBase {
      *     otherwise.
      */
     public boolean atReference() {
-        return atReference(this.heightSetpoint);
+        return atReference(this.heightSetpointMeters);
     }
 
-    public boolean atReference(Distance heightSetpoint) {
-        return Math.abs(currentStateMeters.position - heightSetpoint.in(Meters)) < ELEVATOR_PID_TOLERANCE.in(Meters);
+    public boolean atReference(double heightSetpointMeters) {
+        return Math.abs(currentStateMeters.position - heightSetpointMeters) < ELEVATOR_PID_TOLERANCE.in(Meters);
     }
 
     /**
@@ -159,11 +160,14 @@ public class Elevator extends SubsystemBase {
      *     <code>false</code> otherwise.
      */
     public boolean trulyAtReference() {
-        return trulyAtReference(this.heightSetpoint);
+        return trulyAtReference(this.heightSetpointMeters);
     }
 
-    public boolean trulyAtReference(Distance heightSetpoint) {
-        return getHeight().minus(heightSetpoint).abs(Meters) < ELEVATOR_PID_TOLERANCE.in(Meters);
+    private static final double PID_TOLERANCE = ELEVATOR_PID_TOLERANCE.in(Meters);
+    private static final double MAX_HEIGHT_METERS = ELEVATOR_MAX_HEIGHT.in(Meters);
+
+    public boolean trulyAtReference(double heightSetpointMeters) {
+        return Math.abs(getHeightMeters() - heightSetpointMeters) < PID_TOLERANCE;
     }
 
     @Override
@@ -180,31 +184,27 @@ public class Elevator extends SubsystemBase {
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
         elevatorHardwareFaultsAlert.set(hardwareFaultDetected);
-        if (getHeight().plus(ELEVATOR_PID_TOLERANCE).lt(Meters.zero())) {
-            elevatorExceedLimitAlert.setText(
-                    "Elevator height exceeds lower limit: " + getHeight().in(Meters) + " Meters");
+        if (getHeightMeters() < -PID_TOLERANCE) {
+            elevatorExceedLimitAlert.setText("Elevator height exceeds lower limit: " + getHeightMeters() + " Meters");
             elevatorExceedLimitAlert.set(true);
-        } else if (getHeight().minus(ELEVATOR_PID_TOLERANCE).gt(ELEVATOR_MAX_HEIGHT)) {
-            elevatorExceedLimitAlert.setText(
-                    "Elevator height exceeds higher limit: " + getHeight().in(Meters) + " Meters");
+        } else if (getHeightMeters() > MAX_HEIGHT_METERS + PID_TOLERANCE) {
+            elevatorExceedLimitAlert.setText("Elevator height exceeds higher limit: " + getHeightMeters() + " Meters");
             elevatorExceedLimitAlert.set(true);
         } else elevatorExceedLimitAlert.set(false);
 
         // Tell drivetrain to lower speed if low speed mode enabled
-        RobotState.getInstance().setLowSpeedMode(getHeight().gt(HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE));
+        RobotState.getInstance().setLowSpeedMode(getHeightMeters() > HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE.in(Meters));
 
-        Logger.recordOutput("Elevator/Temperature (Degrees Celsius)", inputs.motorTemperature.in(Celsius));
-        Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpoint.in(Meters));
+        Logger.recordOutput("Elevator/Setpoint (Meters)", heightSetpointMeters);
         Logger.recordOutput("Elevator/Current State Position (Meters)", currentStateMeters.position);
-        Logger.recordOutput("Elevator/Measured Height (Meters)", getHeight().in(Meters));
-        Logger.recordOutput(
-                "Elevator/Measured Velocity (Meters Per Second)", getVelocity().in(MetersPerSecond));
+        Logger.recordOutput("Elevator/Measured Height (Meters)", getHeightMeters());
+        Logger.recordOutput("Elevator/Measured Velocity (Meters Per Second)", getMeasuredVelocityMPS());
         Logger.recordOutput("Elevator/Current State Velocity (Meters Per Second)", currentStateMeters.velocity);
         Logger.recordOutput("Elevator/At Reference", atReference());
     }
 
-    public void requestElevatorHeight(Distance elevatorHeightSetpoint) {
-        this.heightSetpoint = elevatorHeightSetpoint;
+    public void requestElevatorHeight(double elevatorHeightSetpointMeters) {
+        this.heightSetpointMeters = elevatorHeightSetpointMeters;
     }
 
     /**
@@ -213,7 +213,7 @@ public class Elevator extends SubsystemBase {
      * <p><b>Note: This command finishes when the elevator reaches the setpoint, causing the default command to
      * schedule.</b>
      */
-    public Command moveToPosition(Distance elevatorHeightSetpoint) {
+    public Command moveToPosition(double elevatorHeightSetpoint) {
         return run(() -> requestElevatorHeight(elevatorHeightSetpoint)).until(this::atReference);
     }
 

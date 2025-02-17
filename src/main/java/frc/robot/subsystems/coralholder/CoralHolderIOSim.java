@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
 
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
@@ -12,6 +11,7 @@ import frc.robot.Robot;
 import frc.robot.subsystems.superstructure.SuperStructureVisualizer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.AbstractDriveTrainSimulation;
@@ -22,7 +22,7 @@ import org.littletonrobotics.junction.Logger;
 public class CoralHolderIOSim implements CoralHolderIO {
     private final AbstractDriveTrainSimulation driveSimulation;
     private final Supplier<Rotation2d> armAngleSupplier;
-    private final Supplier<Distance> elevatorHeightSupplier;
+    private final DoubleSupplier elevatorHeightSupplier;
 
     private boolean hasCoral;
     /** 0-1 Coral is on feeder 1-2 Coral is on roller */
@@ -31,7 +31,7 @@ public class CoralHolderIOSim implements CoralHolderIO {
     public CoralHolderIOSim(
             AbstractDriveTrainSimulation driveSimulation,
             Supplier<Rotation2d> armAngleSupplier,
-            Supplier<Distance> elevatorHeightSupplier) {
+            DoubleSupplier elevatorHeightSupplier) {
         this.driveSimulation = driveSimulation;
         this.armAngleSupplier = armAngleSupplier;
         this.elevatorHeightSupplier = elevatorHeightSupplier;
@@ -93,7 +93,7 @@ public class CoralHolderIOSim implements CoralHolderIO {
     private void launchCoral() {
         Pose2d robotPose = driveSimulation.getSimulatedDriveTrainPose();
         Pose3d coralInitialPose = SuperStructureVisualizer.getCoralPositionRobotRelative(
-                elevatorHeightSupplier.get(), armAngleSupplier.get(), Centimeters.of(10));
+                elevatorHeightSupplier.getAsDouble(), armAngleSupplier.get(), Centimeters.of(10));
         ReefscapeCoralOnFly coralOnFly = new ReefscapeCoralOnFly(
                 robotPose.getTranslation(),
                 coralInitialPose.getTranslation().toTranslation2d(),

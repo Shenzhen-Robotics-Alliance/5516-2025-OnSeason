@@ -3,7 +3,6 @@ package frc.robot.subsystems.superstructure;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -22,33 +21,33 @@ public class SuperStructure {
      */
     public enum SuperStructurePose {
         // Useful poses
-        IDLE(Meters.of(0), Degrees.of(110)),
-        INTAKE(Centimeters.of(3.5), Degrees.of(136)),
-        SCORE_L2(Meters.of(0.2), Degrees.of(110)),
-        SCORE_L3(Meters.of(0.64), Degrees.of(110)),
-        SCORE_L4(Meters.of(1.28), Degrees.of(98)),
+        IDLE(0, Degrees.of(110)),
+        INTAKE(0.035, Degrees.of(136)),
+        SCORE_L2(0.2, Degrees.of(110)),
+        SCORE_L3(0.64, Degrees.of(110)),
+        SCORE_L4(1.28, Degrees.of(98)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
         // Allow Arm to swing down at zero height
 
         // At 0.3 meters height, allow arm to swing up and down
-        LOW_SWAP_1(Meters.of(0.3), Degrees.of(110)),
-        LOW_SWAP_2(Meters.of(0.3), Degrees.of(55)),
+        LOW_SWAP_1(0.3, Degrees.of(110)),
+        LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(Meters.of(1.28), Degrees.of(110)),
+        HIGH_SWAP(1.28, Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
-        SCORE_L4_LEGACY(Meters.of(1.32), Degrees.of(85)),
-        HIGH_SWAP_LEGACY(Meters.of(1.32), Degrees.of(55)),
-        PREPARE_TO_RUN_UP_LEGACY(Meters.zero(), Degrees.of(55));
+        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
+        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
+        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55));
 
-        public final Distance elevatorHeight;
+        public final double elevatorHeightMeters;
         public final Angle armAngle;
 
-        SuperStructurePose(Distance elevatorHeight, Angle armAngle) {
-            this.elevatorHeight = elevatorHeight;
+        SuperStructurePose(double elevatorHeightMeters, Angle armAngle) {
+            this.elevatorHeightMeters = elevatorHeightMeters;
             this.armAngle = armAngle;
         }
     }
@@ -94,8 +93,7 @@ public class SuperStructure {
         public double timeSeconds() {
             // Differences between the current and target poses
             double armDifferenceRad = pose2.armAngle.minus(pose1.armAngle).abs(Radians);
-            double elevatorDifferenceM =
-                    pose2.elevatorHeight.minus(pose1.elevatorHeight).abs(Meters);
+            double elevatorDifferenceM = Math.abs(pose1.elevatorHeightMeters - pose2.elevatorHeightMeters);
 
             // Constraints from the constants file
             double armMaxAcc = ArmConstants.PROFILE_CONSTRAINS.maxAcceleration;
@@ -155,7 +153,8 @@ public class SuperStructure {
         this.arm = arm;
         this.goal = this.currentPose = SuperStructurePose.IDLE;
 
-        atReference = new Trigger(() -> elevator.atReference(goal.elevatorHeight) && arm.atReference(goal.armAngle));
+        atReference =
+                new Trigger(() -> elevator.atReference(goal.elevatorHeightMeters) && arm.atReference(goal.armAngle));
         atReference.onTrue(Commands.runOnce(() -> currentPose = goal));
 
         new Trigger(DriverStation::isDisabled)
@@ -166,7 +165,7 @@ public class SuperStructure {
     }
 
     private Command runPose(SuperStructurePose pose) {
-        return elevator.moveToPosition(pose.elevatorHeight)
+        return elevator.moveToPosition(pose.elevatorHeightMeters)
                 .alongWith(arm.moveToPosition(pose.armAngle))
                 .beforeStarting(Commands.print("Super Structure/Moving to pose: " + pose.name()))
                 .finallyDo(interrupted -> {

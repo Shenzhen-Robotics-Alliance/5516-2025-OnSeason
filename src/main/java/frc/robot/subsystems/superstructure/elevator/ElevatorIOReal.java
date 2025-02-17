@@ -12,6 +12,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 
 public class ElevatorIOReal implements ElevatorIO {
@@ -59,18 +60,18 @@ public class ElevatorIOReal implements ElevatorIO {
                 motor1Position, motor1Velocity, motorSupplyCurrent, motorOutputVoltage, motorTemperature);
 
         inputs.hardwareConnected = statusCode.isOK();
-        inputs.encoderAngle = motor1Position.getValue();
-        inputs.encoderVelocity = motor1Velocity.getValue();
-        inputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
-        inputs.motorOutputVoltage = motorOutputVoltage.getValue();
-        inputs.motorTemperature = motorTemperature.getValue();
+        inputs.encoderAngleRad = Units.rotationsToRadians(motor1Position.getValueAsDouble());
+        inputs.encoderVelocityRadPerSec = Units.rotationsToRadians(motor1Velocity.getValueAsDouble());
+        inputs.motorSupplyCurrentAmps = motorSupplyCurrent.getValueAsDouble();
+        inputs.motorOutputVolts = motorOutputVoltage.getValueAsDouble();
+        inputs.motorTemperatureCelsius = motorTemperature.getValueAsDouble();
     }
 
     private VoltageOut voltageOut = new VoltageOut(Volts.zero());
 
     @Override
-    public void setMotorOutput(Voltage voltage) {
-        voltageOut.withOutput(voltage);
+    public void setMotorOutput(double volts) {
+        voltageOut.withOutput(volts);
         elevatorTalon.setControl(voltageOut);
     }
 

@@ -21,7 +21,7 @@ public class ElevatorIOSim implements ElevatorIO {
 
     public ElevatorIOSim() {
         // Circumference = Drum Teeth Count * Chain Length
-        double drumCircumferenceMeters = ELEVATOR_DRUM_WHEEL_TEETH * CHAN_LENGTH.in(Meters);
+        double drumCircumferenceMeters = ELEVATOR_DRUM_WHEEL_TEETH * CHAIN_LENGTH.in(Meters);
         // Radius = Circumference / pi / 2
         double drumRadiusMeters = drumCircumferenceMeters / Math.PI / 2;
         this.elevatorSim = new ElevatorSim(
@@ -45,12 +45,12 @@ public class ElevatorIOSim implements ElevatorIO {
         // Drum Rotations * Drum Teeth Count * Chain Length = Height
         // Drum Rotations = Height / Drum Teeth Count / Chain Length
         double drumAngleRotations =
-                elevatorSim.getPositionMeters() / ELEVATOR_STAGES / ELEVATOR_DRUM_WHEEL_TEETH / CHAN_LENGTH.in(Meters);
+                elevatorSim.getPositionMeters() / ELEVATOR_STAGES / ELEVATOR_DRUM_WHEEL_TEETH / CHAIN_LENGTH.in(Meters);
         Angle motorAngle = Rotations.of(drumAngleRotations * ELEVATOR_GEARING_REDUCTION);
         double drumVelocityRotationsPerSecond = elevatorSim.getVelocityMetersPerSecond()
                 / ELEVATOR_STAGES
                 / ELEVATOR_DRUM_WHEEL_TEETH
-                / CHAN_LENGTH.in(Meters);
+                / CHAIN_LENGTH.in(Meters);
         AngularVelocity motorVelocity =
                 RotationsPerSecond.of(drumVelocityRotationsPerSecond * ELEVATOR_GEARING_REDUCTION);
         Voltage actualOutputVoltage =
@@ -62,10 +62,10 @@ public class ElevatorIOSim implements ElevatorIO {
         for (int i = 0; i < 10; i++) elevatorSim.update(Robot.defaultPeriodSecs / 10);
 
         inputs.hardwareConnected = true;
-        inputs.encoderAngle = motorAngle;
-        inputs.encoderVelocity = motorVelocity;
-        inputs.motorSupplyCurrent = getSupplyCurrent();
-        inputs.motorOutputVoltage = actualOutputVoltage;
+        inputs.encoderAngleRad = motorAngle.in(Radians);
+        inputs.encoderVelocityRadPerSec = motorVelocity.in(RadiansPerSecond);
+        inputs.motorSupplyCurrentAmps = getSupplyCurrent().in(Amps);
+        inputs.motorOutputVolts = actualOutputVoltage.in(Volts);
     }
 
     private Current getSupplyCurrent() {
@@ -73,7 +73,7 @@ public class ElevatorIOSim implements ElevatorIO {
     }
 
     @Override
-    public void setMotorOutput(Voltage voltage) {
-        this.requestedVoltage = voltage;
+    public void setMotorOutput(double volts) {
+        this.requestedVoltage = Volts.of(volts);
     }
 }

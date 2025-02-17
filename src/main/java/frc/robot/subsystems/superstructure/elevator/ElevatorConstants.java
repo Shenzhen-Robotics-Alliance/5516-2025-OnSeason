@@ -11,7 +11,7 @@ public final class ElevatorConstants {
     public static final Distance HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE = Centimeters.of(45);
 
     // General Constants
-    public static final Distance CHAN_LENGTH = Inches.of(0.25);
+    public static final Distance CHAIN_LENGTH = Inches.of(0.25);
     public static final int ELEVATOR_DRUM_WHEEL_TEETH = 22;
     public static final int ELEVATOR_STAGES = 2;
     public static final double ELEVATOR_GEARING_REDUCTION = 5.0 * 60.0 / 36.0;

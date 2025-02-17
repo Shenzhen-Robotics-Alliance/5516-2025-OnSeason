@@ -1,8 +1,5 @@
 package frc.robot.subsystems.superstructure.elevator;
 
-import static edu.wpi.first.units.Units.*;
-
-import edu.wpi.first.units.measure.*;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface ElevatorIO {
@@ -12,23 +9,23 @@ public interface ElevatorIO {
         public boolean hardwareConnected = false;
 
         /** The relative encoder angle, measured by the relative encoder. Gearing is NOT considered. */
-        public Angle encoderAngle = Rotations.zero();
+        public double encoderAngleRad = 0.0;
 
         /** The relative encoder velocity, measured by the relative encoder. Gearing is NOT considered. */
-        public AngularVelocity encoderVelocity = RotationsPerSecond.zero();
+        public double encoderVelocityRadPerSec = 0.0;
 
         /** The supply current of the motor. */
-        public Current motorSupplyCurrent = Amps.zero();
+        public double motorSupplyCurrentAmps = 0.0;
 
         /** The actual output voltage of the motor. */
-        public Voltage motorOutputVoltage = Volts.zero();
+        public double motorOutputVolts = 0.0;
 
-        public Temperature motorTemperature = Celsius.of(24);
+        public double motorTemperatureCelsius = 0.0;
     }
 
     void updateInputs(ElevatorInputs inputs);
 
-    default void setMotorOutput(Voltage voltage) {}
+    default void setMotorOutput(double volts) {}
 
     default void setMotorBrake(boolean brakeModeEnable) {}
 }
