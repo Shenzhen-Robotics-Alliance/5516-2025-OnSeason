@@ -34,9 +34,9 @@ public class ReefConstants {
 
     public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_RED = new ReefAlignment.BranchTarget[] {
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(180), new Translation2d(15, 3.8), new Translation2d(14.24, 3.87), 7, false),
+                Rotation2d.fromDegrees(180), new Translation2d(15, 3.8), new Translation2d(14.28, 3.86), 7, false),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(180), new Translation2d(15, 4.2), new Translation2d(14.28, 4.21), 7, true),
+                Rotation2d.fromDegrees(180), new Translation2d(15, 4.2), new Translation2d(14.28, 4.18), 7, true),
         new ReefAlignment.BranchTarget(
                 Rotation2d.fromDegrees(-120), new Translation2d(14.4, 5.9), new Translation2d(13.83, 4.99), 8, false),
         new ReefAlignment.BranchTarget(
@@ -50,12 +50,12 @@ public class ReefConstants {
         new ReefAlignment.BranchTarget(
                 Rotation2d.fromDegrees(0), new Translation2d(11.1, 2.8), new Translation2d(11.84, 3.83), 10, true),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(60), new Translation2d(11.8, 2.3), new Translation2d(12.32, 3.10), 11, false),
+                Rotation2d.fromDegrees(60), new Translation2d(11.8, 2.3), new Translation2d(12.31, 3.04), 11, false),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(60), new Translation2d(12.3, 2.1), new Translation2d(12.62, 2.88), 11, true),
+                Rotation2d.fromDegrees(60), new Translation2d(12.3, 2.1), new Translation2d(12.61, 2.90), 11, true),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(120), new Translation2d(13.9, 2.1), new Translation2d(13.47, 2.90), 6, false),
+                Rotation2d.fromDegrees(120), new Translation2d(13.9, 2.1), new Translation2d(13.52, 2.88), 6, false),
         new ReefAlignment.BranchTarget(
-                Rotation2d.fromDegrees(120), new Translation2d(14.3, 2.3), new Translation2d(13.82, 3.09), 6, true)
+                Rotation2d.fromDegrees(120), new Translation2d(14.3, 2.3), new Translation2d(13.80, 3.07), 6, true)
     };
 }
