@@ -73,14 +73,16 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.LOW_SWAP_1, SuperStructurePose.HIGH_SWAP),
 
             // from high swap we can run to l4
-            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4),
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4)
 
             // Legacy links (for dev bot)
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
-            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
-            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP_LEGACY),
-            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY, SuperStructurePose.HIGH_SWAP_LEGACY),
-            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY));
+            //            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
+            //            new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
+            //            new PoseLink(SuperStructurePose.LOW_SWAP_2, SuperStructurePose.HIGH_SWAP_LEGACY),
+            //            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY,
+            // SuperStructurePose.HIGH_SWAP_LEGACY),
+            //            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY)
+            );
 
     /**
      * Represents a link between two super structure poses
