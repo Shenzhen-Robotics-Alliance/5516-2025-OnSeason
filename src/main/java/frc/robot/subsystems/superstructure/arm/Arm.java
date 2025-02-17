@@ -13,6 +13,7 @@ import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -112,9 +113,11 @@ public class Arm extends SubsystemBase {
     private double previousVelocityRadPerSec = 0.0;
 
     /** Runs the control loops on the arm to achieve the setpoint. */
-    private void executeControlLoops() {
+    private void executeControlLoops(double dtSeconds) {
+        dtSeconds = MathUtil.clamp(dtSeconds, 0, 0.1);
+
         TrapezoidProfile.State goalState = new TrapezoidProfile.State(setpoint.in(Radians), 0);
-        currentStateRad = profile.calculate(Robot.defaultPeriodSecs, currentStateRad, goalState);
+        currentStateRad = profile.calculate(dtSeconds, currentStateRad, goalState);
 
         double accelerationRadPerSecSq =
                 (currentStateRad.velocity - previousVelocityRadPerSec) / Robot.defaultPeriodSecs;
@@ -134,21 +137,21 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/PID/Requested Output Volts", outputVolts);
     }
 
+    private double previousTimeSeconds = Timer.getTimestamp();
+
     @Override
     public void periodic() {
         // Update inputs from IO and AdvantageKit.
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        if (DriverStation.isEnabled()) executeControlLoops();
+        if (DriverStation.isEnabled()) executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
         else executeIdle();
+        previousTimeSeconds = Timer.getTimestamp();
 
         // Calibrates encoder if needed when the robot is disabled and the motor is connected.
         if (!encoderCalibrated && DriverStation.isDisabled() && inputs.motorConnected)
             inputs.absoluteEncoderAngle.ifPresent(this::calibrateEncoders);
-
-        // Run setpoints (or run idle if no setpoint).
-        this.executeControlLoops();
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.motorConnected);

@@ -11,6 +11,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
@@ -84,9 +85,11 @@ public class Elevator extends SubsystemBase {
     private double previousVelocityMPS = 0.0;
 
     /** Runs the control loops on the elevator to achieve the setpoint. */
-    private void executeControlLoops() {
+    private void executeControlLoops(double dtSeconds) {
+        dtSeconds = MathUtil.clamp(dtSeconds, 0, 0.1);
+
         TrapezoidProfile.State goalState = new TrapezoidProfile.State(heightSetpointMeters, 0);
-        currentStateMeters = profile.calculate(Robot.defaultPeriodSecs, currentStateMeters, goalState);
+        currentStateMeters = profile.calculate(dtSeconds, currentStateMeters, goalState);
 
         double accelerationMPSSq = (currentStateMeters.velocity - previousVelocityMPS) / Robot.defaultPeriodSecs;
         previousVelocityMPS = currentStateMeters.velocity;
@@ -170,6 +173,8 @@ public class Elevator extends SubsystemBase {
         return Math.abs(getHeightMeters() - heightSetpointMeters) < PID_TOLERANCE;
     }
 
+    private double previousTimeSeconds = Timer.getTimestamp();
+
     @Override
     public void periodic() {
         // Update inputs from IO and AdvantageKit
@@ -177,9 +182,10 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
 
         // Run setpoints
-        if (DriverStation.isEnabled()) executeControlLoops();
+        if (DriverStation.isEnabled()) executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
         // Disable PID setpoint if the robot is disabled.
         else executeIdle();
+        previousTimeSeconds = Timer.getTimestamp();
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
