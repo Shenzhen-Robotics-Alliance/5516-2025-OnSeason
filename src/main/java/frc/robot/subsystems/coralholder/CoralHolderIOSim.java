@@ -4,7 +4,6 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.coralholder.CoralHolderConstants.*;
 
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import frc.robot.Robot;
@@ -58,8 +57,8 @@ public class CoralHolderIOSim implements CoralHolderIO {
         inputs.firstSensorDistanceMM = firstSensorTriggered ? 0 : 9999;
         inputs.secondSensorDistanceMM = secondSensorTriggered ? 0 : 9999;
 
-        inputs.rollerMotorOutputVoltage = Volts.of(rollerMotorVolts);
-        inputs.feederMotorOutputVoltage = Volts.of(collectorMotorOutput);
+        inputs.rollerMotorOutputVolts = rollerMotorVolts;
+        inputs.feederMotorOutputVolts = collectorMotorOutput;
         if (coralPosition >= 2) launchCoral();
         Logger.recordOutput("Sim/coralPosition", coralPosition);
         Logger.recordOutput("Sim/hasCoral", hasCoral);
@@ -122,14 +121,14 @@ public class CoralHolderIOSim implements CoralHolderIO {
     double rollerMotorVolts = 0.0;
 
     @Override
-    public void setRollerMotorOutput(Voltage voltage) {
-        rollerMotorVolts = voltage.in(Volts);
+    public void setRollerMotorOutput(double volts) {
+        rollerMotorVolts = volts;
     }
 
     double collectorMotorOutput = 0.0;
 
     @Override
-    public void setCollectorMotorOutput(Voltage voltage) {
-        collectorMotorOutput = voltage.in(Volts);
+    public void setCollectorMotorOutput(double volts) {
+        collectorMotorOutput = volts;
     }
 }

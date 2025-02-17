@@ -1,10 +1,5 @@
 package frc.robot.subsystems.coralholder;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Volts;
-
-import edu.wpi.first.units.measure.Current;
-import edu.wpi.first.units.measure.Voltage;
 import org.littletonrobotics.junction.AutoLog;
 
 public interface CoralHolderIO {
@@ -18,16 +13,16 @@ public interface CoralHolderIO {
         public double secondSensorDistanceMM = 0.0;
 
         public boolean motorConnected = false;
-        public Current rollerMotorCurrent = Amps.zero();
-        public Voltage rollerMotorOutputVoltage = Volts.zero();
+        public double rollerMotorCurrentAmps = 0.0;
+        public double rollerMotorOutputVolts = 0.0;
 
-        public Current feederMotorCurrent = Amps.zero();
-        public Voltage feederMotorOutputVoltage = Volts.zero();
+        public double feederMotorCurrentAmps = 0.0;
+        public double feederMotorOutputVolts = 0.0;
     }
 
     void updateInputs(CoralHolderInputs inputs);
 
-    default void setRollerMotorOutput(Voltage voltage) {}
+    default void setRollerMotorOutput(double volts) {}
 
-    default void setCollectorMotorOutput(Voltage voltage) {}
+    default void setCollectorMotorOutput(double volts) {}
 }

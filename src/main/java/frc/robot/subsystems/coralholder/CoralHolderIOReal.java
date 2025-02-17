@@ -110,11 +110,10 @@ public class CoralHolderIOReal implements CoralHolderIO {
                 feeder1Output,
                 feeder2Output);
         inputs.motorConnected = statusCode.isOK();
-        inputs.rollerMotorCurrent = rollerMotorCurrent.getValue();
-        inputs.rollerMotorOutputVoltage = rollerMotorOutputVoltage.getValue();
-        inputs.feederMotorCurrent = feeder1Current.getValue().plus(feeder2Current.getValue());
-        inputs.feederMotorOutputVoltage =
-                feeder1Output.getValue().plus(feeder2Output.getValue()).div(2);
+        inputs.rollerMotorCurrentAmps = rollerMotorCurrent.getValueAsDouble();
+        inputs.rollerMotorOutputVolts = rollerMotorOutputVoltage.getValueAsDouble();
+        inputs.feederMotorCurrentAmps = feeder1Current.getValueAsDouble() + feeder2Current.getValueAsDouble();
+        inputs.feederMotorOutputVolts = (feeder1Output.getValueAsDouble() + feeder2Output.getValueAsDouble()) / 2.0;
 
         LaserCanInterface.Measurement firstSensorMeasurement = firstSensor.getMeasurement();
         if (firstSensorMeasurement == null || firstSensorConfigurationError) {
@@ -141,14 +140,14 @@ public class CoralHolderIOReal implements CoralHolderIO {
     VoltageOut voltageOut = new VoltageOut(Volts.zero());
 
     @Override
-    public void setRollerMotorOutput(Voltage voltage) {
-        voltageOut.withOutput(voltage);
+    public void setRollerMotorOutput(double volts) {
+        voltageOut.withOutput(volts);
         rollerTalon.setControl(voltageOut);
     }
 
     @Override
-    public void setCollectorMotorOutput(Voltage voltage) {
-        voltageOut.withOutput(voltage);
+    public void setCollectorMotorOutput(double volts) {
+        voltageOut.withOutput(volts);
         feederTalon1.setControl(voltageOut);
         feederTalon2.setControl(voltageOut);
     }

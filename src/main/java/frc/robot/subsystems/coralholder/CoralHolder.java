@@ -48,10 +48,12 @@ public class CoralHolder extends SubsystemBase {
         this.io = io;
         inputs = new CoralHolderInputsAutoLogged();
 
-        this.firstSensor = new Trigger(() -> inputs.firstSensorReadingValid
-                && inputs.firstSensorDistanceMM < FIRST_SENSOR_THRESHOLD.in(Millimeters));
-        this.secondSensor = new Trigger(() -> inputs.secondSensorReadingValid
-                && inputs.secondSensorDistanceMM < SECOND_SENSOR_THRESHOLD.in(Millimeters));
+        final double FIRST_SENSOR_THRESHOLD_MM = FIRST_SENSOR_THRESHOLD.in(Millimeters);
+        final double SECOND_SENSOR_THRESHOLD_MM = SECOND_SENSOR_THRESHOLD.in(Millimeters);
+        this.firstSensor = new Trigger(
+                () -> inputs.firstSensorReadingValid && inputs.firstSensorDistanceMM < FIRST_SENSOR_THRESHOLD_MM);
+        this.secondSensor = new Trigger(
+                () -> inputs.secondSensorReadingValid && inputs.secondSensorDistanceMM < SECOND_SENSOR_THRESHOLD_MM);
         this.hasCoral = firstSensor.or(secondSensor);
         this.coralInPlace = firstSensor.and(secondSensor);
         this.robotPoseSupplier = robotPoseSupplier;
@@ -72,8 +74,8 @@ public class CoralHolder extends SubsystemBase {
 
     private void setVoltage(double rollerVolts, double feederVolts) {
         if (!hardwareOK()) rollerVolts = feederVolts = 0;
-        io.setRollerMotorOutput(Volts.of(rollerVolts));
-        io.setCollectorMotorOutput(Volts.of(feederVolts));
+        io.setRollerMotorOutput(rollerVolts);
+        io.setCollectorMotorOutput(feederVolts);
     }
 
     @Override
