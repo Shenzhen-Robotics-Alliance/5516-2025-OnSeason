@@ -14,6 +14,7 @@ import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
@@ -80,10 +81,10 @@ public class ArmIOReal implements ArmIO {
                 relativeEncoderAngle, relativeEncoderVelocity, motorSupplyCurrent, motorOutputVoltage);
         // Obtain Motor Readings
         inputs.motorConnected = statusCode.isOK();
-        inputs.relativeEncoderAngle = relativeEncoderAngle.getValue();
-        inputs.encoderVelocity = relativeEncoderVelocity.getValue();
-        inputs.motorSupplyCurrent = motorSupplyCurrent.getValue();
-        inputs.motorOutputVoltage = motorOutputVoltage.getValue();
+        inputs.relativeEncoderAngleRad = Units.rotationsToRadians(relativeEncoderAngle.getValueAsDouble());
+        inputs.encoderVelocityRadPerSec = Units.rotationsToRadians(relativeEncoderVelocity.getValueAsDouble());
+        inputs.motorSupplyCurrentAmps = motorSupplyCurrent.getValueAsDouble();
+        inputs.motorOutputVolts = motorOutputVoltage.getValueAsDouble();
 
         SmartDashboard.putNumber("Arm/Raw Encoder Reading", absoluteEncoder.get());
         SmartDashboard.putBoolean("Arm/Absolute Encoder Connected", absoluteEncoder.isConnected());

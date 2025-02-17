@@ -10,7 +10,6 @@ import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -93,8 +92,8 @@ public class Arm extends SubsystemBase {
         // real = relative - offset
         // so
         // offset = relative - real
-        relativeEncoderOffset =
-                new Rotation2d(inputs.relativeEncoderAngle.div(ARM_GEARING_REDUCTION)).minus(absoluteEncoderAngle);
+        relativeEncoderOffset = Rotation2d.fromRadians(inputs.relativeEncoderAngleRad / ARM_GEARING_REDUCTION)
+                .minus(absoluteEncoderAngle);
         encoderCalibrated = true;
     }
 
@@ -163,8 +162,7 @@ public class Arm extends SubsystemBase {
         Logger.recordOutput("Arm/MeasuredAngle (Degrees)", getArmAngle().getDegrees());
         Logger.recordOutput(
                 "Arm/Current State Velocity (Degrees Per Second)", Math.toDegrees(currentStateRad.velocity));
-        Logger.recordOutput(
-                "Arm/Measured Velocity (Degrees Per Second)", getVelocity().in(DegreesPerSecond));
+        Logger.recordOutput("Arm/Measured Velocity (Degrees Per Second)", Math.toDegrees(getVelocityRadPerSec()));
         Logger.recordOutput("Arm/At Reference", atReference());
     }
 
@@ -221,11 +219,12 @@ public class Arm extends SubsystemBase {
 
     /** @return the measured arm angle, where zero is horizontally forward. */
     public Rotation2d getArmAngle() {
-        return new Rotation2d(inputs.relativeEncoderAngle.div(ARM_GEARING_REDUCTION)).minus(relativeEncoderOffset);
+        return Rotation2d.fromRadians(inputs.relativeEncoderAngleRad / ARM_GEARING_REDUCTION)
+                .minus(relativeEncoderOffset);
     }
 
-    public AngularVelocity getVelocity() {
-        return inputs.encoderVelocity.div(ARM_GEARING_REDUCTION);
+    public double getVelocityRadPerSec() {
+        return inputs.encoderVelocityRadPerSec / ARM_GEARING_REDUCTION;
     }
 
     public Rotation2d getProfileCurrentState() {

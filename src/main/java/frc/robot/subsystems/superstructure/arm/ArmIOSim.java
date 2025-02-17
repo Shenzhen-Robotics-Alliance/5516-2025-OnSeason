@@ -58,10 +58,11 @@ public class ArmIOSim implements ArmIO {
 
         armInputs.absoluteEncoderAngle = Optional.of(Rotation2d.fromRadians(armSim.getAngleRads()));
         armInputs.motorConnected = true;
-        armInputs.relativeEncoderAngle = motorAngle.plus(relativeEncoderOffset);
-        armInputs.encoderVelocity = motorAngularVelocity;
-        armInputs.motorSupplyCurrent = Amps.of(armSim.getCurrentDrawAmps());
-        armInputs.motorOutputVoltage = actualOutputVoltage;
+        armInputs.relativeEncoderAngleRad =
+                motorAngle.plus(relativeEncoderOffset).in(Radians);
+        armInputs.encoderVelocityRadPerSec = motorAngularVelocity.in(RadiansPerSecond);
+        armInputs.motorSupplyCurrentAmps = Amps.of(armSim.getCurrentDrawAmps()).in(Amps);
+        armInputs.motorOutputVolts = actualOutputVoltage.in(Volts);
     }
 
     private Current getSupplyCurrent() {
