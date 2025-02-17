@@ -162,6 +162,8 @@ public class SuperStructure {
                         .andThen(() -> goal = currentPose = SuperStructurePose.IDLE)
                         .until(DriverStation::isEnabled)
                         .ignoringDisable(true));
+
+        warmUpCommand().schedule();
     }
 
     private Command runPose(SuperStructurePose pose) {
@@ -286,5 +288,18 @@ public class SuperStructure {
 
     public Optional<List<SuperStructurePose>> getTrajectory(SuperStructurePose targetPose) {
         return getTrajectory(currentPose, targetPose);
+    }
+
+    private void testTrajectoryGen() {
+        long t0 = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++) getTrajectory(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L4);
+        System.out.println("tried 10 plans, took " + (System.currentTimeMillis() - t0) + " ms");
+    }
+
+    public Command warmUpCommand() {
+        return Commands.run(this::testTrajectoryGen)
+                .until(DriverStation::isEnabled)
+                .withTimeout(5)
+                .ignoringDisable(true);
     }
 }

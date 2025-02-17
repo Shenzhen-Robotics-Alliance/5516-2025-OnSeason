@@ -10,7 +10,7 @@ import org.photonvision.targeting.PhotonTrackedTarget;
 
 public interface AprilTagVisionIO {
     class CameraInputs {
-        public static final int MAX_TARGET_PER_CAMERA = 5;
+        public static final int MAX_TARGET_PER_CAMERA = 2;
         public final int cameraID;
         public boolean cameraConnected;
         public boolean newPipeLineResultAvailable;
