@@ -4,11 +4,11 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
-   "transvel":{
+   "maxvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1 m / s",
-     "val":1.0
+     "exp":"3.5 m / s",
+     "val":3.5
     }
    },
    "maxacc":{
@@ -18,19 +18,19 @@
      "val":6.5
     }
    },
-   "maxvel":{
+   "transvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"3.5 m / s",
-     "val":3.5
+     "exp":"0.8 m / s",
+     "val":0.8
     }
    }
   },
   "poses":{
    "station":{
     "x":{
-     "exp":"1.2 m",
-     "val":1.2
+     "exp":"1.4 m",
+     "val":1.4
     },
     "y":{
      "exp":"7.2 m",

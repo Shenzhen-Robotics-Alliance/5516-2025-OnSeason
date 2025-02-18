@@ -24,16 +24,16 @@ public class DriveControlLoops {
                     Math.toRadians(300), Math.toRadians(90), 0, Math.toRadians(2), 0, true, 0);
 
     public static final MaplePIDController.MaplePIDConfig CHASSIS_TRANSLATION_CLOSE_LOOP =
-            new MaplePIDController.MaplePIDConfig(3, 0.9, 0, 0.03, 0, false, 0);
+            new MaplePIDController.MaplePIDConfig(3, 0.7, 0, 0.03, 0, false, 0);
 
     public static final double ROTATIONAL_LOOKAHEAD_TIME = 0.07, TRANSLATIONAL_LOOKAHEAD_TIME = 0.07;
 
-    public static final boolean USE_TORQUE_FEEDFORWARD = true;
+    public static final boolean USE_TORQUE_FEEDFORWARD = false;
 
     public static final double AUTO_ALIGNMENT_TRANSITION_COMPENSATION_FACTOR = 0.2;
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    Meters.of(0.3),
+                    Meters.of(0.5),
                     MetersPerSecond.of(0),
                     MetersPerSecond.of(1),
                     Meters.of(0.45),
