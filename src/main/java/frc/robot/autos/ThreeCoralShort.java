@@ -23,7 +23,7 @@ public class ThreeCoralShort implements Auto {
 
     private static Command runRobotBackwardsSlow(RobotContainer robot) {
         return robot.drive
-                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.5, 0, 0)))
+                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.25, 0, 0)))
                 .asProxy();
     }
 
@@ -54,9 +54,11 @@ public class ThreeCoralShort implements Auto {
 
         // Grab second
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab second", isRightSide))
-                .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
+                .deadlineFor(robot.superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                        .asProxy()
+                        .finallyDo(intakeCoral::schedule))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
                 .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
@@ -71,9 +73,11 @@ public class ThreeCoralShort implements Auto {
 
         // Grab third
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab third", isRightSide))
-                .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
+                .deadlineFor(robot.superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                        .asProxy()
+                        .finallyDo(intakeCoral::schedule))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
                 .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
@@ -88,9 +92,11 @@ public class ThreeCoralShort implements Auto {
 
         // Grab fourth
         commandGroup.addCommands(AutoBuilder.followPath(Auto.getChoreoPath("grab fourth", isRightSide))
-                .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
+                .deadlineFor(robot.superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                        .asProxy()
+                        .finallyDo(intakeCoral::schedule))
                 .asProxy());
-        commandGroup.addCommands(Commands.runOnce(intakeCoral::schedule));
         commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
                 .deadlineFor(runRobotBackwardsSlow(robot))
                 .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
