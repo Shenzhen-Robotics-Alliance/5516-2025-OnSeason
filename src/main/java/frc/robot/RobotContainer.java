@@ -229,7 +229,11 @@ public class RobotContainer {
 
     private void configureAutoNamedCommands() {
         NamedCommands.registerCommand(
-                "Raise Elevator", superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4));
+                "Raise Elevator",
+                superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
+                        .deadlineFor(Commands.waitSeconds(0.1).andThen(coralHolder.keepCoralShuffledForever()))
+                        .asProxy());
     }
 
     private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
