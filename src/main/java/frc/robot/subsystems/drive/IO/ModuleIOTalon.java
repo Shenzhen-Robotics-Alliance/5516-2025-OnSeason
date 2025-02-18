@@ -23,10 +23,10 @@ import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.ctre.phoenix6.swerve.SwerveModuleConstants;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.SwerveModule;
-import java.util.Queue;
 
 public class ModuleIOTalon implements ModuleIO {
     private final String name;
@@ -41,14 +41,14 @@ public class ModuleIOTalon implements ModuleIO {
 
     // Inputs from drive motor
     private final StatusSignal<Angle> driveRotterPosition;
-    private final Queue<Angle> driveRotterPositionRotations;
+    private final OdometryThread.OdometryInput driveRotterPositionRotations;
     private final StatusSignal<AngularVelocity> driveRotterVelocity;
     private final StatusSignal<Voltage> driveAppliedVoltage;
     private final StatusSignal<Current> driveMotorCurrentDrawn;
 
     // Inputs from turn motor
     private final StatusSignal<Angle> steerAbsolutePosition;
-    private final Queue<Angle> steerAbsolutePositionCache;
+    private final OdometryThread.OdometryInput steerAbsolutePositionCache;
     private final StatusSignal<AngularVelocity> steerFinalMechanismVelocity;
     private final StatusSignal<Voltage> steerAppliedVoltage;
     private final StatusSignal<Current> steerMotorCurrentDrawn;
@@ -163,28 +163,23 @@ public class ModuleIOTalon implements ModuleIO {
         inputs.steerEncoderConnected = steerEncoderConnectedDebounce.calculate(steerEncoderStatus.isOK());
 
         // Fetch high-frequency drive encoder inputs
-        inputs.odometryDriveWheelRevolutions = driveRotterPositionRotations.stream()
-                .mapToDouble(value -> value.in(Rotations) / DRIVE_GEAR_RATIO)
-                .toArray();
-        driveRotterPositionRotations.clear();
+        driveRotterPositionRotations.writeToDoubleInput(
+                inputs.odometryDriveWheelRevolutions, rotterPosition -> rotterPosition / DRIVE_GEAR_RATIO);
 
         // Fetch high-frequency drive encoder inputs
-        inputs.odometrySteerPositions =
-                steerAbsolutePositionCache.stream().map(Rotation2d::new).toArray(Rotation2d[]::new);
-        steerAbsolutePositionCache.clear();
+        steerAbsolutePositionCache.writeToInput(inputs.odometrySteerPositions, Rotation2d::fromRotations);
 
         // Fetch low frequency position and velocity signals
-        inputs.driveWheelFinalRevolutions = driveRotterPosition.getValue().in(Revolutions) / DRIVE_GEAR_RATIO;
-        inputs.driveWheelFinalVelocityRevolutionsPerSec =
-                driveRotterVelocity.getValue().in(RotationsPerSecond) / DRIVE_GEAR_RATIO;
-        inputs.steerFacing = new Rotation2d(steerAbsolutePosition.getValue());
-        inputs.steerVelocityRadPerSec = steerFinalMechanismVelocity.getValue().in(RadiansPerSecond);
+        inputs.driveWheelFinalRevolutions = driveRotterPosition.getValueAsDouble() / DRIVE_GEAR_RATIO;
+        inputs.driveWheelFinalVelocityRevolutionsPerSec = driveRotterVelocity.getValueAsDouble() / DRIVE_GEAR_RATIO;
+        inputs.steerFacing = Rotation2d.fromRotations(steerAbsolutePosition.getValueAsDouble());
+        inputs.steerVelocityRadPerSec = Units.rotationsToRadians(steerFinalMechanismVelocity.getValueAsDouble());
 
         // Fetch applied voltage and current
-        inputs.driveMotorAppliedVolts = driveAppliedVoltage.getValue().in(Volts);
-        inputs.driveMotorCurrentAmps = driveMotorCurrentDrawn.getValue().in(Amps);
-        inputs.steerMotorAppliedVolts = steerAppliedVoltage.getValue().in(Volts);
-        inputs.steerMotorCurrentAmps = steerMotorCurrentDrawn.getValue().in(Amps);
+        inputs.driveMotorAppliedVolts = driveAppliedVoltage.getValueAsDouble();
+        inputs.driveMotorCurrentAmps = driveMotorCurrentDrawn.getValueAsDouble();
+        inputs.steerMotorAppliedVolts = steerAppliedVoltage.getValueAsDouble();
+        inputs.steerMotorCurrentAmps = steerMotorCurrentDrawn.getValueAsDouble();
     }
 
     boolean driveBrakeEnabled = true;

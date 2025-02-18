@@ -117,7 +117,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         modulesPeriodic();
 
         for (int timeStampIndex = 0;
-                timeStampIndex < odometryThreadInputs.measurementTimeStamps.length;
+                timeStampIndex < odometryThreadInputs.odometryTicksCountInPreviousRobotPeriod;
                 timeStampIndex++) feedSingleOdometryDataToPositionEstimator(timeStampIndex);
 
         RobotState.getInstance()
@@ -202,19 +202,23 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
             return;
         }
 
-        boolean lowSpeedMode = RobotState.getInstance().lowSpeedModeEnabled();
+        PathConstraints constraints =
+                getPathConstraints(RobotState.getInstance().lowSpeedModeEnabled());
+        this.setpoint = setpointGenerator.generateSetpoint(setpoint, speeds, constraints, Robot.defaultPeriodSecs, 13);
+
+        executeSetpoint();
+    }
+
+    private static PathConstraints getPathConstraints(boolean lowSpeedMode) {
         LinearAcceleration accelerationConstrain =
                 lowSpeedMode ? ACCELERATION_SOFT_CONSTRAIN_LOW : ACCELERATION_SOFT_CONSTRAIN;
         LinearVelocity velocityConstrain =
                 lowSpeedMode ? MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW : MOVEMENT_VELOCITY_SOFT_CONSTRAIN;
-        PathConstraints constraints = new PathConstraints(
+        return new PathConstraints(
                 velocityConstrain,
                 accelerationConstrain,
                 ANGULAR_VELOCITY_SOFT_CONSTRAIN,
                 ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
-        this.setpoint = setpointGenerator.generateSetpoint(setpoint, speeds, constraints, Robot.defaultPeriodSecs, 13);
-
-        executeSetpoint();
     }
 
     @Override
