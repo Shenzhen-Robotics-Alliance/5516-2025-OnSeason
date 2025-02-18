@@ -41,6 +41,10 @@ public class ThreeCoralShort implements Auto {
         double superStructTimeOutSeconds = 10;
 
         // Score preloaded
+        commandGroup.addCommands(Commands.runOnce(robot.superStructure
+                .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
+                .deadlineFor(robot.coralHolder.keepCoralShuffledForever())
+                .beforeStarting(Commands.waitSeconds(0.8))::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                         robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, Commands.none())
                 .asProxy());
@@ -106,7 +110,7 @@ public class ThreeCoralShort implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.2, 5.8, Rotation2d.fromDegrees(-135));
+        Pose2d poseAtLeft = new Pose2d(7.2, 5.8, Rotation2d.fromDegrees(-140));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }

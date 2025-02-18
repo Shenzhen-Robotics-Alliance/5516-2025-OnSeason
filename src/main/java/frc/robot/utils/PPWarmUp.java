@@ -38,7 +38,7 @@ public class PPWarmUp {
     public static Command choreoWarmUp() {
         PathPlannerPath path;
         try {
-            path = PathPlannerPath.fromChoreoTrajectory("New Path");
+            path = PathPlannerPath.fromChoreoTrajectory("place first");
         } catch (Exception e) {
             return Commands.none();
         }
