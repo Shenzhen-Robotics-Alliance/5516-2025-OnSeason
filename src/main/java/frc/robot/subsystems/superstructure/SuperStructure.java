@@ -36,12 +36,12 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.28, Degrees.of(110)),
+        HIGH_SWAP(1.28, Degrees.of(110));
 
         // Legacy L4 Scoring Poses (for dev bot)
-        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
-        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
-        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55));
+//        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
+//        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
+//        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
 
         public final double elevatorHeightMeters;
         public final Angle armAngle;
