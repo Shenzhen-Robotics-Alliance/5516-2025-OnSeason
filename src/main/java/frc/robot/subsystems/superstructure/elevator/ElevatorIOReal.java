@@ -27,7 +27,7 @@ public class ElevatorIOReal implements ElevatorIO {
     private final StatusSignal<Temperature> motorTemperature;
 
     public ElevatorIOReal() {
-        this.elevatorTalon = new TalonFX(1);
+        this.elevatorTalon = new TalonFX(2);
         CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
                 .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(STATOR_CURRENT_LIMIT)

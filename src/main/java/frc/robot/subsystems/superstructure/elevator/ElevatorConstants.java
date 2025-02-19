@@ -18,15 +18,15 @@ public final class ElevatorConstants {
     public static final Distance ELEVATOR_MAX_HEIGHT = Meters.of(1.34);
 
     // PID Constants
-    public static final double kS = 0.03;
-    public static final double kG = 0.60;
+    public static final double kS = 0.1;
+    public static final double kG = 0.36;
     public static final double kV = 3.70;
-    public static final double kA = 0.08;
+    public static final double kA = 0.05;
     public static final double kP_STRONG = 7.5 / 0.2;
     public static final double kP_WEAK = 3.0 / 0.2;
     public static final Voltage MAX_OUTPUT_VOLTAGE = Volts.of(12);
     public static final Voltage MIN_OUTPUT_VOLTAGE = Volts.of(-8);
-    public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS = new TrapezoidProfile.Constraints(3, 7.2);
+    public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS = new TrapezoidProfile.Constraints(3, 10);
     public static final Distance ELEVATOR_PID_TOLERANCE = Centimeters.of(4);
     public static final LinearVelocity ELEVATOR_MOVING_VELOCITY_THRESHOLD = MetersPerSecond.of(0.05);
 
