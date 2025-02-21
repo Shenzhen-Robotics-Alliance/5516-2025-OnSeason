@@ -168,6 +168,10 @@ public class CoralHolder extends SubsystemBase {
                 .withTimeout(1);
     }
 
+    public Command runRollerVolts(double rollerVolts) {
+        return run(() -> setVoltage(rollerVolts, 0.0));
+    }
+
     public Command runIdle() {
         return run(() -> setVoltage(0.0, 0.0));
     }

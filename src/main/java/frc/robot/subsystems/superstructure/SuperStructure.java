@@ -36,12 +36,18 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.28, Degrees.of(110));
+        HIGH_SWAP(1.28, Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
         //        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
         //        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
+
+        LOW_ALGAE(0.5, Degrees.of(-35)),
+        HIGH_ALGAE(0.8, Degrees.of(-35)),
+        SCORE_ALGAE(0.2, Degrees.of(-35)),
+        ALGAE_SWAP_1(0.3, Degrees.of(110)),
+        ALGAE_SWAP_2(0.3, Degrees.of(-45));
 
         public final double elevatorHeightMeters;
         public final Angle armAngle;
@@ -73,7 +79,7 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.LOW_SWAP_1, SuperStructurePose.HIGH_SWAP),
 
             // from high swap we can run to l4
-            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4)
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4),
 
             // Legacy links (for dev bot)
             //            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
@@ -82,7 +88,15 @@ public class SuperStructure {
             //            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY,
             // SuperStructurePose.HIGH_SWAP_LEGACY),
             //            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY)
-            );
+
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.ALGAE_SWAP_1),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.LOW_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_ALGAE));
 
     /**
      * Represents a link between two super structure poses
@@ -193,6 +207,10 @@ public class SuperStructure {
 
     public SuperStructurePose currentPose() {
         return currentPose;
+    }
+
+    public SuperStructurePose targetPose() {
+        return goal;
     }
 
     private static final int loopNumLimit = 100;

@@ -92,6 +92,8 @@ public class RobotContainer {
 
     private final Field2d field = new Field2d();
 
+    public final Trigger isAlgaeMode;
+
     /** The container for the robot. Contains subsystems, OI devices, and commands. */
     public RobotContainer() {
         final List<PhotonCameraProperties> camerasProperties =
@@ -218,6 +220,14 @@ public class RobotContainer {
         SmartDashboard.putData("Select Test", testChooser = buildTestsChooser());
         autoChooser = buildAutoChooser();
 
+        isAlgaeMode = new Trigger(() -> superStructure.currentPose() == SuperStructure.SuperStructurePose.LOW_ALGAE
+                || superStructure.currentPose() == SuperStructure.SuperStructurePose.HIGH_ALGAE
+                || superStructure.currentPose() == SuperStructure.SuperStructurePose.ALGAE_SWAP_2
+                || superStructure.currentPose() == SuperStructure.SuperStructurePose.SCORE_ALGAE
+                || superStructure.targetPose() == SuperStructure.SuperStructurePose.LOW_ALGAE
+                || superStructure.targetPose() == SuperStructure.SuperStructurePose.HIGH_ALGAE
+                || superStructure.targetPose() == SuperStructure.SuperStructurePose.ALGAE_SWAP_2
+                || superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_ALGAE);
         configureButtonBindings();
         configureAutoNamedCommands();
         configureLEDEffects();
@@ -378,6 +388,19 @@ public class RobotContainer {
 
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 
+        operator.povDown()
+                .and(operator.leftBumper().or(isAlgaeMode))
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_ALGAE));
+        operator.povUp()
+                .and(operator.leftBumper().or(isAlgaeMode))
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.HIGH_ALGAE));
+        operator.rightBumper()
+                .and(isAlgaeMode)
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
+        operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runRollerVolts(3));
+        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runRollerVolts(-4));
+        isAlgaeMode.onFalse(coralHolder.runRollerVolts(-2).withTimeout(0.5));
+
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
         operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
         operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
@@ -386,10 +409,7 @@ public class RobotContainer {
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-        coralHolder.hasCoral.onTrue(ledStatusLight
-                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kYellow), 3)
-                .withTimeout(1));
-        coralHolder.coralInPlace.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
+        coralHolder.hasCoral.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
     }
 
     /**
