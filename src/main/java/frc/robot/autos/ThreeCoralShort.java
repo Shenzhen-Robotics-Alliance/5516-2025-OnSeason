@@ -1,20 +1,27 @@
 package frc.robot.autos;
 
+import static edu.wpi.first.units.Units.Seconds;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.commands.reefscape.ReefAlignment;
+import frc.robot.constants.RobotMode;
 import frc.robot.subsystems.superstructure.SuperStructure;
 import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class ThreeCoralShort implements Auto {
+    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.5);
+
     private final boolean isRightSide;
 
     public ThreeCoralShort(boolean isRightSide) {
@@ -23,8 +30,15 @@ public class ThreeCoralShort implements Auto {
 
     private static Command runRobotBackwardsSlow(RobotContainer robot) {
         return robot.drive
-                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.25, 0, 0)))
+                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.5, 0, 0)))
                 .asProxy();
+    }
+
+    private static Command waitForIntake(RobotContainer robot) {
+        return Commands.waitUntil(robot.coralHolder.hasCoral.and(() -> Robot.CURRENT_ROBOT_MODE != RobotMode.SIM))
+                .withTimeout(WAIT_FOR_CORAL_TIMEOUT)
+                .deadlineFor(runRobotBackwardsSlow(robot))
+                .deadlineFor(Commands.print("waiting for coral...").repeatedly());
     }
 
     @Override
@@ -35,7 +49,7 @@ public class ThreeCoralShort implements Auto {
                 .intakeCoralSequence()
                 .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
-        int firstGoal = isRightSide ? 5 : 8;
+        int firstGoal = isRightSide ? 4 : 9;
         int secondGoal = isRightSide ? 3 : 10;
         int thirdGoalAndFourthGoal = isRightSide ? 2 : 11;
         double superStructTimeOutSeconds = 10;
@@ -59,9 +73,7 @@ public class ThreeCoralShort implements Auto {
                         .asProxy()
                         .finallyDo(intakeCoral::schedule))
                 .asProxy());
-        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
-                .deadlineFor(runRobotBackwardsSlow(robot))
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
+        commandGroup.addCommands(waitForIntake(robot));
 
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
@@ -78,9 +90,7 @@ public class ThreeCoralShort implements Auto {
                         .asProxy()
                         .finallyDo(intakeCoral::schedule))
                 .asProxy());
-        commandGroup.addCommands(Commands.waitUntil(robot.coralHolder.hasCoral)
-                .deadlineFor(runRobotBackwardsSlow(robot))
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly()));
+        commandGroup.addCommands(waitForIntake(robot));
 
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
@@ -122,7 +132,7 @@ public class ThreeCoralShort implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.2, 5.8, Rotation2d.fromDegrees(-140));
+        Pose2d poseAtLeft = new Pose2d(7.2, 5.8, Rotation2d.fromDegrees(180));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }

@@ -4,11 +4,11 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
-   "maxacc":{
-    "dimension":"LinAcc",
+   "stationspeed":{
+    "dimension":"LinVel",
     "var":{
-     "exp":"6 m / s ^ 2",
-     "val":6.0
+     "exp":"1.5 m / s",
+     "val":1.5
     }
    },
    "transvel":{
@@ -25,23 +25,23 @@
      "val":3.5
     }
    },
-   "stationspeed":{
-    "dimension":"LinVel",
+   "maxacc":{
+    "dimension":"LinAcc",
     "var":{
-     "exp":"1.35 m / s",
-     "val":1.35
+     "exp":"5.5 m / s ^ 2",
+     "val":5.5
     }
    }
   },
   "poses":{
    "station":{
     "x":{
-     "exp":"1.34 m",
-     "val":1.34
+     "exp":"1.21 m",
+     "val":1.21
     },
     "y":{
-     "exp":"7.39 m",
-     "val":7.39
+     "exp":"7.49 m",
+     "val":7.49
     },
     "heading":{
      "exp":"-56 deg",
