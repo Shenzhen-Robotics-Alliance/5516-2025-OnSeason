@@ -132,7 +132,7 @@ public class ThreeCoralShort implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.2, 5.8, Rotation2d.fromDegrees(180));
+        Pose2d poseAtLeft = new Pose2d(7.3, 6.15, Rotation2d.fromDegrees(180));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }

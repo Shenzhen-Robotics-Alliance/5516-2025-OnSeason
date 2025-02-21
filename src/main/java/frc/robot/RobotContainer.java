@@ -397,8 +397,8 @@ public class RobotContainer {
         operator.rightBumper()
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
-        operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runRollerVolts(3));
-        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runRollerVolts(-4));
+        operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runRollerVolts(-3));
+        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runRollerVolts(4));
         isAlgaeMode.onFalse(coralHolder.runRollerVolts(-2).withTimeout(0.5));
 
         operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
