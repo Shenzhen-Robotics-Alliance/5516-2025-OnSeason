@@ -145,8 +145,8 @@ public class Arm extends SubsystemBase {
         io.updateInputs(inputs);
         Logger.processInputs("Arm", inputs);
 
-        if (DriverStation.isEnabled()) executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
-        else executeIdle();
+        executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
+        if (DriverStation.isDisabled()) executeIdle();
         previousTimeSeconds = Timer.getTimestamp();
 
         // Calibrates encoder if needed when the robot is disabled and the motor is connected.
