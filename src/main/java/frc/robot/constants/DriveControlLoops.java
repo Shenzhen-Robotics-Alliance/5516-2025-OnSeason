@@ -33,12 +33,12 @@ public class DriveControlLoops {
     public static final double AUTO_ALIGNMENT_TRANSITION_COMPENSATION_FACTOR = 0.2;
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    Meters.of(0.5),
+                    Meters.of(0.2),
                     MetersPerSecond.of(0),
                     MetersPerSecond.of(1),
-                    Meters.of(0.45),
+                    Meters.of(0.4),
                     MetersPerSecond.of(0.15),
-                    MetersPerSecondPerSecond.of(1));
+                    MetersPerSecondPerSecond.of(1.2));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(

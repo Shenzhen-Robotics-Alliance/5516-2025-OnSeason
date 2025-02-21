@@ -4,18 +4,18 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "maxacc":{
+    "dimension":"LinAcc",
+    "var":{
+     "exp":"6 m / s ^ 2",
+     "val":6.0
+    }
+   },
    "transvel":{
     "dimension":"LinVel",
     "var":{
      "exp":"0.8 m / s",
      "val":0.8
-    }
-   },
-   "stationspeed":{
-    "dimension":"LinVel",
-    "var":{
-     "exp":"1.2 m / s",
-     "val":1.2
     }
    },
    "maxvel":{
@@ -25,11 +25,11 @@
      "val":3.5
     }
    },
-   "maxacc":{
-    "dimension":"LinAcc",
+   "stationspeed":{
+    "dimension":"LinVel",
     "var":{
-     "exp":"6 m / s ^ 2",
-     "val":6.0
+     "exp":"1.35 m / s",
+     "val":1.35
     }
    }
   },
@@ -92,12 +92,12 @@
    "val":544.5427266222308
   },
   "tmax":{
-   "exp":"0.9 N * m",
-   "val":0.9
+   "exp":"1 N * m",
+   "val":1.0
   },
   "cof":{
-   "exp":"0.85",
-   "val":0.85
+   "exp":"1.3",
+   "val":1.3
   },
   "bumper":{
    "front":{

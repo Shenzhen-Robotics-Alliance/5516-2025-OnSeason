@@ -241,7 +241,6 @@ public class RobotContainer {
     private LoggedDashboardChooser<Auto> buildAutoChooser() {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
-        autoSendableChooser.addOption("Preview Auto Paths", new PreviewAutoPaths());
         autoSendableChooser.addOption("[Three Coral - Short] <-- LEFT SIDE <-- ", new ThreeCoralShort(false));
         autoSendableChooser.addOption("[Three Coral - Short] --> RIGHT SIDE -->", new ThreeCoralShort(true));
 
