@@ -10,7 +10,7 @@ public class DriveControlLoops {
     public static final boolean ENABLE_SOFTWARE_CONSTRAIN = true;
     public static final AngularVelocity ANGULAR_VELOCITY_SOFT_CONSTRAIN = RotationsPerSecond.of(0.9);
     public static final AngularAcceleration ANGULAR_ACCELERATION_SOFT_CONSTRAIN = RotationsPerSecondPerSecond.of(1.8);
-    public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN = DriveTrainConstants.CHASSIS_MAX_VELOCITY;
+    public static final LinearVelocity MOVEMENT_VELOCITY_SOFT_CONSTRAIN = MetersPerSecond.of(4);
     public static final LinearVelocity AUTO_ALIGNMENT_VELOCITY_LIMIT = MetersPerSecond.of(3);
     public static final LinearAcceleration ACCELERATION_SOFT_CONSTRAIN = MetersPerSecondPerSecond.of(8);
     public static final LinearAcceleration AUTO_ALIGNMENT_ACCELERATION_LIMIT = MetersPerSecondPerSecond.of(5);

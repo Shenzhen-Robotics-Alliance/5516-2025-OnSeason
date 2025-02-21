@@ -1,5 +1,8 @@
 package frc.robot.commands.drive;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static frc.robot.constants.DriveControlLoops.*;
 import static frc.robot.constants.JoystickConfigs.*;
 import static frc.robot.subsystems.drive.HolonomicDriveSubsystem.isZero;
 
@@ -27,6 +30,9 @@ public class JoystickDrive extends Command {
     private Rotation2d currentRotationMaintenanceSetpoint;
 
     private double translationalSensitivity, rotationalSensitivity;
+
+    private static final double maxMovementVelMPS = MOVEMENT_VELOCITY_SOFT_CONSTRAIN.in(MetersPerSecond);
+    private static final double maxRotationVelRadPerSed = ANGULAR_VELOCITY_SOFT_CONSTRAIN.in(RadiansPerSecond);
 
     public JoystickDrive(
             MapleJoystickDriveInput input,
@@ -58,8 +64,7 @@ public class JoystickDrive extends Command {
     @Override
     public void execute() {
         final ChassisSpeeds pilotInputSpeeds = input.getJoystickChassisSpeeds(
-                driveSubsystem.getChassisMaxLinearVelocityMetersPerSec() * translationalSensitivity,
-                driveSubsystem.getChassisMaxAngularVelocity() * rotationalSensitivity);
+                maxMovementVelMPS * translationalSensitivity, maxRotationVelRadPerSed * rotationalSensitivity);
 
         if (Math.abs(pilotInputSpeeds.omegaRadiansPerSecond) > 0.05) previousRotationalInputTimer.reset();
 
