@@ -152,6 +152,7 @@ public interface HolonomicDriveSubsystem extends Subsystem {
         pathPlannerWarmUpInProgressAlert.set(true);
         PPWarmUp.pathFindingWarmup()
                 .andThen(PPWarmUp.choreoWarmUp())
+                .andThen(PPWarmUp.alignmentWarmUp())
                 .finallyDo(() -> pathPlannerWarmUpInProgressAlert.set(false))
                 .until(DriverStation::isEnabled)
                 .schedule();

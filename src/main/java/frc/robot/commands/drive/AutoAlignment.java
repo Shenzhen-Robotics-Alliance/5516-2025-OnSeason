@@ -179,7 +179,7 @@ public class AutoAlignment {
                         () -> RobotState.getInstance().setVisionSensitiveMode(false)));
     }
 
-    private static PathPlannerPath getPreciseAlignmentPath(
+    public static PathPlannerPath getPreciseAlignmentPath(
             PathConstraints constraints,
             ChassisSpeeds measuredSpeedsFieldRelative,
             Pose2d currentRobotPose,
