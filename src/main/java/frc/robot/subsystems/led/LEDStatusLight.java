@@ -15,24 +15,26 @@ public class LEDStatusLight extends SubsystemBase {
     private final Color[] dashboardColors;
     private final String[] dashboardColorsHex;
     private final AddressableLEDBuffer buffer;
-    private final AddressableLEDBufferView view1, view2;
+    private final AddressableLEDBufferView[] views;
 
-    public LEDStatusLight(int port, int length, boolean reverseView1, boolean reverseView2) {
+    public LEDStatusLight(int port, int lengthOfEachSide, boolean... viewsReversed) {
         // make sure length is even
-        length = length / 2 * 2;
-        this.ledColors = new Color[length / 2 - 1];
+        int length = lengthOfEachSide * viewsReversed.length;
+
+        this.ledColors = new Color[lengthOfEachSide];
         this.dashboardColors = new Color[DASHBOARD_DISPLAY_LENGTH];
         this.dashboardColorsHex = new String[DASHBOARD_DISPLAY_LENGTH];
         Arrays.fill(ledColors, new Color());
         Arrays.fill(dashboardColors, new Color());
         this.buffer = new AddressableLEDBuffer(length);
 
-        AddressableLEDBufferView view1 = buffer.createView(0, length / 2);
-        AddressableLEDBufferView view2 = buffer.createView(length / 2 + 1, length - 1);
-        if (reverseView1) view1 = view1.reversed();
-        if (reverseView2) view2 = view2.reversed();
-        this.view1 = view1;
-        this.view2 = view2;
+        views = new AddressableLEDBufferView[viewsReversed.length];
+        int tmp = 0;
+        for (int i = 0; i < viewsReversed.length; i++) {
+            views[i] = buffer.createView(tmp, lengthOfEachSide);
+            if (viewsReversed[i]) views[i] = views[i].reversed();
+            tmp += lengthOfEachSide;
+        }
 
         if (led != null) led.close();
         led = new AddressableLED(port);
@@ -43,11 +45,8 @@ public class LEDStatusLight extends SubsystemBase {
 
     @Override
     public void periodic() {
-        for (int i = 0; i < ledColors.length; i++) {
-            view1.setLED(i, ledColors[i]);
-            view2.setLED(i, ledColors[i]);
-        }
-
+        for (AddressableLEDBufferView view : views)
+            for (int i = 0; i < ledColors.length; i++) view.setLED(i, ledColors[i]);
         led.setData(buffer);
         for (int i = 0; i < DASHBOARD_DISPLAY_LENGTH; i++) dashboardColorsHex[i] = dashboardColors[i].toHexString();
         Logger.recordOutput("Status Light", dashboardColorsHex);
