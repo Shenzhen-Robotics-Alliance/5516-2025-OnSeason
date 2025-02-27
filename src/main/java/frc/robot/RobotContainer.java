@@ -213,7 +213,7 @@ public class RobotContainer {
         }
 
         this.superStructure = new SuperStructure(elevator, arm);
-        this.ledStatusLight = new LEDStatusLight(0, 62, true, false);
+        this.ledStatusLight = new LEDStatusLight(0, 63, true, false);
 
         this.drive.configHolonomicPathPlannerAutoBuilder(field);
 
