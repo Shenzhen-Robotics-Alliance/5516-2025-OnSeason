@@ -38,5 +38,5 @@ public final class ElevatorConstants {
 
     // Simulation Constants
     public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getKrakenX60(1);
-    public static final Mass ELEVATOR_CARRIAGE_WEIGHT = Kilograms.of(10);
+    public static final Mass ELEVATOR_CARRIAGE_WEIGHT = Kilograms.of(6);
 }

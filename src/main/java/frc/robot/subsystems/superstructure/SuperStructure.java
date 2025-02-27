@@ -43,8 +43,8 @@ public class SuperStructure {
         //        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
         //        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
 
-        LOW_ALGAE(0.55, Degrees.of(-35)),
-        HIGH_ALGAE(0.95, Degrees.of(-35)),
+        LOW_ALGAE(0.60, Degrees.of(-45)),
+        HIGH_ALGAE(1.05, Degrees.of(-45)),
         SCORE_ALGAE(0.2, Degrees.of(-45)),
         ALGAE_SWAP_1(0.3, Degrees.of(110)),
         ALGAE_SWAP_2(0.3, Degrees.of(-45));

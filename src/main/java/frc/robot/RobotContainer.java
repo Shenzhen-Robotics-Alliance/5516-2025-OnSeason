@@ -213,7 +213,7 @@ public class RobotContainer {
         }
 
         this.superStructure = new SuperStructure(elevator, arm);
-        this.ledStatusLight = new LEDStatusLight(0, 68, true, false);
+        this.ledStatusLight = new LEDStatusLight(0, 62, true, false);
 
         this.drive.configHolonomicPathPlannerAutoBuilder(field);
 
@@ -398,7 +398,7 @@ public class RobotContainer {
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
         operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runVolts(-3, 0));
-        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runVolts(4, 0));
+        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runVolts(6, 0));
         isAlgaeMode.onFalse(coralHolder.runVolts(-2, 0).withTimeout(0.5));
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
 
@@ -465,7 +465,8 @@ public class RobotContainer {
         Transform2d difference = autoStartingPose.minus(currentPose);
         boolean autoPlacementIncorrectDetected = difference.getTranslation().getNorm() > AUTO_PLACEMENT_TOLERANCE_METERS
                 || Math.abs(difference.getRotation().getDegrees()) > AUTO_PLACEMENT_TOLERANCE_DEGREES;
-        autoPlacementIncorrect.set(autoPlacementIncorrectDetected && DriverStation.isDisabled());
+        // autoPlacementIncorrect.set(autoPlacementIncorrectDetected && DriverStation.isDisabled());
+        autoPlacementIncorrect.set(false);
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
