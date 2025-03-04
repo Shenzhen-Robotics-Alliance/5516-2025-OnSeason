@@ -19,7 +19,7 @@ public final class ArmConstants {
     public static final double kG = 0.31;
     public static final double kV = 0.49;
     public static final double kA = 0.01;
-    public static final double kP = 9.0 / Math.toRadians(30);
+    public static final double kP = 6.0 / Math.toRadians(30);
     public static final TrapezoidProfile.Constraints PROFILE_CONSTRAINS =
             new TrapezoidProfile.Constraints(Math.toRadians(900), Math.toRadians(720));
     public static final Angle ARM_PID_TOLERANCE = Degrees.of(3);

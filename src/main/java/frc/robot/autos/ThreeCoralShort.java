@@ -20,7 +20,7 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class ThreeCoralShort implements Auto {
-    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.5);
+    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.6);
 
     private final boolean isRightSide;
 

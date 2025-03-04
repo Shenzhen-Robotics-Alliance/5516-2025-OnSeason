@@ -100,5 +100,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"Raise Elevator", "from":{"target":2, "targetTimestamp":1.50444, "offset":{"exp":"-0.5 s", "val":-0.5}}, "event":{"type":"named", "data":{"name":"Raise Elevator"}}}]
+   {"name":"Raise Elevator", "from":{"target":2, "targetTimestamp":1.50444, "offset":{"exp":"-0.35 s", "val":-0.35}}, "event":{"type":"named", "data":{"name":"Raise Elevator"}}}]
 }
