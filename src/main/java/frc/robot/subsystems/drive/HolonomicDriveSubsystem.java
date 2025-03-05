@@ -11,11 +11,13 @@ import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.PathPlannerLogging;
-import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.constants.DriveTrainConstants;
 import frc.robot.utils.AlertsManager;
@@ -99,7 +101,7 @@ public interface HolonomicDriveSubsystem extends Subsystem {
     }
 
     default void stop() {
-        runRobotCentricChassisSpeeds(new ChassisSpeeds());
+        runRobotCentricSpeedsWithFeedforwards(new ChassisSpeeds(), DriveFeedforwards.zeros(4));
     }
 
     default RobotConfig defaultPathPlannerRobotConfig() {
@@ -150,11 +152,13 @@ public interface HolonomicDriveSubsystem extends Subsystem {
         Alert pathPlannerWarmUpInProgressAlert =
                 AlertsManager.create("PathPlanner Warm-Up in progress", Alert.AlertType.kWarning);
         pathPlannerWarmUpInProgressAlert.set(true);
-        PPWarmUp.pathFindingWarmup()
-                .andThen(PPWarmUp.choreoWarmUp())
-                .andThen(PPWarmUp.alignmentWarmUp())
+        PPWarmUp.pathFindingWarmup(this)
+                .andThen(PPWarmUp.choreoWarmUp(this))
                 .finallyDo(() -> pathPlannerWarmUpInProgressAlert.set(false))
+                .andThen(Commands.print("[PathPlanner] PathfindingCommand finished warmup"))
                 .until(DriverStation::isEnabled)
+                .finallyDo(this::stop)
+                .ignoringDisable(true)
                 .schedule();
     }
 
