@@ -7,31 +7,31 @@
         {
           "type": "path",
           "data": {
-            "pathName": "auto2 - place first"
+            "pathName": "place first"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto2 - grab second"
+            "pathName": "grab second"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto2 - place second"
+            "pathName": "place second"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto2 - grab third"
+            "pathName": "grab third"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "auto2 - place fourth"
+            "pathName": "place third"
           }
         }
       ]
