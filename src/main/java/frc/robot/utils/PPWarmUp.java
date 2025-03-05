@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.DriveTrainConstants;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
+import frc.robot.commands.drive.AutoAlignment;
 
 public class PPWarmUp {
     public static Command pathFindingWarmup(HolonomicDriveSubsystem driveSubsystem) {
@@ -60,5 +61,17 @@ public class PPWarmUp {
                         () -> false)
                 .repeatedly()
                 .withTimeout(4);
+    }
+
+    public static Command alignmentWarmUp() {
+        return Commands.run(() -> AutoAlignment.getPreciseAlignmentPath(
+                        new PathConstraints(1, 3, 1, 1),
+                        new ChassisSpeeds(),
+                        new Pose2d(3, 3, new Rotation2d()),
+                        new Pose2d(5, 4, new Rotation2d()),
+                        new Rotation2d(),
+                        AutoAlignment.AutoAlignmentConfigurations.DEFAULT_CONFIG))
+                .ignoringDisable(true)
+                .withTimeout(6);
     }
 }

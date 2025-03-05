@@ -9,7 +9,7 @@
         "containers": [
           {
             "title": "Enabled",
-            "x": 384.0,
+            "x": 640.0,
             "y": 512.0,
             "width": 256.0,
             "height": 128.0,
@@ -26,7 +26,7 @@
           },
           {
             "title": "BatteryVoltage",
-            "x": 640.0,
+            "x": 1152.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -44,7 +44,7 @@
           },
           {
             "title": "BrownedOut",
-            "x": 384.0,
+            "x": 640.0,
             "y": 640.0,
             "width": 128.0,
             "height": 128.0,
@@ -62,7 +62,7 @@
           {
             "title": "TotalCurrent",
             "x": 896.0,
-            "y": 0.0,
+            "y": 512.0,
             "width": 256.0,
             "height": 256.0,
             "type": "Graph",
@@ -92,7 +92,7 @@
           },
           {
             "title": "MatchTime",
-            "x": 384.0,
+            "x": 896.0,
             "y": 0.0,
             "width": 256.0,
             "height": 256.0,
@@ -108,7 +108,7 @@
           },
           {
             "title": "Vision Result",
-            "x": 512.0,
+            "x": 768.0,
             "y": 640.0,
             "width": 128.0,
             "height": 128.0,
@@ -125,7 +125,7 @@
           },
           {
             "title": "FullCycleMS",
-            "x": 640.0,
+            "x": 1152.0,
             "y": 512.0,
             "width": 256.0,
             "height": 256.0,
@@ -143,7 +143,7 @@
           },
           {
             "title": "Swerve Drive",
-            "x": 384.0,
+            "x": 896.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -156,29 +156,8 @@
             }
           },
           {
-            "title": "PDP Temperature",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Radial Gauge",
-            "properties": {
-              "topic": "/AdvantageKit/PowerDistribution/Temperature",
-              "period": 0.06,
-              "data_type": "double",
-              "start_angle": -140.0,
-              "end_angle": 140.0,
-              "min_value": 20.0,
-              "max_value": 100.0,
-              "number_of_labels": 8,
-              "wrap_value": false,
-              "show_pointer": true,
-              "show_ticks": true
-            }
-          },
-          {
             "title": "DriveTrain CAN Utilization",
-            "x": 640.0,
+            "x": 1152.0,
             "y": 256.0,
             "width": 256.0,
             "height": 256.0,
@@ -216,14 +195,53 @@
           },
           {
             "title": "Alerts",
-            "x": 896.0,
-            "y": 256.0,
+            "x": 384.0,
+            "y": 128.0,
             "width": 512.0,
-            "height": 512.0,
+            "height": 384.0,
             "type": "Alerts",
             "properties": {
               "topic": "/SmartDashboard/Alerts",
               "period": 0.06
+            }
+          },
+          {
+            "title": "Select Auto",
+            "x": 384.0,
+            "y": 0.0,
+            "width": 512.0,
+            "height": 128.0,
+            "type": "ComboBox Chooser",
+            "properties": {
+              "topic": "/SmartDashboard/Select Auto",
+              "period": 0.06,
+              "sort_options": false
+            }
+          },
+          {
+            "title": "Disable Motor Brake",
+            "x": 384.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Disable Motor Brake",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Enable Motor Brake",
+            "x": 384.0,
+            "y": 640.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Enable Motor Brake",
+              "period": 0.06,
+              "show_type": false
             }
           }
         ]

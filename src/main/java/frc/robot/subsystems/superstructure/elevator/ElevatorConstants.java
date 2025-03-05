@@ -18,10 +18,10 @@ public final class ElevatorConstants {
     public static final Distance ELEVATOR_MAX_HEIGHT = Meters.of(1.34);
 
     // PID Constants
-    public static final double kS = 0.03;
-    public static final double kG = 0.60;
+    public static final double kS = 0.1;
+    public static final double kG = 0.36;
     public static final double kV = 3.70;
-    public static final double kA = 0.08;
+    public static final double kA = 0.05;
     public static final double kP_STRONG = 7.5 / 0.2;
     public static final double kP_WEAK = 3.0 / 0.2;
     public static final Voltage MAX_OUTPUT_VOLTAGE = Volts.of(12);
@@ -38,5 +38,5 @@ public final class ElevatorConstants {
 
     // Simulation Constants
     public static final DCMotor ELEVATOR_GEARBOX = DCMotor.getKrakenX60(1);
-    public static final Mass ELEVATOR_CARRIAGE_WEIGHT = Kilograms.of(10);
+    public static final Mass ELEVATOR_CARRIAGE_WEIGHT = Kilograms.of(6);
 }

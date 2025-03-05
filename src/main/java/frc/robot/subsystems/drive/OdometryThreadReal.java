@@ -76,6 +76,7 @@ public class OdometryThreadReal extends Thread implements OdometryThread {
         inputs.odometryTicksCountInPreviousRobotPeriod = timeStampsQueue.size();
         for (int i = 0; i < ODOMETRY_CACHE_CAPACITY; i++)
             inputs.measurementTimeStamps[i] = Objects.requireNonNullElse(timeStampsQueue.poll(), 0.0);
+        timeStampsQueue.clear();
     }
 
     @Override

@@ -182,9 +182,9 @@ public class Elevator extends SubsystemBase {
         Logger.processInputs("Elevator", inputs);
 
         // Run setpoints
-        if (DriverStation.isEnabled()) executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
+        executeControlLoops(Timer.getTimestamp() - previousTimeSeconds);
         // Disable PID setpoint if the robot is disabled.
-        else executeIdle();
+        if (DriverStation.isDisabled()) executeIdle();
         previousTimeSeconds = Timer.getTimestamp();
 
         // Update Alerts

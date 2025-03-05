@@ -23,9 +23,9 @@ public class SuperStructure {
         // Useful poses
         IDLE(0, Degrees.of(110)),
         INTAKE(0.035, Degrees.of(136)),
-        SCORE_L2(0.2, Degrees.of(110)),
-        SCORE_L3(0.64, Degrees.of(110)),
-        SCORE_L4(1.28, Degrees.of(98)),
+        SCORE_L2(0.22, Degrees.of(110)),
+        SCORE_L3(0.66, Degrees.of(110)),
+        SCORE_L4(1.30, Degrees.of(85)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
@@ -36,12 +36,18 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.28, Degrees.of(110)),
+        HIGH_SWAP(1.30, Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
-        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
-        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
-        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55));
+        //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
+        //        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
+        //        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
+
+        LOW_ALGAE(0.65, Degrees.of(-45)),
+        HIGH_ALGAE(1.1, Degrees.of(-45)),
+        SCORE_ALGAE(0.2, Degrees.of(-45)),
+        ALGAE_SWAP_1(0.3, Degrees.of(110)),
+        ALGAE_SWAP_2(0.3, Degrees.of(-45));
 
         public final double elevatorHeightMeters;
         public final Angle armAngle;
@@ -73,7 +79,7 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.LOW_SWAP_1, SuperStructurePose.HIGH_SWAP),
 
             // from high swap we can run to l4
-            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4)
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4),
 
             // Legacy links (for dev bot)
             //            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),
@@ -82,7 +88,15 @@ public class SuperStructure {
             //            new PoseLink(SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY,
             // SuperStructurePose.HIGH_SWAP_LEGACY),
             //            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY)
-            );
+
+            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.ALGAE_SWAP_1),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.LOW_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_ALGAE));
 
     /**
      * Represents a link between two super structure poses
@@ -159,11 +173,7 @@ public class SuperStructure {
                 new Trigger(() -> elevator.atReference(goal.elevatorHeightMeters) && arm.atReference(goal.armAngle));
         atReference.onTrue(Commands.runOnce(() -> currentPose = goal));
 
-        new Trigger(DriverStation::isDisabled)
-                .onTrue(Commands.waitSeconds(2)
-                        .andThen(() -> goal = currentPose = SuperStructurePose.IDLE)
-                        .until(DriverStation::isEnabled)
-                        .ignoringDisable(true));
+        new Trigger(DriverStation::isTeleop).onTrue(moveToPose(SuperStructurePose.IDLE));
 
         warmUpCommand().schedule();
     }
@@ -193,6 +203,10 @@ public class SuperStructure {
 
     public SuperStructurePose currentPose() {
         return currentPose;
+    }
+
+    public SuperStructurePose targetPose() {
+        return goal;
     }
 
     private static final int loopNumLimit = 100;

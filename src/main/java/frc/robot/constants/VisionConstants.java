@@ -19,10 +19,10 @@ public class VisionConstants {
     public static final Time ADDITIONAL_LATENCY_COMPENSATION = Milliseconds.of(30);
 
     // for filtering
-    public static final Distance ROBOT_HEIGHT_TOLERANCE = Meters.of(0.15);
-    public static final Angle ROBOT_PITCH_TOLERANCE = Degrees.of(10);
-    public static final Angle ROBOT_ROLL_TOLERANCE = Degrees.of(10);
-    public static final Distance MAX_TAG_DISTANCE = Meters.of(4);
+    public static final Distance ROBOT_HEIGHT_TOLERANCE = Meters.of(0.1);
+    public static final Angle ROBOT_PITCH_TOLERANCE = Degrees.of(6);
+    public static final Angle ROBOT_ROLL_TOLERANCE = Degrees.of(6);
+    public static final Distance MAX_TAG_DISTANCE = Meters.of(3);
     public static final double MAX_TAG_AMBIGUITY = 0.2;
     public static final Angle MAX_TAG_ANGLE = Degrees.of(70);
 
@@ -54,60 +54,60 @@ public class VisionConstants {
     public static final List<PhotonCameraProperties> photonVisionCameras = List.of(
             new PhotonCameraProperties(
                     "FrontLeftLowerCam",
-                    Hertz.of(20),
-                    Milliseconds.of(55),
+                    Hertz.of(35),
+                    Milliseconds.of(35),
                     Milliseconds.of(5),
                     Degrees.of(72),
                     0.9,
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, 0.27),
+                    new Translation2d(0.02, 0.29),
                     Centimeters.of(57),
                     Rotation2d.fromDegrees(0),
-                    Degrees.of(-35),
+                    Degrees.of(-28),
                     Degrees.zero()),
             new PhotonCameraProperties(
                     "FrontRightLowerCam",
-                    Hertz.of(20),
-                    Milliseconds.of(55),
+                    Hertz.of(35),
+                    Milliseconds.of(35),
                     Milliseconds.of(5),
                     Degrees.of(72),
                     0.9,
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, -0.27),
+                    new Translation2d(0.02, -0.29),
                     Centimeters.of(57),
                     Rotation2d.fromDegrees(0),
-                    Degrees.of(-35),
+                    Degrees.of(-28),
                     Degrees.zero()),
             new PhotonCameraProperties(
                     "FrontLeftUpperCam",
-                    Hertz.of(40),
-                    Milliseconds.of(35),
-                    Milliseconds.of(5),
+                    Hertz.of(20),
+                    Milliseconds.of(50),
+                    Milliseconds.of(10),
                     Degrees.of(58),
                     0.9,
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, 0.27),
+                    new Translation2d(0.02, 0.29),
                     Centimeters.of(61),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-20),
                     Degrees.zero()),
             new PhotonCameraProperties(
                     "FrontRightUpperCam",
-                    Hertz.of(40),
-                    Milliseconds.of(35),
-                    Milliseconds.of(5),
+                    Hertz.of(20),
+                    Milliseconds.of(50),
+                    Milliseconds.of(10),
                     Degrees.of(58),
                     0.9,
                     0.2,
                     1280,
                     800,
-                    new Translation2d(0.14, -0.27),
+                    new Translation2d(0.02, -0.29),
                     Centimeters.of(61),
                     Rotation2d.fromDegrees(0),
                     Degrees.of(-20),

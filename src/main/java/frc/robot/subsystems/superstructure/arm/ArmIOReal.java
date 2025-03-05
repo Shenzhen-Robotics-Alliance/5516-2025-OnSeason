@@ -1,7 +1,6 @@
 package frc.robot.subsystems.superstructure.arm;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.subsystems.superstructure.arm.ArmConstants.*;
 
 import com.ctre.phoenix6.BaseStatusSignal;
@@ -28,7 +27,7 @@ public class ArmIOReal implements ArmIO {
      * The absolute encoder reading when the arm hits the upper limit. Measure this on "SmartDashboard/Arm/Raw Encoder
      * Reading", which is in rotations.
      */
-    private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Degrees.of(96);
+    private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Rotations.of(0.260);
     /**
      * The difference between the raw encoder reading angle and actual arm angle. Real Angle = Encoder Angle - Offset
      * Angle. Offset Angle = Encoder Angle - Real Angle.
@@ -52,8 +51,7 @@ public class ArmIOReal implements ArmIO {
         this.absoluteEncoder = new DutyCycleEncoder(0);
 
         // Configure Motor
-        armTalon.getConfigurator()
-                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+        armTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
         armTalon.getConfigurator()
                 .apply(new CurrentLimitsConfigs()
                         .withSupplyCurrentLimitEnable(true)
