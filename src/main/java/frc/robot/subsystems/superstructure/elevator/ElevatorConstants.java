@@ -26,7 +26,8 @@ public final class ElevatorConstants {
             DCMotor ELEVATOR_GEARBOX,
             Mass ELEVATOR_CARRIAGE_WEIGHT,
             Distance ELEVATOR_MAX_HEIGHT,
-            int ELEVATOR_MOTOR_ID) {}
+            int ELEVATOR_MOTOR_ID,
+            boolean ELEVATOR_MOTOR_INVERTED) {}
 
     public static final ElevatorHardwareConstants HARDWARE_CONSTANTS =
             switch (Robot.CURRENT_ROBOT) {
@@ -38,7 +39,8 @@ public final class ElevatorConstants {
                         DCMotor.getKrakenX60(1),
                         Kilograms.of(10),
                         Meters.of(1.34),
-                        1);
+                        1,
+                        false);
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ElevatorHardwareConstants(
                         Inches.of(0.25),
                         22,
@@ -47,7 +49,8 @@ public final class ElevatorConstants {
                         DCMotor.getKrakenX60(1),
                         Kilograms.of(6),
                         Meters.of(1.34),
-                        2);
+                        2,
+                        false);
                     // TODO: constants for 6706 robot
                 case TEAM_6706_COMPBOT -> new ElevatorHardwareConstants(
                         Inches.of(0.25),
@@ -57,7 +60,8 @@ public final class ElevatorConstants {
                         DCMotor.getKrakenX60(1),
                         Kilograms.of(6),
                         Meters.of(1.34),
-                        1);
+                        1,
+                        false);
             };
 
     // Elevator PID Constants

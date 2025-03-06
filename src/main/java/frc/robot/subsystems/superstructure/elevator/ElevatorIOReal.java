@@ -39,7 +39,9 @@ public class ElevatorIOReal implements ElevatorIO {
         this.elevatorTalon.getConfigurator().apply(currentLimitsConfigs);
         this.elevatorTalon
                 .getConfigurator()
-                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+                .apply(new MotorOutputConfigs().withInverted(HARDWARE_CONSTANTS.ELEVATOR_MOTOR_INVERTED()
+                        ? InvertedValue.Clockwise_Positive
+                        : InvertedValue.CounterClockwise_Positive));
 
         this.motor1Position = elevatorTalon.getPosition();
         this.motor1Velocity = elevatorTalon.getVelocity();

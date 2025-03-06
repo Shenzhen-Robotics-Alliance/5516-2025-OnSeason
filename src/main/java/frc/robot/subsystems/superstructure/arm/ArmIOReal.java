@@ -43,11 +43,14 @@ public class ArmIOReal implements ArmIO {
 
     public ArmIOReal() {
         // Hardware Creation
-        this.armTalon = new TalonFX(4);
-        this.absoluteEncoder = new DutyCycleEncoder(0);
+        this.armTalon = new TalonFX(HARDWARE_CONSTANTS.ARM_MOTOR_ID());
+        this.absoluteEncoder = new DutyCycleEncoder(HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_CHANNEL());
 
         // Configure Motor
-        armTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        armTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(
+                HARDWARE_CONSTANTS.ARM_MOTOR_INVERTED()
+                        ? InvertedValue.Clockwise_Positive
+                        : InvertedValue.CounterClockwise_Positive));
         armTalon.getConfigurator()
                 .apply(new CurrentLimitsConfigs()
                         .withSupplyCurrentLimitEnable(true)

@@ -18,8 +18,9 @@ public final class ArmConstants {
             Angle ARM_UPPER_HARD_LIMIT,
             Angle ARM_LOWER_HARD_LIMIT,
             Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIM,
-            int absoluteEncoderChannel,
-            int armMotorID) {}
+            int ABSOLUTE_ENCODER_CHANNEL,
+            int ARM_MOTOR_ID,
+            boolean ARM_MOTOR_INVERTED) {}
 
     public static final ArmHardwareConstants HARDWARE_CONSTANTS =
             switch (Robot.CURRENT_ROBOT) {
@@ -32,7 +33,8 @@ public final class ArmConstants {
                         Degrees.of(-48.0),
                         Rotations.of(0.0),
                         0,
-                        4);
+                        4,
+                        false);
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmHardwareConstants(
                         Centimeters.of(26.0),
                         Kilograms.of(3.0),
@@ -42,7 +44,8 @@ public final class ArmConstants {
                         Degrees.of(-48.0),
                         Rotations.of(0.260),
                         0,
-                        4);
+                        4,
+                        true);
                 case TEAM_6706_COMPBOT -> new ArmHardwareConstants(
                         Centimeters.of(26.0),
                         Kilograms.of(4.0),
@@ -52,7 +55,8 @@ public final class ArmConstants {
                         Degrees.of(-48.0),
                         Rotations.of(0.0),
                         0,
-                        4);
+                        4,
+                        false);
             };
 
     public record ArmPIDConstants(
