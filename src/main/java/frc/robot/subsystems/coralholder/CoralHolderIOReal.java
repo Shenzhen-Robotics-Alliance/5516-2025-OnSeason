@@ -8,7 +8,6 @@ import au.grapplerobotics.ConfigurationFailedException;
 import au.grapplerobotics.LaserCan;
 import au.grapplerobotics.interfaces.LaserCanInterface;
 import com.ctre.phoenix6.BaseStatusSignal;
-import com.ctre.phoenix6.StatusCode;
 import com.ctre.phoenix6.StatusSignal;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.MotorOutputConfigs;
@@ -78,8 +77,8 @@ public class CoralHolderIOReal implements CoralHolderIO {
             feederTalons[i].optimizeBusUtilization();
         }
 
-        this.firstSensor = new LaserCan(1);
-        this.secondSensor = new LaserCan(0);
+        this.firstSensor = new LaserCan(HARDWARE_CONSTANTS.firstSensorID());
+        this.secondSensor = new LaserCan(HARDWARE_CONSTANTS.secondSensorID());
         this.firstSensorConfigurationError = !configureSensor(firstSensor);
         this.secondSensorConfigurationError = !configureSensor(secondSensor);
 
@@ -109,10 +108,14 @@ public class CoralHolderIOReal implements CoralHolderIO {
 
     @Override
     public void updateInputs(CoralHolderInputs inputs) {
-        StatusCode statusCode = BaseStatusSignal.refreshAll(rollerMotorCurrent, rollerMotorOutputVoltage);
-        BaseStatusSignal.refreshAll(feedersOutput);
-        BaseStatusSignal.refreshAll(feedersCurrent);
-        inputs.motorConnected = statusCode.isOK();
+        inputs.motorConnected = BaseStatusSignal.refreshAll(rollerMotorCurrent, rollerMotorOutputVoltage)
+                .isOK();
+        if (feederTalons.length > 0) {
+            inputs.motorConnected = inputs.motorConnected
+                    && BaseStatusSignal.refreshAll(feedersOutput).isOK();
+            inputs.motorConnected = inputs.motorConnected
+                    && BaseStatusSignal.refreshAll(feedersCurrent).isOK();
+        }
         inputs.rollerMotorCurrentAmps = rollerMotorCurrent.getValueAsDouble();
         inputs.rollerMotorOutputVolts = rollerMotorOutputVoltage.getValueAsDouble();
         inputs.feederMotorCurrentAmps = inputs.feederMotorOutputVolts = 0;
