@@ -50,10 +50,13 @@ public class Elevator extends SubsystemBase {
         this.io = io;
         this.inputs = new ElevatorInputsAutoLogged();
 
-        this.feedforwardController = new ElevatorFeedforward(kS, kG, kV, kA);
-        this.strongFeedbackController = new PIDController(kP_STRONG, 0, 0);
-        this.weakFeedbackController = new PIDController(kP_WEAK, 0, 0);
-        this.profile = new TrapezoidProfile(PROFILE_CONSTRAINS);
+        this.feedforwardController =
+                new ElevatorFeedforward(PID_CONSTANTS.kS(), PID_CONSTANTS.kG(), PID_CONSTANTS.kV(), PID_CONSTANTS.kA());
+        this.strongFeedbackController = new PIDController(PID_CONSTANTS.kP_STRONG(), 0, 0);
+        this.weakFeedbackController = new PIDController(PID_CONSTANTS.kP_WEAK(), 0, 0);
+        this.profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+                PID_CONSTANTS.VELOCITY_CONSTRAIN().in(MetersPerSecond),
+                PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(MetersPerSecondPerSecond)));
 
         this.elevatorExceedLimitAlert = AlertsManager.create("", Alert.AlertType.kError);
         this.elevatorExceedLimitAlert.set(false);
@@ -102,7 +105,9 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput("Elevator/PID/setpoint", currentStateMeters.position);
 
         double outputVolts = MathUtil.clamp(
-                feedforwardVolts + feedbackVolts, MIN_OUTPUT_VOLTAGE.in(Volts), MAX_OUTPUT_VOLTAGE.in(Volts));
+                feedforwardVolts + feedbackVolts,
+                PID_CONSTANTS.MIN_OUTPUT_VOLTAGE().in(Volts),
+                PID_CONSTANTS.MAX_OUTPUT_VOLTAGE().in(Volts));
 
         if (goalState.position == 0.0 && currentStateMeters.position == 0.0 && atReference()) outputVolts = 0.0;
         io.setMotorOutput(outputVolts);
@@ -116,15 +121,16 @@ public class Elevator extends SubsystemBase {
     }
 
     /** @return the measured elevator height, where zero is lowest. */
-    private static final double CHAIN_LENGTH_METERS = CHAIN_LENGTH.in(Meters);
+    private static final double CHAIN_LENGTH_METERS =
+            HARDWARE_CONSTANTS.CHAIN_LENGTH().in(Meters);
 
     public double getHeightMeters() {
         // Height = Drum Rotations * Drum Teeth Count * Chain Length
         return CHAIN_LENGTH_METERS
                 * Units.radiansToRotations(inputs.encoderAngleRad)
-                / ELEVATOR_GEARING_REDUCTION
-                * ELEVATOR_DRUM_WHEEL_TEETH
-                * ELEVATOR_STAGES;
+                / HARDWARE_CONSTANTS.ELEVATOR_GEARING_REDUCTION()
+                * HARDWARE_CONSTANTS.ELEVATOR_DRUM_WHEEL_TEETH()
+                * HARDWARE_CONSTANTS.ELEVATOR_STAGES();
     }
 
     public double getProfileCurrentStateMeters() {
@@ -135,9 +141,9 @@ public class Elevator extends SubsystemBase {
     public double getMeasuredVelocityMPS() {
         return CHAIN_LENGTH_METERS
                 * Units.radiansToRotations(inputs.encoderVelocityRadPerSec)
-                / ELEVATOR_GEARING_REDUCTION
-                * ELEVATOR_DRUM_WHEEL_TEETH
-                * ELEVATOR_STAGES;
+                / HARDWARE_CONSTANTS.ELEVATOR_GEARING_REDUCTION()
+                * HARDWARE_CONSTANTS.ELEVATOR_DRUM_WHEEL_TEETH()
+                * HARDWARE_CONSTANTS.ELEVATOR_STAGES();
     }
 
     /**
@@ -153,7 +159,8 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atReference(double heightSetpointMeters) {
-        return Math.abs(currentStateMeters.position - heightSetpointMeters) < ELEVATOR_PID_TOLERANCE.in(Meters);
+        return Math.abs(currentStateMeters.position - heightSetpointMeters)
+                < PID_CONSTANTS.TOLERANCE().in(Meters);
     }
 
     /**
@@ -166,11 +173,9 @@ public class Elevator extends SubsystemBase {
         return trulyAtReference(this.heightSetpointMeters);
     }
 
-    private static final double PID_TOLERANCE = ELEVATOR_PID_TOLERANCE.in(Meters);
-    private static final double MAX_HEIGHT_METERS = ELEVATOR_MAX_HEIGHT.in(Meters);
-
     public boolean trulyAtReference(double heightSetpointMeters) {
-        return Math.abs(getHeightMeters() - heightSetpointMeters) < PID_TOLERANCE;
+        return Math.abs(getHeightMeters() - heightSetpointMeters)
+                < PID_CONSTANTS.TOLERANCE().in(Meters);
     }
 
     private double previousTimeSeconds = Timer.getTimestamp();
@@ -190,10 +195,12 @@ public class Elevator extends SubsystemBase {
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
         elevatorHardwareFaultsAlert.set(hardwareFaultDetected);
-        if (getHeightMeters() < -PID_TOLERANCE) {
+        if (getHeightMeters() < -PID_CONSTANTS.TOLERANCE().in(Meters)) {
             elevatorExceedLimitAlert.setText("Elevator height exceeds lower limit: " + getHeightMeters() + " Meters");
             elevatorExceedLimitAlert.set(true);
-        } else if (getHeightMeters() > MAX_HEIGHT_METERS + PID_TOLERANCE) {
+        } else if (getHeightMeters()
+                > HARDWARE_CONSTANTS.ELEVATOR_MAX_HEIGHT().in(Meters)
+                        + PID_CONSTANTS.TOLERANCE().in(Meters)) {
             elevatorExceedLimitAlert.setText("Elevator height exceeds higher limit: " + getHeightMeters() + " Meters");
             elevatorExceedLimitAlert.set(true);
         } else elevatorExceedLimitAlert.set(false);

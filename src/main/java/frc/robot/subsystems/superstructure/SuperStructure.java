@@ -112,10 +112,13 @@ public class SuperStructure {
             double elevatorDifferenceM = Math.abs(pose1.elevatorHeightMeters - pose2.elevatorHeightMeters);
 
             // Constraints from the constants file
-            double armMaxAcc = ArmConstants.PROFILE_CONSTRAINS.maxAcceleration;
-            double armMaxVel = ArmConstants.PROFILE_CONSTRAINS.maxVelocity;
-            double elevatorAcc = ElevatorConstants.PROFILE_CONSTRAINS.maxAcceleration;
-            double elevatorVel = ElevatorConstants.PROFILE_CONSTRAINS.maxVelocity;
+            double armMaxAcc =
+                    ArmConstants.PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(RadiansPerSecondPerSecond);
+            double armMaxVel = ArmConstants.PID_CONSTANTS.VELOCITY_CONSTRAIN().in(RadiansPerSecond);
+            double elevatorAcc =
+                    ElevatorConstants.PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(MetersPerSecondPerSecond);
+            double elevatorVel =
+                    ElevatorConstants.PID_CONSTANTS.VELOCITY_CONSTRAIN().in(MetersPerSecond);
 
             // Time to move arm
             double armTime = calculateTimeToSetpoint(armDifferenceRad, armMaxAcc, armMaxVel);

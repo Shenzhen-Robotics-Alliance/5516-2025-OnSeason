@@ -21,20 +21,22 @@ public class ElevatorIOSim implements ElevatorIO {
 
     public ElevatorIOSim() {
         // Circumference = Drum Teeth Count * Chain Length
-        double drumCircumferenceMeters = ELEVATOR_DRUM_WHEEL_TEETH * CHAIN_LENGTH.in(Meters);
+        double drumCircumferenceMeters = HARDWARE_CONSTANTS.ELEVATOR_DRUM_WHEEL_TEETH()
+                * HARDWARE_CONSTANTS.CHAIN_LENGTH().in(Meters);
         // Radius = Circumference / pi / 2
         double drumRadiusMeters = drumCircumferenceMeters / Math.PI / 2;
         this.elevatorSim = new ElevatorSim(
-                ELEVATOR_GEARBOX,
-                ELEVATOR_GEARING_REDUCTION / ELEVATOR_STAGES,
-                ELEVATOR_CARRIAGE_WEIGHT.in(Kilograms),
+                HARDWARE_CONSTANTS.ELEVATOR_GEARBOX(),
+                HARDWARE_CONSTANTS.ELEVATOR_GEARING_REDUCTION() / HARDWARE_CONSTANTS.ELEVATOR_STAGES(),
+                HARDWARE_CONSTANTS.ELEVATOR_CARRIAGE_WEIGHT().in(Kilograms),
                 drumRadiusMeters,
                 0,
-                ELEVATOR_MAX_HEIGHT.in(Meters),
+                HARDWARE_CONSTANTS.ELEVATOR_MAX_HEIGHT().in(Meters),
                 true,
                 0);
 
-        this.simMotorController = new SimulatedMotorController.GenericMotorController(ELEVATOR_GEARBOX);
+        this.simMotorController =
+                new SimulatedMotorController.GenericMotorController(HARDWARE_CONSTANTS.ELEVATOR_GEARBOX());
         simMotorController.withCurrentLimit(STATOR_CURRENT_LIMIT);
         SimulatedBattery.addElectricalAppliances(this::getSupplyCurrent);
         elevatorSim.update(0.0);
@@ -44,22 +46,25 @@ public class ElevatorIOSim implements ElevatorIO {
     public void updateInputs(ElevatorInputs inputs) {
         // Drum Rotations * Drum Teeth Count * Chain Length = Height
         // Drum Rotations = Height / Drum Teeth Count / Chain Length
-        double drumAngleRotations =
-                elevatorSim.getPositionMeters() / ELEVATOR_STAGES / ELEVATOR_DRUM_WHEEL_TEETH / CHAIN_LENGTH.in(Meters);
-        Angle motorAngle = Rotations.of(drumAngleRotations * ELEVATOR_GEARING_REDUCTION);
+        double drumAngleRotations = elevatorSim.getPositionMeters()
+                / HARDWARE_CONSTANTS.ELEVATOR_STAGES()
+                / HARDWARE_CONSTANTS.ELEVATOR_DRUM_WHEEL_TEETH()
+                / HARDWARE_CONSTANTS.CHAIN_LENGTH().in(Meters);
+        Angle motorAngle = Rotations.of(drumAngleRotations * HARDWARE_CONSTANTS.ELEVATOR_GEARING_REDUCTION());
         double drumVelocityRotationsPerSecond = elevatorSim.getVelocityMetersPerSecond()
-                / ELEVATOR_STAGES
-                / ELEVATOR_DRUM_WHEEL_TEETH
-                / CHAIN_LENGTH.in(Meters);
+                / HARDWARE_CONSTANTS.ELEVATOR_STAGES()
+                / HARDWARE_CONSTANTS.ELEVATOR_DRUM_WHEEL_TEETH()
+                / HARDWARE_CONSTANTS.CHAIN_LENGTH().in(Meters);
         AngularVelocity motorVelocity =
-                RotationsPerSecond.of(drumVelocityRotationsPerSecond * ELEVATOR_GEARING_REDUCTION);
+                RotationsPerSecond.of(drumVelocityRotationsPerSecond * HARDWARE_CONSTANTS.ELEVATOR_GEARING_REDUCTION());
         Voltage actualOutputVoltage =
                 simMotorController.constrainOutputVoltage(motorAngle, motorVelocity, requestedVoltage);
         actualOutputVoltage = SimulatedBattery.clamp(actualOutputVoltage);
         if (DriverStation.isDisabled()) actualOutputVoltage = Volts.zero();
         elevatorSim.setInputVoltage(actualOutputVoltage.in(Volts));
+
         // Run 10 iterations of the physics simulation to improve accuracy
-        for (int i = 0; i < 10; i++) elevatorSim.update(Robot.defaultPeriodSecs / 10);
+        for (int i = 0; i < 10; i++) elevatorSim.update(Robot.defaultPeriodSecs / 10.0);
 
         inputs.hardwareConnected = true;
         inputs.encoderAngleRad = motorAngle.in(Radians);
