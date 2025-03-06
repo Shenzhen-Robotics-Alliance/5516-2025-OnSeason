@@ -56,7 +56,7 @@ public final class ArmConstants {
                         24.0 / 12.0 * 20.0,
                         Degrees.of(136.0),
                         Degrees.of(-48.0),
-                        Rotations.of(-0.11),
+                        Rotations.of(0.10),
                         0,
                         true,
                         19,
@@ -81,7 +81,7 @@ public final class ArmConstants {
                         1.13,
                         0.01,
                         9.0 / Math.toRadians(30),
-                        RotationsPerSecond.of(3),
+                        RotationsPerSecond.of(1.8),
                         RotationsPerSecondPerSecond.of(2.5),
                         Degrees.of(3));
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmPIDConstants(
@@ -90,14 +90,14 @@ public final class ArmConstants {
                         0.49,
                         0.01,
                         6.0 / Math.toRadians(30),
-                        RotationsPerSecond.of(3),
+                        RotationsPerSecond.of(1.8),
                         RotationsPerSecondPerSecond.of(2.5),
                         Degrees.of(3));
                 case TEAM_6706_COMPBOT -> new ArmPIDConstants(
-                        0.0,
-                        0.0,
-                        0.0,
-                        0.0,
+                        0.05,
+                        0.33,
+                        0.76,
+                        0.01,
                         0.0,
                         RotationsPerSecond.of(1),
                         RotationsPerSecondPerSecond.of(5),
