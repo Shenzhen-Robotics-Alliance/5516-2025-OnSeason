@@ -48,7 +48,7 @@ public class CoralHolderIOSim implements CoralHolderIO {
                 inputs.secondSensorConnected = inputs.firstSensorReadingValid = inputs.secondSensorReadingValid = true;
 
         boolean hasNewCoral = controller.getBackButton() || DriverStation.isAutonomous();
-        if (!hasCoral && rollerMotorVolts == INTAKE_VOLTS) hasCoral = hasNewCoral;
+        if (!hasCoral && rollerMotorVolts == VOLTAGE_SETTINGS.INTAKE_VOLTS()) hasCoral = hasNewCoral;
 
         if (hasCoral) simulateCoralInsideIntake();
 

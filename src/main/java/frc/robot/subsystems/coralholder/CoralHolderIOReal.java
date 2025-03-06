@@ -19,7 +19,6 @@ import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
-
 import java.util.Arrays;
 
 public class CoralHolderIOReal implements CoralHolderIO {
@@ -50,22 +49,32 @@ public class CoralHolderIOReal implements CoralHolderIO {
         this.rollerMotorCurrent = rollerTalon.getSupplyCurrent();
         this.rollerMotorOutputVoltage = rollerTalon.getMotorVoltage();
 
-        this.feederTalons = Arrays.stream(HARDWARE_CONSTANTS.feederMotorsIDs()).mapToObj(TalonFX::new).toArray(TalonFX[]::new);
-        this.feedersCurrent = Arrays.stream(feederTalons).map(TalonFX::getSupplyCurrent).toArray(StatusSignal[]::new);
-        this.feedersOutput = Arrays.stream(feederTalons).map(TalonFX::getMotorVoltage).toArray(StatusSignal[]::new);
+        this.feederTalons = Arrays.stream(HARDWARE_CONSTANTS.feederMotorsIDs())
+                .mapToObj(TalonFX::new)
+                .toArray(TalonFX[]::new);
+        this.feedersCurrent =
+                Arrays.stream(feederTalons).map(TalonFX::getSupplyCurrent).toArray(StatusSignal[]::new);
+        this.feedersOutput =
+                Arrays.stream(feederTalons).map(TalonFX::getMotorVoltage).toArray(StatusSignal[]::new);
 
         double freq = 100.0;
-        BaseStatusSignal.setUpdateFrequencyForAll(
-                freq,
-                rollerMotorCurrent,
-                rollerMotorOutputVoltage);
+        BaseStatusSignal.setUpdateFrequencyForAll(freq, rollerMotorCurrent, rollerMotorOutputVoltage);
         BaseStatusSignal.setUpdateFrequencyForAll(freq, feedersCurrent);
         BaseStatusSignal.setUpdateFrequencyForAll(freq, feedersOutput);
         this.rollerTalon.optimizeBusUtilization();
         for (int i = 0; i < feederTalons.length; i++) {
-            feederTalons[i].getConfigurator().apply(new MotorOutputConfigs().withInverted(
-                    HARDWARE_CONSTANTS.feederMotorsInverted()[i] ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive));
-            feederTalons[i].getConfigurator().apply(new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(40));
+            feederTalons[i]
+                    .getConfigurator()
+                    .apply(new MotorOutputConfigs()
+                            .withInverted(
+                                    HARDWARE_CONSTANTS.feederMotorsInverted()[i]
+                                            ? InvertedValue.Clockwise_Positive
+                                            : InvertedValue.CounterClockwise_Positive));
+            feederTalons[i]
+                    .getConfigurator()
+                    .apply(new CurrentLimitsConfigs()
+                            .withSupplyCurrentLimitEnable(true)
+                            .withSupplyCurrentLimit(40));
             feederTalons[i].optimizeBusUtilization();
         }
 
@@ -100,9 +109,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
 
     @Override
     public void updateInputs(CoralHolderInputs inputs) {
-        StatusCode statusCode = BaseStatusSignal.refreshAll(
-                rollerMotorCurrent,
-                rollerMotorOutputVoltage);
+        StatusCode statusCode = BaseStatusSignal.refreshAll(rollerMotorCurrent, rollerMotorOutputVoltage);
         BaseStatusSignal.refreshAll(feedersOutput);
         BaseStatusSignal.refreshAll(feedersCurrent);
         inputs.motorConnected = statusCode.isOK();
@@ -148,7 +155,6 @@ public class CoralHolderIOReal implements CoralHolderIO {
     @Override
     public void setCollectorMotorOutput(double volts) {
         voltageOut.withOutput(volts);
-        for (TalonFX feederTalon:feederTalons)
-            feederTalon.setControl(voltageOut);
+        for (TalonFX feederTalon : feederTalons) feederTalon.setControl(voltageOut);
     }
 }

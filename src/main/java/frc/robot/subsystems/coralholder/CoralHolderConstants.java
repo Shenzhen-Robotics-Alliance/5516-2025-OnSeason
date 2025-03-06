@@ -9,8 +9,6 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import frc.robot.Robot;
 
-import java.util.OptionalInt;
-
 public final class CoralHolderConstants {
     public record HardwareConstants(
             int rollerMotorID,
@@ -19,36 +17,24 @@ public final class CoralHolderConstants {
             int secondSensorID,
             int[] feederMotorsIDs,
             boolean[] feederMotorsInverted) {}
-    public static final HardwareConstants HARDWARE_CONSTANTS = switch (Robot.CURRENT_ROBOT) {
-        case TEAM_5516_DEVBOT_HYDROXIDE_I -> new HardwareConstants(
-                3, true,
-                0, 1,
-                new int[] {5, 6},
-                new boolean[] {true, false});
-        case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
-                1, false,
-                0, 1,
-                new int[] {5, 6},
-                new boolean[] {false, true});
-        // TODO: figure out for 6706 bot
-        case TEAM_6706_COMPBOT -> new HardwareConstants(
-                1, false,
-                0, 1,
-                new int[0],
-                new boolean[0]);
-    };
 
-    public record VoltageSettings(
-            double INTAKE_VOLTS,
-            double SHOOT_VOLTS,
-            double BRAKE_VOLTS,
-            double SHUFFLE_VOLTS) {}
-    public static final VoltageSettings VOLTAGE_SETTINGS = switch (Robot.CURRENT_ROBOT) {
-        case TEAM_5516_DEVBOT_HYDROXIDE_I, TEAM_5516_COMPBOT_HYDROXIDE_II ->
-                new VoltageSettings(2.4, 8.0, -1.8, 1.2);
-        case TEAM_6706_COMPBOT ->
-                new VoltageSettings(5.0, 8.0, -1.0, 1.5);
-    };
+    public static final HardwareConstants HARDWARE_CONSTANTS =
+            switch (Robot.CURRENT_ROBOT) {
+                case TEAM_5516_DEVBOT_HYDROXIDE_I -> new HardwareConstants(
+                        3, true, 0, 1, new int[] {5, 6}, new boolean[] {true, false});
+                case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
+                        1, false, 0, 1, new int[] {5, 6}, new boolean[] {false, true});
+                case TEAM_6706_COMPBOT -> new HardwareConstants(18, true, 0, 1, new int[0], new boolean[0]);
+            };
+
+    public record VoltageSettings(double INTAKE_VOLTS, double SHOOT_VOLTS, double BRAKE_VOLTS, double SHUFFLE_VOLTS) {}
+
+    public static final VoltageSettings VOLTAGE_SETTINGS =
+            switch (Robot.CURRENT_ROBOT) {
+                case TEAM_5516_DEVBOT_HYDROXIDE_I, TEAM_5516_COMPBOT_HYDROXIDE_II -> new VoltageSettings(
+                        2.4, 8.0, -1.8, 1.2);
+                case TEAM_6706_COMPBOT -> new VoltageSettings(5.0, 8.0, -1.0, 1.5);
+            };
 
     public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);
     public static final Distance SECOND_SENSOR_THRESHOLD = Centimeters.of(5);

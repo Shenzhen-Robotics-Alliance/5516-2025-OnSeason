@@ -19,6 +19,7 @@ public final class ArmConstants {
             Angle ARM_LOWER_HARD_LIMIT,
             Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIM,
             int ABSOLUTE_ENCODER_CHANNEL,
+            boolean ABSOLUTE_ENCODER_INVERTED,
             int ARM_MOTOR_ID,
             boolean ARM_MOTOR_INVERTED) {}
 
@@ -33,6 +34,7 @@ public final class ArmConstants {
                         Degrees.of(-48.0),
                         Rotations.of(0.0),
                         0,
+                        false,
                         4,
                         false);
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmHardwareConstants(
@@ -44,18 +46,20 @@ public final class ArmConstants {
                         Degrees.of(-48.0),
                         Rotations.of(0.260),
                         0,
+                        false,
                         4,
                         true);
                 case TEAM_6706_COMPBOT -> new ArmHardwareConstants(
                         Centimeters.of(26.0),
                         Kilograms.of(4.0),
                         DCMotor.getKrakenX60(1),
-                        44.0 / 16.0 * 9.0,
+                        24.0 / 12.0 * 20.0,
                         Degrees.of(136.0),
                         Degrees.of(-48.0),
-                        Rotations.of(0.0),
+                        Rotations.of(-0.11),
                         0,
-                        4,
+                        true,
+                        19,
                         false);
             };
 

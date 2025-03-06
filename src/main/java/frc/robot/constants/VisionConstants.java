@@ -57,8 +57,8 @@ public class VisionConstants {
                 case TEAM_5516_DEVBOT_HYDROXIDE_I -> List.of(
                         new PhotonCameraProperties(
                                 "FrontLeftLowerCam",
-                                Hertz.of(20),
-                                Milliseconds.of(55),
+                                Hertz.of(35),
+                                Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
                                 0.9,
@@ -72,8 +72,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontRightLowerCam",
-                                Hertz.of(20),
-                                Milliseconds.of(55),
+                                Hertz.of(35),
+                                Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
                                 0.9,
@@ -87,8 +87,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontLeftUpperCam",
-                                Hertz.of(40),
-                                Milliseconds.of(35),
+                                Hertz.of(20),
+                                Milliseconds.of(50),
                                 Milliseconds.of(5),
                                 Degrees.of(58),
                                 0.9,
@@ -102,8 +102,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontRightUpperCam",
-                                Hertz.of(40),
-                                Milliseconds.of(35),
+                                Hertz.of(20),
+                                Milliseconds.of(50),
                                 Milliseconds.of(5),
                                 Degrees.of(58),
                                 0.9,
@@ -176,12 +176,11 @@ public class VisionConstants {
                                 Rotation2d.fromDegrees(0),
                                 Degrees.of(-20),
                                 Degrees.zero()));
-                    // TODO: find out the actual constants for 6706's robot
                 case TEAM_6706_COMPBOT -> List.of(
                         new PhotonCameraProperties(
                                 "FrontLeftCam",
-                                Hertz.of(20),
-                                Milliseconds.of(55),
+                                Hertz.of(35),
+                                Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
                                 0.9,
@@ -195,8 +194,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontRightCam",
-                                Hertz.of(20),
-                                Milliseconds.of(55),
+                                Hertz.of(35),
+                                Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
                                 0.9,

@@ -27,8 +27,9 @@ public class ArmIOReal implements ArmIO {
      * The difference between the raw encoder reading angle and actual arm angle. Real Angle = Encoder Angle - Offset
      * Angle. Offset Angle = Encoder Angle - Real Angle.
      */
-    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET = new Rotation2d(
-                    HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_READING_AT_UPPER_LIM())
+    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET = new Rotation2d(HARDWARE_CONSTANTS
+                    .ABSOLUTE_ENCODER_READING_AT_UPPER_LIM()
+                    .times(HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_INVERTED() ? -1 : 1))
             .minus(new Rotation2d(HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT()));
 
     // Hardware
@@ -47,10 +48,12 @@ public class ArmIOReal implements ArmIO {
         this.absoluteEncoder = new DutyCycleEncoder(HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_CHANNEL());
 
         // Configure Motor
-        armTalon.getConfigurator().apply(new MotorOutputConfigs().withInverted(
-                HARDWARE_CONSTANTS.ARM_MOTOR_INVERTED()
-                        ? InvertedValue.Clockwise_Positive
-                        : InvertedValue.CounterClockwise_Positive));
+        armTalon.getConfigurator()
+                .apply(new MotorOutputConfigs()
+                        .withInverted(
+                                HARDWARE_CONSTANTS.ARM_MOTOR_INVERTED()
+                                        ? InvertedValue.Clockwise_Positive
+                                        : InvertedValue.CounterClockwise_Positive));
         armTalon.getConfigurator()
                 .apply(new CurrentLimitsConfigs()
                         .withSupplyCurrentLimitEnable(true)
@@ -70,7 +73,9 @@ public class ArmIOReal implements ArmIO {
     public void updateInputs(ArmInputs inputs) {
         // Obtain absolute encoder readings
         inputs.absoluteEncoderAngle = absoluteEncoder.isConnected()
-                ? Optional.of(Rotation2d.fromRotations(absoluteEncoder.get()).minus(ABSOLUTE_ENCODER_OFFSET))
+                ? Optional.of(Rotation2d.fromRotations(
+                                absoluteEncoder.get() * (HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_INVERTED() ? -1 : 1))
+                        .minus(ABSOLUTE_ENCODER_OFFSET))
                 : Optional.empty();
 
         // Refresh signals
