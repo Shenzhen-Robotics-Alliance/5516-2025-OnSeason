@@ -20,21 +20,24 @@ import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.Voltage;
 
+import java.util.Arrays;
+
 public class CoralHolderIOReal implements CoralHolderIO {
-    private final TalonFX rollerTalon, feederTalon1, feederTalon2;
+    private final TalonFX rollerTalon;
+    private final TalonFX[] feederTalons;
     private final LaserCan firstSensor, secondSensor;
 
     private final StatusSignal<Current> rollerMotorCurrent;
     private final StatusSignal<Voltage> rollerMotorOutputVoltage;
 
-    private final StatusSignal<Current> feeder1Current, feeder2Current;
-    private final StatusSignal<Voltage> feeder1Output, feeder2Output;
+    private final StatusSignal<Current>[] feedersCurrent;
+    private final StatusSignal<Voltage>[] feedersOutput;
 
     private final boolean firstSensorConfigurationError;
     private final boolean secondSensorConfigurationError;
 
     public CoralHolderIOReal() {
-        this.rollerTalon = new TalonFX(1);
+        this.rollerTalon = new TalonFX(HARDWARE_CONSTANTS.rollerMotorID());
         CurrentLimitsConfigs rollerCurrentLimit = new CurrentLimitsConfigs()
                 .withSupplyCurrentLimitEnable(true)
                 .withSupplyCurrentLimit(ROLLERS_CURRENT_LIMIT);
@@ -47,31 +50,24 @@ public class CoralHolderIOReal implements CoralHolderIO {
         this.rollerMotorCurrent = rollerTalon.getSupplyCurrent();
         this.rollerMotorOutputVoltage = rollerTalon.getMotorVoltage();
 
-        this.feederTalon1 = new TalonFX(5);
-        this.feederTalon2 = new TalonFX(6);
-        CurrentLimitsConfigs feederCurrentLimit =
-                new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(40);
-        feederTalon1.getConfigurator().apply(feederCurrentLimit);
-        feederTalon1
-                .getConfigurator()
-                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
-        feederTalon2.getConfigurator().apply(feederCurrentLimit);
-        feederTalon2.getConfigurator().apply(new MotorOutputConfigs().withInverted(InvertedValue.Clockwise_Positive));
+        this.feederTalons = Arrays.stream(HARDWARE_CONSTANTS.feederMotorsIDs()).mapToObj(TalonFX::new).toArray(TalonFX[]::new);
+        this.feedersCurrent = Arrays.stream(feederTalons).map(TalonFX::getSupplyCurrent).toArray(StatusSignal[]::new);
+        this.feedersOutput = Arrays.stream(feederTalons).map(TalonFX::getMotorVoltage).toArray(StatusSignal[]::new);
 
-        feeder1Current = feederTalon1.getSupplyCurrent();
-        feeder2Current = feederTalon2.getSupplyCurrent();
-        feeder1Output = feederTalon1.getMotorVoltage();
-        feeder2Output = feederTalon2.getMotorVoltage();
-
+        double freq = 100.0;
         BaseStatusSignal.setUpdateFrequencyForAll(
-                100.0,
+                freq,
                 rollerMotorCurrent,
-                rollerMotorOutputVoltage,
-                feeder1Current,
-                feeder1Output,
-                feeder2Current,
-                feeder2Output);
+                rollerMotorOutputVoltage);
+        BaseStatusSignal.setUpdateFrequencyForAll(freq, feedersCurrent);
+        BaseStatusSignal.setUpdateFrequencyForAll(freq, feedersOutput);
         this.rollerTalon.optimizeBusUtilization();
+        for (int i = 0; i < feederTalons.length; i++) {
+            feederTalons[i].getConfigurator().apply(new MotorOutputConfigs().withInverted(
+                    HARDWARE_CONSTANTS.feederMotorsInverted()[i] ? InvertedValue.Clockwise_Positive : InvertedValue.CounterClockwise_Positive));
+            feederTalons[i].getConfigurator().apply(new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(40));
+            feederTalons[i].optimizeBusUtilization();
+        }
 
         this.firstSensor = new LaserCan(1);
         this.secondSensor = new LaserCan(0);
@@ -106,16 +102,18 @@ public class CoralHolderIOReal implements CoralHolderIO {
     public void updateInputs(CoralHolderInputs inputs) {
         StatusCode statusCode = BaseStatusSignal.refreshAll(
                 rollerMotorCurrent,
-                rollerMotorOutputVoltage,
-                feeder1Current,
-                feeder1Output,
-                feeder2Current,
-                feeder2Output);
+                rollerMotorOutputVoltage);
+        BaseStatusSignal.refreshAll(feedersOutput);
+        BaseStatusSignal.refreshAll(feedersCurrent);
         inputs.motorConnected = statusCode.isOK();
         inputs.rollerMotorCurrentAmps = rollerMotorCurrent.getValueAsDouble();
         inputs.rollerMotorOutputVolts = rollerMotorOutputVoltage.getValueAsDouble();
-        inputs.feederMotorCurrentAmps = feeder1Current.getValueAsDouble() + feeder2Current.getValueAsDouble();
-        inputs.feederMotorOutputVolts = (feeder1Output.getValueAsDouble() + feeder2Output.getValueAsDouble()) / 2;
+        inputs.feederMotorCurrentAmps = inputs.feederMotorOutputVolts = 0;
+        for (int i = 0; i < feederTalons.length; i++) {
+            inputs.feederMotorOutputVolts += feedersCurrent[i].getValueAsDouble();
+            inputs.feederMotorCurrentAmps += feedersOutput[i].getValueAsDouble();
+        }
+        inputs.feederMotorOutputVolts /= feederTalons.length;
 
         LaserCanInterface.Measurement firstSensorMeasurement = firstSensor.getMeasurement();
         if (firstSensorMeasurement == null || firstSensorConfigurationError) {
@@ -150,7 +148,7 @@ public class CoralHolderIOReal implements CoralHolderIO {
     @Override
     public void setCollectorMotorOutput(double volts) {
         voltageOut.withOutput(volts);
-        feederTalon1.setControl(voltageOut);
-        feederTalon2.setControl(voltageOut);
+        for (TalonFX feederTalon:feederTalons)
+            feederTalon.setControl(voltageOut);
     }
 }

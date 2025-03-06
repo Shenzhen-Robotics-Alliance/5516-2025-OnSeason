@@ -7,8 +7,37 @@ import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import frc.robot.Robot;
+
+import java.util.OptionalInt;
 
 public final class CoralHolderConstants {
+    public record HardwareConstants(
+            int rollerMotorID,
+            boolean rollerMotorInverted,
+            int firstSensorID,
+            int secondSensorID,
+            int[] feederMotorsIDs,
+            boolean[] feederMotorsInverted) {}
+    public static final HardwareConstants HARDWARE_CONSTANTS = switch (Robot.CURRENT_ROBOT) {
+        case TEAM_5516_DEVBOT_HYDROXIDE_I -> new HardwareConstants(
+                3, true,
+                0, 1,
+                new int[] {5, 6},
+                new boolean[] {true, false});
+        case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
+                1, false,
+                0, 1,
+                new int[] {5, 6},
+                new boolean[] {false, true});
+        // TODO: figure out for 6706 bot
+        case TEAM_6706_COMPBOT -> new HardwareConstants(
+                1, false,
+                0, 1,
+                new int[0],
+                new boolean[0]);
+    };
+
     public static final double INTAKE_VOLTS = 2.4;
     public static final double SHOOT_VOLTS = 10;
     public static final double BRAKE_VOLTS = -1.8;
