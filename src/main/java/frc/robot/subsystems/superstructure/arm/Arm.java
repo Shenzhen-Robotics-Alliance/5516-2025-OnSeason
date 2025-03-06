@@ -58,9 +58,12 @@ public class Arm extends SubsystemBase {
         this.io = io;
         inputs = new ArmIO.ArmInputs();
 
-        this.feedforwardController = new ArmFeedforward(kS, kG, kV, kA);
-        this.feedbackController = new PIDController(kP, 0, 0);
-        this.profile = new TrapezoidProfile(PROFILE_CONSTRAINS);
+        this.feedforwardController =
+                new ArmFeedforward(PID_CONSTANTS.kS(), PID_CONSTANTS.kG(), PID_CONSTANTS.kV(), PID_CONSTANTS.kA());
+        this.feedbackController = new PIDController(PID_CONSTANTS.kP(), 0, 0);
+        this.profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+                PID_CONSTANTS.VELOCITY_CONSTRAIN().in(RadiansPerSecond),
+                PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(RadiansPerSecondPerSecond)));
 
         this.armHardwareFaultsAlert = AlertsManager.create("Arm hardware faults detected!", Alert.AlertType.kError);
         this.armNotCalibratedAlert =
@@ -73,7 +76,8 @@ public class Arm extends SubsystemBase {
         this.armNotCalibratedAlert.set(false);
         this.armAbsoluteEncoderDisconnectedAlert.set(false);
 
-        currentStateRad = new TrapezoidProfile.State(ARM_UPPER_LIMIT.in(Radians), 0);
+        currentStateRad = new TrapezoidProfile.State(
+                HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT().in(Radians), 0);
         setpoint = SuperStructure.SuperStructurePose.IDLE.armAngle;
 
         hardwareFaultDetected = false;
@@ -83,7 +87,7 @@ public class Arm extends SubsystemBase {
         // Assumes that the arm starts at upper limit during boot.
         // The calibration will be overwritten if the absolute encoder is available.
         // Offset = Relative Angle - Actual Angle, where Relative Angle is 0 at boot.
-        relativeEncoderOffset = Rotation2d.kZero.minus(new Rotation2d(ARM_UPPER_LIMIT));
+        relativeEncoderOffset = Rotation2d.kZero.minus(new Rotation2d((HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT())));
 
         io.setMotorBrake(true);
     }
@@ -93,7 +97,8 @@ public class Arm extends SubsystemBase {
         // real = relative - offset
         // so
         // offset = relative - real
-        relativeEncoderOffset = Rotation2d.fromRadians(inputs.relativeEncoderAngleRad / ARM_GEARING_REDUCTION)
+        relativeEncoderOffset = Rotation2d.fromRadians(
+                        inputs.relativeEncoderAngleRad / HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION())
                 .minus(absoluteEncoderAngle);
         encoderCalibrated = true;
     }
@@ -126,7 +131,8 @@ public class Arm extends SubsystemBase {
                 getArmAngle().getRadians(), currentStateRad.velocity, accelerationRadPerSecSq);
         double feedbackVolts = feedbackController.calculate(getArmAngle().getRadians(), currentStateRad.position);
 
-        Voltage output = Volts.of(MathUtil.clamp(feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTS, ARM_MAX_VOLTS));
+        Voltage output = Volts.of(MathUtil.clamp(
+                feedforwardVolts + feedbackVolts, -ARM_MAX_VOLTAGE.in(Volts), ARM_MAX_VOLTAGE.in(Volts)));
         io.setMotorOutput(output);
         logControlLoops(feedforwardVolts, feedbackVolts, output.in(Volts));
     }
@@ -185,7 +191,7 @@ public class Arm extends SubsystemBase {
         double errorRad = Rotation2d.fromRadians(currentStateRad.position)
                 .minus(new Rotation2d(setpoint))
                 .getRadians();
-        return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
+        return Math.abs(errorRad) < PID_CONSTANTS.TOLERANCE().in(Radians);
     }
 
     /**
@@ -200,7 +206,7 @@ public class Arm extends SubsystemBase {
 
     public boolean trulyAtReference(Angle setpoint) {
         double errorRad = getArmAngle().minus(new Rotation2d(setpoint)).getRadians();
-        return Math.abs(errorRad) < ARM_PID_TOLERANCE.in(Radians);
+        return Math.abs(errorRad) < PID_CONSTANTS.TOLERANCE().in(Radians);
     }
 
     /** Request the arm to move to a given setpoint. */
@@ -222,12 +228,12 @@ public class Arm extends SubsystemBase {
 
     /** @return the measured arm angle, where zero is horizontally forward. */
     public Rotation2d getArmAngle() {
-        return Rotation2d.fromRadians(inputs.relativeEncoderAngleRad / ARM_GEARING_REDUCTION)
+        return Rotation2d.fromRadians(inputs.relativeEncoderAngleRad / HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION())
                 .minus(relativeEncoderOffset);
     }
 
     public double getVelocityRadPerSec() {
-        return inputs.encoderVelocityRadPerSec / ARM_GEARING_REDUCTION;
+        return inputs.encoderVelocityRadPerSec / HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION();
     }
 
     public Rotation2d getProfileCurrentState() {

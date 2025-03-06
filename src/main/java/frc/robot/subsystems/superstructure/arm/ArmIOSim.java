@@ -24,17 +24,19 @@ public class ArmIOSim implements ArmIO {
 
     public ArmIOSim() {
         this.armSim = new SingleJointedArmSim(
-                ARM_GEARBOX,
-                ARM_GEARING_REDUCTION,
-                SingleJointedArmSim.estimateMOI(ARM_LENGTH.in(Meters), ARM_MASS.in(Kilograms)),
-                ARM_LENGTH.in(Meters),
-                ARM_LOWER_LIMIT.in(Radians),
-                ARM_UPPER_LIMIT.in(Radians),
+                HARDWARE_CONSTANTS.ARM_GEARBOX(),
+                HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION(),
+                SingleJointedArmSim.estimateMOI(
+                        HARDWARE_CONSTANTS.ARM_COM_LENGTH().in(Meters),
+                        HARDWARE_CONSTANTS.ARM_MASS().in(Kilograms)),
+                HARDWARE_CONSTANTS.ARM_COM_LENGTH().in(Meters),
+                HARDWARE_CONSTANTS.ARM_LOWER_HARD_LIMIT().in(Radians),
+                HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT().in(Radians),
                 true,
-                ARM_UPPER_LIMIT.in(Radians));
+                HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT().in(Radians));
 
-        this.simMotorController =
-                new SimulatedMotorController.GenericMotorController(ARM_GEARBOX).withCurrentLimit(ARM_CURRENT_LIMIT);
+        this.simMotorController = new SimulatedMotorController.GenericMotorController(HARDWARE_CONSTANTS.ARM_GEARBOX())
+                .withCurrentLimit(ARM_CURRENT_LIMIT);
         this.relativeEncoderOffset = Rotations.of((Math.random() - 0.5) * 10);
         this.requestedVoltage = Volts.zero();
 
@@ -44,9 +46,9 @@ public class ArmIOSim implements ArmIO {
 
     @Override
     public void updateInputs(ArmInputs armInputs) {
-        Angle motorAngle = Radians.of(armSim.getAngleRads() * ARM_GEARING_REDUCTION);
+        Angle motorAngle = Radians.of(armSim.getAngleRads() * HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION());
         AngularVelocity motorAngularVelocity =
-                RadiansPerSecond.of(armSim.getVelocityRadPerSec() * ARM_GEARING_REDUCTION);
+                RadiansPerSecond.of(armSim.getVelocityRadPerSec() * HARDWARE_CONSTANTS.ARM_GEARING_REDUCTION());
         Voltage actualOutputVoltage =
                 simMotorController.constrainOutputVoltage(motorAngle, motorAngularVelocity, requestedVoltage);
         actualOutputVoltage = SimulatedBattery.clamp(actualOutputVoltage);

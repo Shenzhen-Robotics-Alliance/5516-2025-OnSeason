@@ -24,16 +24,12 @@ import java.util.Optional;
 
 public class ArmIOReal implements ArmIO {
     /**
-     * The absolute encoder reading when the arm hits the upper limit. Measure this on "SmartDashboard/Arm/Raw Encoder
-     * Reading", which is in rotations.
-     */
-    private static final Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT = Rotations.of(0.260);
-    /**
      * The difference between the raw encoder reading angle and actual arm angle. Real Angle = Encoder Angle - Offset
      * Angle. Offset Angle = Encoder Angle - Real Angle.
      */
-    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET =
-            new Rotation2d(ABSOLUTE_ENCODER_READING_AT_UPPER_LIMIT).minus(new Rotation2d(ARM_UPPER_LIMIT));
+    private static final Rotation2d ABSOLUTE_ENCODER_OFFSET = new Rotation2d(
+                    HARDWARE_CONSTANTS.ABSOLUTE_ENCODER_READING_AT_UPPER_LIM())
+            .minus(new Rotation2d(HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT()));
 
     // Hardware
     private final TalonFX armTalon;

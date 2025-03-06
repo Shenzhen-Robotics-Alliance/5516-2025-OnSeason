@@ -17,8 +17,18 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 public class Robot extends LoggedRobot {
+    public enum RobotName {
+        // Team 5516 dev bot
+        TEAM_5516_DEVBOT_HYDROXIDE_I,
+        // Team 5516 comp bot
+        TEAM_5516_COMPBOT_HYDROXIDE_II,
+        // Team 6706 comp bot
+        TEAM_6706_COMPBOT
+    }
+
     private static final RobotMode JAVA_SIM_MODE = RobotMode.SIM;
     public static final RobotMode CURRENT_ROBOT_MODE = isReal() ? RobotMode.REAL : JAVA_SIM_MODE;
+    public static final RobotName CURRENT_ROBOT = RobotName.TEAM_5516_DEVBOT_HYDROXIDE_I;
     private Command autonomousCommand;
     private RobotContainer robotContainer;
 
