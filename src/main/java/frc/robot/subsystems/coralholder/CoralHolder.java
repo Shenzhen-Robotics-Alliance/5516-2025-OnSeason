@@ -122,11 +122,11 @@ public class CoralHolder extends SubsystemBase {
     public Command intakeCoralSequence() {
         return Commands.sequence(
                         // Run the rollers forward quickly until the coral hits the first sensor
-                        runVolts(INTAKE_VOLTS, 4.0).until(firstSensor),
+                        runVolts(VOLTAGE_SETTINGS.INTAKE_VOLTS(), 4.0).until(firstSensor),
                         // Run the rollers backwards for 0.1 for a rapid brake
-                        runVolts(BRAKE_VOLTS, 3.0).withTimeout(0.1),
+                        runVolts(VOLTAGE_SETTINGS.BRAKE_VOLTS(), 3.0).withTimeout(0.1),
                         // Next, run the rollers forward slowly until the coal hits the second sensor
-                        runVolts(SHUFFLE_VOLTS, 1.0).until(coralInPlace))
+                        runVolts(VOLTAGE_SETTINGS.SHUFFLE_VOLTS(), 1.0).until(coralInPlace))
                 // Only run when the rollers are not in place yet
                 .onlyIf(coralInPlace.negate())
                 // Stop the intake at the end of the command
@@ -142,11 +142,11 @@ public class CoralHolder extends SubsystemBase {
         return Commands.sequence(
                         // If the coral is not in place (triggering sensor 2) yet,
                         // we run rollers slowly forward until it triggers sensor 2.
-                        runVolts(SHUFFLE_VOLTS, 1.0)
+                        runVolts(VOLTAGE_SETTINGS.SHUFFLE_VOLTS(), 1.0)
                                 .onlyIf(secondSensor.negate())
                                 .until(secondSensor),
                         // Next, run the rollers slowly backwards until it does not trigger sensor 2
-                        runVolts(-SHUFFLE_VOLTS, 1.0).until(secondSensor.negate()))
+                        runVolts(-VOLTAGE_SETTINGS.SHUFFLE_VOLTS(), 1.0).until(secondSensor.negate()))
                 // Only shuffle the coral if we have a coral.
                 .onlyIf(hasCoral)
                 .withTimeout(1.5)
@@ -162,7 +162,7 @@ public class CoralHolder extends SubsystemBase {
 
     /** Score the Coral inside the holder. */
     public Command scoreCoral() {
-        return runVolts(SHOOT_VOLTS, 2)
+        return runVolts(VOLTAGE_SETTINGS.SHOOT_VOLTS(), 2)
                 .until(hasCoral.negate())
                 .finallyDo(() -> setVoltage(0.0, 0.0))
                 .withTimeout(0.6);

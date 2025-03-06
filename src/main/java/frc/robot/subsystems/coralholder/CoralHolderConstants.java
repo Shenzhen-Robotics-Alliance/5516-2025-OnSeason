@@ -38,10 +38,17 @@ public final class CoralHolderConstants {
                 new boolean[0]);
     };
 
-    public static final double INTAKE_VOLTS = 2.4;
-    public static final double SHOOT_VOLTS = 10;
-    public static final double BRAKE_VOLTS = -1.8;
-    public static final double SHUFFLE_VOLTS = 1.2;
+    public record VoltageSettings(
+            double INTAKE_VOLTS,
+            double SHOOT_VOLTS,
+            double BRAKE_VOLTS,
+            double SHUFFLE_VOLTS) {}
+    public static final VoltageSettings VOLTAGE_SETTINGS = switch (Robot.CURRENT_ROBOT) {
+        case TEAM_5516_DEVBOT_HYDROXIDE_I, TEAM_5516_COMPBOT_HYDROXIDE_II ->
+                new VoltageSettings(2.4, 8.0, -1.8, 1.2);
+        case TEAM_6706_COMPBOT ->
+                new VoltageSettings(5.0, 8.0, -1.0, 1.5);
+    };
 
     public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);
     public static final Distance SECOND_SENSOR_THRESHOLD = Centimeters.of(5);
