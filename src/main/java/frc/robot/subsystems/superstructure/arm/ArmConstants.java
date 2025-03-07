@@ -41,7 +41,7 @@ public final class ArmConstants {
                         Centimeters.of(26.0),
                         Kilograms.of(3.0),
                         DCMotor.getKrakenX60(1),
-                        44.0 / 16.0 * 9.0,
+                        44.0 / 16.0 * 15.0,
                         Degrees.of(136.0),
                         Degrees.of(-48.0),
                         Rotations.of(0.260),
@@ -82,16 +82,16 @@ public final class ArmConstants {
                         0.01,
                         9.0 / Math.toRadians(30),
                         RotationsPerSecond.of(1.8),
-                        RotationsPerSecondPerSecond.of(2.5),
+                        RotationsPerSecondPerSecond.of(4),
                         Degrees.of(3));
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmPIDConstants(
                         0.03,
-                        0.31,
-                        0.49,
+                        0.30,
+                        0.79,
                         0.01,
                         6.0 / Math.toRadians(30),
-                        RotationsPerSecond.of(1.8),
-                        RotationsPerSecondPerSecond.of(2.5),
+                        RotationsPerSecond.of(2),
+                        RotationsPerSecondPerSecond.of(6),
                         Degrees.of(3));
                 case TEAM_6706_COMPBOT -> new ArmPIDConstants(
                         0.05,

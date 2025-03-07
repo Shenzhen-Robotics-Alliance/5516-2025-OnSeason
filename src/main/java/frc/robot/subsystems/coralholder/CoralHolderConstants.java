@@ -23,7 +23,7 @@ public final class CoralHolderConstants {
                 case TEAM_5516_DEVBOT_HYDROXIDE_I -> new HardwareConstants(
                         3, true, 0, 1, new int[] {5, 6}, new boolean[] {true, false});
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
-                        1, false, 0, 1, new int[] {5, 6}, new boolean[] {false, true});
+                        1, false, 1, 0, new int[] {5, 6}, new boolean[] {false, true});
                 case TEAM_6706_COMPBOT -> new HardwareConstants(18, true, 0, 1, new int[0], new boolean[0]);
             };
 
