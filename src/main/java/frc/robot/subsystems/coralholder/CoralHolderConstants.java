@@ -24,7 +24,7 @@ public final class CoralHolderConstants {
                         3, true, 0, 1, new int[] {5, 6}, new boolean[] {true, false});
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
                         1, false, 0, 1, new int[] {5, 6}, new boolean[] {false, true});
-                case TEAM_6706_COMPBOT -> new HardwareConstants(18, false, 0, 1, new int[0], new boolean[0]);
+                case TEAM_6706_COMPBOT -> new HardwareConstants(18, true, 0, 1, new int[0], new boolean[0]);
             };
 
     public record VoltageSettings(double INTAKE_VOLTS, double SHOOT_VOLTS, double BRAKE_VOLTS, double SHUFFLE_VOLTS) {}

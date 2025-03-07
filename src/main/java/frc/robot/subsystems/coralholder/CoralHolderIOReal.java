@@ -42,7 +42,11 @@ public class CoralHolderIOReal implements CoralHolderIO {
         this.rollerTalon.getConfigurator().apply(rollerCurrentLimit);
         rollerTalon
                 .getConfigurator()
-                .apply(new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive));
+                .apply(new MotorOutputConfigs()
+                        .withInverted(
+                                HARDWARE_CONSTANTS.rollerMotorInverted()
+                                        ? InvertedValue.Clockwise_Positive
+                                        : InvertedValue.CounterClockwise_Positive));
         this.rollerTalon.setNeutralMode(NeutralModeValue.Brake);
 
         this.rollerMotorCurrent = rollerTalon.getSupplyCurrent();
