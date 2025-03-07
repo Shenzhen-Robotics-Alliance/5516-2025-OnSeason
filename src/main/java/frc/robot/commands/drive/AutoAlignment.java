@@ -162,8 +162,8 @@ public class AutoAlignment {
         PathConstraints constraints = new PathConstraints(
                 MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW,
                 ACCELERATION_SOFT_CONSTRAIN_LOW,
-                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
-                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN_LOW,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN_LOW);
         return Commands.defer(
                         () -> AutoBuilder.followPath(getPreciseAlignmentPath(
                                 constraints,
@@ -173,7 +173,6 @@ public class AutoAlignment {
                                 preciseTargetApproachDirection,
                                 config)),
                         Set.of(driveSubsystem))
-                .beforeStarting(Commands.runOnce(RobotState.getInstance()::mergeVisionOdometryToPrimaryOdometry))
                 .deadlineFor(Commands.startEnd(
                         () -> RobotState.getInstance().setVisionSensitiveMode(true),
                         () -> RobotState.getInstance().setVisionSensitiveMode(false)));

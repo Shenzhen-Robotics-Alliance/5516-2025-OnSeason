@@ -391,9 +391,8 @@ public class RobotContainer {
         // Retrieve elevator when robot is about to tip
         drive.driveTrainTipping
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
-                .whileTrue(drive.run(drive::stop))
-                .whileTrue(ledStatusLight
-                        .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kRed), 4)
+                .onTrue(ledStatusLight
+                        .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());

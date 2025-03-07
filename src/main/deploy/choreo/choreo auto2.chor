@@ -4,6 +4,20 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
+   "stationspeed":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"1.5 m / s",
+     "val":1.5
+    }
+   },
+   "transvel":{
+    "dimension":"LinVel",
+    "var":{
+     "exp":"0.8 m / s",
+     "val":0.8
+    }
+   },
    "maxvel":{
     "dimension":"LinVel",
     "var":{
@@ -16,20 +30,6 @@
     "var":{
      "exp":"6.5 m / s ^ 2",
      "val":6.5
-    }
-   },
-   "transvel":{
-    "dimension":"LinVel",
-    "var":{
-     "exp":"0.8 m / s",
-     "val":0.8
-    }
-   },
-   "stationspeed":{
-    "dimension":"LinVel",
-    "var":{
-     "exp":"1.5 m / s",
-     "val":1.5
     }
    }
   },
