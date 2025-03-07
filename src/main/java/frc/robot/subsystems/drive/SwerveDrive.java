@@ -14,12 +14,12 @@ import com.pathplanner.lib.util.DriveFeedforwards;
 import com.pathplanner.lib.util.swerve.SwerveSetpoint;
 import com.pathplanner.lib.util.swerve.SwerveSetpointGenerator;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Voltage;
@@ -27,6 +27,7 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Robot;
 import frc.robot.RobotState;
@@ -34,6 +35,7 @@ import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.IO.*;
 import frc.robot.utils.AlertsManager;
 import frc.robot.utils.ChassisHeadingController;
+import frc.robot.utils.CustomMaths.TipOverDetection;
 import frc.robot.utils.MapleTimeUtils;
 import java.util.Arrays;
 import java.util.Optional;
@@ -149,12 +151,23 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         Logger.recordOutput(
                 "RobotState/PrimaryEstimatorPose", RobotState.getInstance().getPrimaryEstimatorPose());
         Logger.recordOutput(
+                "RobotState/PrimaryEstimatorPoseWith3dRot",
+                new Pose3d(
+                        new Translation3d(RobotState.getInstance()
+                                .getPrimaryEstimatorPose()
+                                .getTranslation()),
+                        getDriveTrain3dOrientation()));
+        Logger.recordOutput(
                 "RobotState/VisionSensitivePose", RobotState.getInstance().getVisionPose());
         Logger.recordOutput(
                 "RobotState/ControlLoopPose", RobotState.getInstance().getPose());
         Logger.recordOutput(
                 "RobotState/ControlLoopPoseWithLookAhead",
                 RobotState.getInstance().getPoseWithLookAhead());
+
+        Logger.recordOutput(
+                "RobotState/TippingAngleDeg",
+                Math.toDegrees(TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation())));
     }
 
     private void fetchOdometryInputs() {
@@ -372,6 +385,15 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     public double getCanBusUtilization() {
         return canBusInputs.utilization;
     }
+
+    public Rotation3d getDriveTrain3dOrientation() {
+        return new Rotation3d(
+                gyroInputs.rollRad, gyroInputs.pitchRad, getFacing().getRadians());
+    }
+
+    private static final Angle TIP_OVER_THRESHOLD = Degrees.of(2.4);
+    public Trigger driveTrainTipping = new Trigger(
+            () -> TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation()) > TIP_OVER_THRESHOLD.in(Radians));
 
     @AutoLogOutput(key = "DrivetrainTotalCurrentAmps")
     public double getDriveTrainTotalCurrentAmps() {

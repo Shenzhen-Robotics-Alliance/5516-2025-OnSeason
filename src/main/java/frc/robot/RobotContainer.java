@@ -383,8 +383,18 @@ public class RobotContainer {
         driver.moveToL4Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
                 .onTrue(coralHolder.keepCoralShuffledForever());
+
+        // Retrieve elevator at the start of teleop
         new Trigger(DriverStation::isTeleopEnabled)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+
+        // Retrieve elevator when robot is about to tip
+        drive.driveTrainTipping
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
+                .whileTrue(drive.run(drive::stop))
+                .whileTrue(ledStatusLight
+                        .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kRed), 4)
+                        .ignoringDisable(true));
 
         driver.scoreButton().whileTrue(coralHolder.scoreCoral());
 
