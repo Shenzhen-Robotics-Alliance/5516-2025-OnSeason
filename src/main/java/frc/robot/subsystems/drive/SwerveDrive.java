@@ -19,10 +19,7 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.units.measure.Angle;
-import edu.wpi.first.units.measure.LinearAcceleration;
-import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -67,12 +64,18 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
             "Gyro configuration failed! Reboot robot after fixing connection.", Alert.AlertType.kError);
     private final Alert canBusHighUtilization =
             AlertsManager.create("Drivetrain CanBus high utilization!", Alert.AlertType.kError);
-    private final Debouncer batteryBrownoutDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
     private final Alert batteryBrownoutAlert =
             AlertsManager.create("Battery brownout detected!", Alert.AlertType.kError);
     private final Debouncer drivetrainOverCurrentDebouncer = new Debouncer(0.2, Debouncer.DebounceType.kBoth);
     private final Alert drivetrainOverCurrentAlert =
             AlertsManager.create("Drivetrain over current detected! Current: ", Alert.AlertType.kError);
+
+    private final Debouncer batteryBrownoutDebouncer = new Debouncer(0.5, Debouncer.DebounceType.kFalling);
+    private final Debouncer robotTippingDebouncer = new Debouncer(0.25, Debouncer.DebounceType.kBoth);
+
+    private boolean robotTipping = false;
+    private static final Angle TIP_OVER_THRESHOLD = Degrees.of(2.4);
+    public Trigger driveTrainTipping = new Trigger(() -> robotTipping);
 
     private final SwerveSetpointGenerator setpointGenerator;
     private SwerveSetpoint setpoint;
@@ -165,6 +168,8 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
                 "RobotState/ControlLoopPoseWithLookAhead",
                 RobotState.getInstance().getPoseWithLookAhead());
 
+        robotTipping = robotTippingDebouncer.calculate(
+                TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation()) > TIP_OVER_THRESHOLD.in(Radians));
         Logger.recordOutput(
                 "RobotState/TippingAngleDeg",
                 Math.toDegrees(TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation())));
@@ -223,15 +228,20 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     }
 
     private static PathConstraints getPathConstraints(boolean lowSpeedMode) {
-        LinearAcceleration accelerationConstrain =
-                lowSpeedMode ? ACCELERATION_SOFT_CONSTRAIN_LOW : ACCELERATION_SOFT_CONSTRAIN;
-        LinearVelocity velocityConstrain =
-                lowSpeedMode ? MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW : MOVEMENT_VELOCITY_SOFT_CONSTRAIN;
+        double accelerationConstrain = lowSpeedMode
+                ? ACCELERATION_SOFT_CONSTRAIN_LOW.in(MetersPerSecondPerSecond)
+                : ACCELERATION_SOFT_CONSTRAIN.in(MetersPerSecondPerSecond);
+        double velocityConstrain = lowSpeedMode
+                ? MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW.in(MetersPerSecond)
+                : MOVEMENT_VELOCITY_SOFT_CONSTRAIN.in(MetersPerSecond);
+        double angularVelocityConstrain = lowSpeedMode
+                ? ANGULAR_VELOCITY_SOFT_CONSTRAIN_LOW.in(RadiansPerSecond)
+                : ANGULAR_VELOCITY_SOFT_CONSTRAIN.in(RadiansPerSecond);
+        double angularAccelerationConstrain = lowSpeedMode
+                ? ANGULAR_ACCELERATION_SOFT_CONSTRAIN_LOW.in(RadiansPerSecondPerSecond)
+                : ANGULAR_ACCELERATION_SOFT_CONSTRAIN.in(RadiansPerSecondPerSecond);
         return new PathConstraints(
-                velocityConstrain,
-                accelerationConstrain,
-                ANGULAR_VELOCITY_SOFT_CONSTRAIN,
-                ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
+                velocityConstrain, accelerationConstrain, angularVelocityConstrain, angularAccelerationConstrain);
     }
 
     @Override
@@ -390,10 +400,6 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         return new Rotation3d(
                 gyroInputs.rollRad, gyroInputs.pitchRad, getFacing().getRadians());
     }
-
-    private static final Angle TIP_OVER_THRESHOLD = Degrees.of(2.4);
-    public Trigger driveTrainTipping = new Trigger(
-            () -> TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation()) > TIP_OVER_THRESHOLD.in(Radians));
 
     @AutoLogOutput(key = "DrivetrainTotalCurrentAmps")
     public double getDriveTrainTotalCurrentAmps() {
