@@ -365,7 +365,7 @@
       }
     },
     {
-      "name": "Test",
+      "name": "Debug",
       "grid_layout": {
         "layouts": [],
         "containers": [
@@ -373,13 +373,141 @@
             "title": "Select Test",
             "x": 384.0,
             "y": 0.0,
-            "width": 640.0,
+            "width": 768.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
               "topic": "/SmartDashboard/Select Test",
               "period": 0.06,
               "sort_options": false
+            }
+          },
+          {
+            "title": "Arm Encoder Raw Reading",
+            "x": 384.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Text Display",
+            "properties": {
+              "topic": "/SmartDashboard/Arm/Raw Encoder Reading",
+              "period": 0.06,
+              "data_type": "double",
+              "show_submit_button": false
+            }
+          },
+          {
+            "title": "Disable Motor Brake",
+            "x": 640.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Disable Motor Brake",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "Alerts",
+            "x": 384.0,
+            "y": 256.0,
+            "width": 768.0,
+            "height": 512.0,
+            "type": "Alerts",
+            "properties": {
+              "topic": "/SmartDashboard/Alerts",
+              "period": 0.06
+            }
+          },
+          {
+            "title": "Enable Motor Brake",
+            "x": 896.0,
+            "y": 128.0,
+            "width": 256.0,
+            "height": 128.0,
+            "type": "Command",
+            "properties": {
+              "topic": "/SmartDashboard/Enable Motor Brake",
+              "period": 0.06,
+              "show_type": false
+            }
+          },
+          {
+            "title": "FrontLeftLowerCam",
+            "x": 0.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontleftlowervision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0,
+              "compression": 60,
+              "fps": 5,
+              "resolution": [
+                256.0,
+                144.0
+              ]
+            }
+          },
+          {
+            "title": "FrontLeftUpperCam",
+            "x": 0.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontleftuppervision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0,
+              "compression": 60,
+              "fps": 5,
+              "resolution": [
+                256.0,
+                144.0
+              ]
+            }
+          },
+          {
+            "title": "FrontRightUpperCam",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontrightuppervision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0,
+              "compression": 60,
+              "fps": 5,
+              "resolution": [
+                256.0,
+                144.0
+              ]
+            }
+          },
+          {
+            "title": "FrontRightLowerCam",
+            "x": 1152.0,
+            "y": 384.0,
+            "width": 384.0,
+            "height": 384.0,
+            "type": "Camera Stream",
+            "properties": {
+              "topic": "/CameraPublisher/frontrightlowervision_Port_1182_Output_MJPEG_Server",
+              "period": 0.06,
+              "rotation_turns": 0,
+              "compression": 60,
+              "fps": 5,
+              "resolution": [
+                256.0,
+                144.0
+              ]
             }
           }
         ]
