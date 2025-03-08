@@ -8,6 +8,7 @@ package frc.robot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
+import frc.robot.constants.ReefConstants;
 import frc.robot.constants.RobotMode;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
@@ -51,6 +52,8 @@ public class Robot extends LoggedRobot {
                 Logger.recordMetadata("GitDirty", "Unknown");
                 break;
         }
+
+        ReefConstants.loadStatic();
 
         // Set up data receivers & replay source
         switch (CURRENT_ROBOT_MODE) {
