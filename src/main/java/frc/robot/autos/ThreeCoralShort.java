@@ -21,6 +21,7 @@ import org.json.simple.parser.ParseException;
 
 public class ThreeCoralShort implements Auto {
     public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(1);
+    public static final Time WAIT_FOR_SUPER_STRUCTURE_TIMEOUT = Seconds.of(0.5);
 
     private final boolean isRightSide;
 
@@ -63,6 +64,8 @@ public class ThreeCoralShort implements Auto {
         commandGroup.addCommands(Commands.runOnce(waitAndRaiseElevator::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, Commands.none()));
+        commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
+                .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab second
@@ -77,6 +80,8 @@ public class ThreeCoralShort implements Auto {
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, Commands.none()));
+        commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
+                .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab third
@@ -91,6 +96,8 @@ public class ThreeCoralShort implements Auto {
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place third", isRightSide), thirdGoalAndFourthGoal, Commands.none()));
+        commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
+                .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
 
         // Grab fourth
