@@ -23,6 +23,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.constants.DriveControlLoops;
 import frc.robot.subsystems.vision.apriltags.MapleMultiTagPoseEstimator;
 import frc.robot.utils.AlertsManager;
@@ -49,8 +51,15 @@ public class RobotState {
     private Pose2d visionSensitivePose = new Pose2d();
     private ChassisSpeeds measuredSpeedsRobotRelative = new ChassisSpeeds();
 
-    private boolean visionSensitiveModeOn = false;
     private boolean lowSpeedModeEnabled = false;
+
+    public enum NavigationMode {
+        SENSOR_LESS_ODOMETRY,
+        VISION_FUSED_ODOMETRY,
+        VISION_GUIDED
+    }
+    private NavigationMode navigationMode = NavigationMode.VISION_FUSED_ODOMETRY;
+    private static final Subsystem lock = new Subsystem() {};
 
     private RobotState() {
         this.poseBuffer = TimeInterpolatableBuffer.createBuffer(POSE_BUFFER_DURATION.in(Seconds));
@@ -182,7 +191,11 @@ public class RobotState {
     }
 
     public Pose2d getPose() {
-        return visionSensitiveModeOn ? getVisionPose() : getPrimaryEstimatorPose();
+        return switch (navigationMode) {
+            case SENSOR_LESS_ODOMETRY -> getSensorLessOdometryPose();
+            case VISION_FUSED_ODOMETRY -> getPrimaryEstimatorPose();
+            case VISION_GUIDED -> getVisionPose();
+        };
     }
 
     public ChassisSpeeds getRobotRelativeSpeeds() {
@@ -204,12 +217,18 @@ public class RobotState {
         return currentPose.exp(lookAhead);
     }
 
-    public void mergeVisionOdometryToPrimaryOdometry() {
-        this.primaryEstimatorPose = this.visionSensitivePose;
+    public void mergeVisionOdometry() {
+        this.odometryPoseSensorLess = this.primaryEstimatorPose = this.visionSensitivePose;
+        poseBuffer.clear();
     }
 
-    public void setVisionSensitiveMode(boolean visionSensitiveModeOn) {
-        this.visionSensitiveModeOn = visionSensitiveModeOn;
+    public Command withNavigationMode(NavigationMode mode) {
+        return lock.startEnd(
+                () -> {
+                    if (mode != NavigationMode.VISION_GUIDED) mergeVisionOdometry();
+                    this.navigationMode = mode;
+                },
+                () -> this.navigationMode = NavigationMode.VISION_FUSED_ODOMETRY);
     }
 
     public void setLowSpeedMode(boolean lowSpeedModeEnabled) {

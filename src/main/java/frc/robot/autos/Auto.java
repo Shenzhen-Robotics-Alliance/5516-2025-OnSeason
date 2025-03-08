@@ -1,12 +1,16 @@
 package frc.robot.autos;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.RobotContainer;
 import java.io.IOException;
+
+import frc.robot.RobotState;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.json.simple.parser.ParseException;
 
@@ -39,5 +43,14 @@ public interface Auto {
                 pose.getX(),
                 FieldMirroringUtils.FIELD_HEIGHT - pose.getY(),
                 pose.getRotation().unaryMinus());
+    }
+
+    default Command followChoreoPath(String pathName, RobotState.NavigationMode navigationMode, boolean mirror) throws IOException, ParseException {
+        PathPlannerPath rawPath = PathPlannerPath.fromChoreoTrajectory(pathName);
+        PathPlannerPath path = mirror ? rawPath.mirrorPath() : rawPath;
+
+        return AutoBuilder.followPath(path)
+                .deadlineFor(RobotState.getInstance().withNavigationMode(navigationMode))
+                .asProxy();
     }
 }
