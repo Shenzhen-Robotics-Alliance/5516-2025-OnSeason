@@ -385,7 +385,11 @@ public class RobotContainer {
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
                         .finallyDo(flashLEDForIntake::cancel))
-                .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+                // move coral in place before retrieving arm
+                .onFalse(coralHolder
+                        .intakeCoralSequence()
+                        .onlyIf(coralHolder.hasCoral)
+                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE)));
         driver.moveToL2Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
                 .onTrue(coralHolder.keepCoralShuffledForever());
@@ -407,7 +411,7 @@ public class RobotContainer {
                         .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
-        driver.scoreButton().whileTrue(scoreCoral(5.0));
+        driver.scoreButton().whileTrue(scoreCoral(3.0));
 
         operator.povDown()
                 .and(operator.leftBumper().or(isAlgaeMode))
