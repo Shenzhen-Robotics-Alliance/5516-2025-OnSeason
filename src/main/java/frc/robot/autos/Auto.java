@@ -6,11 +6,9 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import frc.robot.RobotContainer;
-import java.io.IOException;
-
 import frc.robot.RobotState;
+import java.io.IOException;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.json.simple.parser.ParseException;
 
@@ -45,7 +43,8 @@ public interface Auto {
                 pose.getRotation().unaryMinus());
     }
 
-    default Command followChoreoPath(String pathName, RobotState.NavigationMode navigationMode, boolean mirror) throws IOException, ParseException {
+    default Command followChoreoPath(String pathName, RobotState.NavigationMode navigationMode, boolean mirror)
+            throws IOException, ParseException {
         PathPlannerPath rawPath = PathPlannerPath.fromChoreoTrajectory(pathName);
         PathPlannerPath path = mirror ? rawPath.mirrorPath() : rawPath;
 

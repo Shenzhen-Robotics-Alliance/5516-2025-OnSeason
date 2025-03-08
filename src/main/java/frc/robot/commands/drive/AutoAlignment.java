@@ -173,9 +173,7 @@ public class AutoAlignment {
                                 preciseTargetApproachDirection,
                                 config)),
                         Set.of(driveSubsystem))
-                .deadlineFor(Commands.startEnd(
-                        () -> RobotState.getInstance().setVisionSensitiveMode(true),
-                        () -> RobotState.getInstance().setVisionSensitiveMode(false)));
+                .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED));
     }
 
     public static PathPlannerPath getPreciseAlignmentPath(

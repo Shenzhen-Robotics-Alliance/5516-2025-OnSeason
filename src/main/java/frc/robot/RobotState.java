@@ -58,6 +58,7 @@ public class RobotState {
         VISION_FUSED_ODOMETRY,
         VISION_GUIDED
     }
+
     private NavigationMode navigationMode = NavigationMode.VISION_FUSED_ODOMETRY;
     private static final Subsystem lock = new Subsystem() {};
 
