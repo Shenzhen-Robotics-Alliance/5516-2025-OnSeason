@@ -65,7 +65,6 @@ public class PPWarmUp {
 
     public static Command alignmentWarmUp() {
         return Commands.run(() -> AutoAlignment.getPreciseAlignmentPath(
-                        new PathConstraints(1, 3, 1, 1),
                         new ChassisSpeeds(),
                         new Pose2d(3, 3, new Rotation2d()),
                         new Pose2d(5, 4, new Rotation2d()),

@@ -129,12 +129,10 @@ public class AutoAlignment {
                 ACCELERATION_SOFT_CONSTRAIN_LOW,
                 ANGULAR_VELOCITY_SOFT_CONSTRAIN,
                 ANGULAR_ACCELERATION_SOFT_CONSTRAIN);
-        Command pathFindToPoseNormalConstrains = AutoBuilder.pathfindToPose(
-                        targetPose, normalConstraints, config.preciseApproachStartingSpeed())
+        Command pathFindToPoseNormalConstrains = AutoBuilder.pathfindToPose(targetPose, normalConstraints)
                 .onlyIf(() -> !RobotState.getInstance().lowSpeedModeEnabled())
                 .until(RobotState.getInstance()::lowSpeedModeEnabled);
-        Command pathFindToPoseLowConstrains = AutoBuilder.pathfindToPose(
-                        targetPose, lowSpeedConstrain, config.preciseApproachStartingSpeed())
+        Command pathFindToPoseLowConstrains = AutoBuilder.pathfindToPose(targetPose, lowSpeedConstrain)
                 .onlyIf(RobotState.getInstance()::lowSpeedModeEnabled);
         Command pathFindToPose = pathFindToPoseNormalConstrains.andThen(pathFindToPoseLowConstrains);
 
@@ -159,14 +157,8 @@ public class AutoAlignment {
             Pose2d preciseTarget,
             Rotation2d preciseTargetApproachDirection,
             AutoAlignmentConfigurations config) {
-        PathConstraints constraints = new PathConstraints(
-                MOVEMENT_VELOCITY_SOFT_CONSTRAIN_LOW,
-                ACCELERATION_SOFT_CONSTRAIN_LOW,
-                ANGULAR_VELOCITY_SOFT_CONSTRAIN_LOW,
-                ANGULAR_ACCELERATION_SOFT_CONSTRAIN_LOW);
         return Commands.defer(
                         () -> AutoBuilder.followPath(getPreciseAlignmentPath(
-                                constraints,
                                 driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
                                 driveSubsystem.getPose(),
                                 preciseTarget,
@@ -177,7 +169,6 @@ public class AutoAlignment {
     }
 
     public static PathPlannerPath getPreciseAlignmentPath(
-            PathConstraints constraints,
             ChassisSpeeds measuredSpeedsFieldRelative,
             Pose2d currentRobotPose,
             Pose2d preciseTarget,
@@ -200,20 +191,19 @@ public class AutoAlignment {
                 new Pose2d(interiorWaypoint, preciseTargetApproachDirection),
                 new Pose2d(preciseTarget.getTranslation(), preciseTargetApproachDirection));
 
-        PathConstraints slowDownConstrains = new PathConstraints(
+        PathConstraints constraints = new PathConstraints(
                 config.finalAlignmentSpeed(),
-                config.preciseAlignmentMaxAcceleration,
-                RotationsPerSecond.of(0.5),
-                RotationsPerSecondPerSecond.of(1));
+                config.preciseAlignmentMaxAcceleration(),
+                ANGULAR_VELOCITY_SOFT_CONSTRAIN_LOW,
+                ANGULAR_ACCELERATION_SOFT_CONSTRAIN_LOW);
 
         List<RotationTarget> rotationTargets = List.of(new RotationTarget(1.0, preciseTarget.getRotation()));
-        List<ConstraintsZone> constraintsZones = List.of(new ConstraintsZone(1.0, 2.0, slowDownConstrains));
 
         PathPlannerPath path = new PathPlannerPath(
                 waypoints,
                 rotationTargets,
                 List.of(),
-                constraintsZones,
+                List.of(),
                 List.of(),
                 constraints,
                 new IdealStartingState(fieldRelativeSpeedsMPS.getNorm(), currentRobotPose.getRotation()),
@@ -226,14 +216,12 @@ public class AutoAlignment {
 
     public record AutoAlignmentConfigurations(
             Distance distanceStartPreciseApproach,
-            LinearVelocity preciseApproachStartingSpeed,
             LinearVelocity finalAlignmentSpeed,
             Distance finalApproachStraightTrajectoryLength,
             LinearVelocity hitTargetSpeed,
             LinearAcceleration preciseAlignmentMaxAcceleration) {
         public static final AutoAlignmentConfigurations DEFAULT_CONFIG = new AutoAlignmentConfigurations(
                 Meters.of(0.5),
-                MetersPerSecond.of(3),
                 MetersPerSecond.of(2),
                 Meters.of(0.4),
                 MetersPerSecond.of(0.5),
