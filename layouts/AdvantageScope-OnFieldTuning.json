@@ -1,10 +1,10 @@
 {
   "hubs": [
     {
-      "x": -8,
-      "y": -8,
-      "width": 1708,
-      "height": 1020,
+      "x": 0,
+      "y": 0,
+      "width": 1706,
+      "height": 1018,
       "state": {
         "sidebar": {
           "width": 342,
@@ -12,7 +12,6 @@
             "/AdvantageKit",
             "/AdvantageKit/RealOutputs/Vision/AprilTags/Filtering",
             "/AdvantageKit/RealOutputs/Vision/AprilTags",
-            "/SmartDashboard",
             "/SmartDashboard/Intake",
             "/AdvantageKit/Arm/absoluteEncoderAngle",
             "/AdvantageKit/RealOutputs",
@@ -45,14 +44,14 @@
             "/AdvantageKit/Drive",
             "/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps",
             "/photonvision/.timesync",
-            "/AdvantageKit/Drive/Gyro",
             "/AdvantageKit/Drive/Gyro/YawPosition",
             "/AdvantageKit/Drive/Gyro/OdometryYawPositions",
-            "/AdvantageKit/Drive/Gyro/OdometryYawPositions/6"
+            "/AdvantageKit/Drive/Gyro/OdometryYawPositions/6",
+            "/AdvantageKit/RealOutputs/CoralHolder"
           ]
         },
         "tabs": {
-          "selected": 2,
+          "selected": 1,
           "tabs": [
             {
               "type": 0,
@@ -103,7 +102,7 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
+                "game": "2025 Field (Welded)",
                 "origin": "blue"
               },
               "controllerUUID": "5mksczgiclyud8rihcbi5bv3ld4ujof7",
@@ -130,8 +129,8 @@
                 "sources": [
                   {
                     "type": "robot",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/PrimaryEstimatorPose",
-                    "logType": "Pose2d",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/PrimaryEstimatorPoseWith3dRot",
+                    "logType": "Pose3d",
                     "visible": true,
                     "options": {
                       "model": "WCP CC"
@@ -144,6 +143,16 @@
                     "visible": true,
                     "options": {
                       "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/SetpointsOptimized",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
                       "arrangement": "0,1,2,3"
                     }
                   },
@@ -166,8 +175,8 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/PrimaryEstimatorPose",
-                    "logType": "Pose2d",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/RobotState/PrimaryEstimatorPoseWith3dRot",
+                    "logType": "Pose3d",
                     "visible": true,
                     "options": {
                       "model": "WCP CC",
@@ -250,7 +259,7 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
+                "game": "2025 Field (Welded)",
                 "origin": "blue"
               },
               "controllerUUID": "xsrx25f4oj63akofvijnzfcfcqyd3see",
@@ -258,14 +267,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -6.187476246134381,
-                  3.384287072258902,
-                  2.8980061641256283
+                  -10.653926671135086,
+                  4.283215811461664,
+                  -9.777025167553953
                 ],
                 "cameraTarget": [
-                  -4.309524061345174,
-                  -1.3688386060959243,
-                  1.2183867020897112
+                  -4.7311125844403605,
+                  -0.1434637357160557,
+                  0.3765014461987262
                 ]
               },
               "controlsHeight": 317
@@ -340,7 +349,7 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
+                "game": "2025 Field (Welded)",
                 "bumpers": "auto",
                 "origin": "blue",
                 "orientation": 0,

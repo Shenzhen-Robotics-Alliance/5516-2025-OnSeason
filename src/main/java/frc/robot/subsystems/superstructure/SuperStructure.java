@@ -47,7 +47,9 @@ public class SuperStructure {
         HIGH_ALGAE(1.1, Degrees.of(-45)),
         SCORE_ALGAE(0.2, Degrees.of(-45)),
         ALGAE_SWAP_1(0.3, Degrees.of(110)),
-        ALGAE_SWAP_2(0.3, Degrees.of(-45));
+        ALGAE_SWAP_2(0.3, Degrees.of(-45)),
+        ALGAE_SWAP_3(0.9, Degrees.of(110)),
+        ALGAE_SWAP_4(0.9, Degrees.of(-45));
 
         public final double elevatorHeightMeters;
         public final Angle armAngle;
@@ -89,14 +91,20 @@ public class SuperStructure {
             // SuperStructurePose.HIGH_SWAP_LEGACY),
             //            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY)
 
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.ALGAE_SWAP_1),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.LOW_ALGAE),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.HIGH_ALGAE),
-            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.HIGH_ALGAE),
-            new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_ALGAE));
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.ALGAE_SWAP_3),
+            new PoseLink(SuperStructurePose.SCORE_L4, SuperStructurePose.ALGAE_SWAP_3),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_3, SuperStructurePose.ALGAE_SWAP_4),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.LOW_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.SCORE_ALGAE));
 
     /**
      * Represents a link between two super structure poses
