@@ -20,8 +20,9 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class ThreeCoralShort implements Auto {
-    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(1);
+    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.8);
     public static final Time WAIT_FOR_SUPER_STRUCTURE_TIMEOUT = Seconds.of(0.5);
+    public static final Time SCORING_TIME = Seconds.of(0.5);
 
     private final boolean isRightSide;
 
@@ -66,7 +67,7 @@ public class ThreeCoralShort implements Auto {
                 robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, Commands.none()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
-        commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
+        commandGroup.addCommands(robot.scoreCoral(SCORING_TIME.in(Seconds)));
 
         // Grab second
         commandGroup.addCommands(
@@ -82,7 +83,7 @@ public class ThreeCoralShort implements Auto {
                 robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, Commands.none()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
-        commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
+        commandGroup.addCommands(robot.scoreCoral(SCORING_TIME.in(Seconds)));
 
         // Grab third
         commandGroup.addCommands(
@@ -98,7 +99,7 @@ public class ThreeCoralShort implements Auto {
                 robot, Auto.getChoreoPath("place third", isRightSide), thirdGoalAndFourthGoal, Commands.none()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
-        commandGroup.addCommands(robot.coralHolder.scoreCoral().asProxy());
+        commandGroup.addCommands(robot.scoreCoral(SCORING_TIME.in(Seconds)));
 
         // Grab fourth
         commandGroup.addCommands(

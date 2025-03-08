@@ -25,7 +25,8 @@ public class SuperStructure {
         INTAKE(0, Degrees.of(136)),
         SCORE_L2(0.22, Degrees.of(110)),
         SCORE_L3(0.66, Degrees.of(110)),
-        SCORE_L4(1.30, Degrees.of(85)),
+        SCORE_L4(1.28, Degrees.of(88)),
+        SCORE_L4_COMPLETE(1.32, Degrees.of(82)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
@@ -82,6 +83,8 @@ public class SuperStructure {
 
             // from high swap we can run to l4
             new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4),
+            new PoseLink(SuperStructurePose.HIGH_SWAP, SuperStructurePose.SCORE_L4_COMPLETE),
+            new PoseLink(SuperStructurePose.SCORE_L4, SuperStructurePose.SCORE_L4_COMPLETE),
 
             // Legacy links (for dev bot)
             //            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.PREPARE_TO_RUN_UP_LEGACY),

@@ -324,6 +324,16 @@ public class RobotContainer {
                 .schedule();
     }
 
+    public Command scoreCoral(double scoringTimeOut) {
+        Command retrieveElevator = superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE);
+        return Commands.deferredProxy(() -> superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4_COMPLETE)
+                        .onlyIf(() -> superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_L4)
+                        .beforeStarting(Commands.waitSeconds(0.1))
+                        .alongWith(coralHolder.scoreCoral(scoringTimeOut)))
+                .finallyDo(retrieveElevator::schedule);
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link Joystick} or {@link XboxController}), and then passing it to
@@ -397,7 +407,7 @@ public class RobotContainer {
                         .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
-        driver.scoreButton().whileTrue(coralHolder.scoreCoral());
+        driver.scoreButton().whileTrue(scoreCoral(5.0));
 
         operator.povDown()
                 .and(operator.leftBumper().or(isAlgaeMode))

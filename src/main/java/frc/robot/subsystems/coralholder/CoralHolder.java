@@ -161,11 +161,10 @@ public class CoralHolder extends SubsystemBase {
     }
 
     /** Score the Coral inside the holder. */
-    public Command scoreCoral() {
-        return runVolts(VOLTAGE_SETTINGS.SHOOT_VOLTS(), 2)
-                .until(hasCoral.negate())
+    public Command scoreCoral(double timeOutSeconds) {
+        return runVolts(VOLTAGE_SETTINGS.SHOOT_VOLTS(), 1)
                 .finallyDo(() -> setVoltage(0.0, 0.0))
-                .withTimeout(0.6);
+                .withTimeout(timeOutSeconds);
     }
 
     public Command runVolts(double rollerVolts, double feederVolts) {
