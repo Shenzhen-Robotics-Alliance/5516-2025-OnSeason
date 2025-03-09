@@ -3,25 +3,19 @@ package frc.robot.commands.reefscape;
 import static frc.robot.constants.ReefConstants.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.DriverMap;
 import frc.robot.RobotContainer;
 import frc.robot.commands.drive.AutoAlignment;
 import frc.robot.constants.DriveControlLoops;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
-import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
-import java.util.function.Supplier;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -137,7 +131,7 @@ public class ReefAlignment {
     }
 
     public static Command followPathAndAlign(
-            RobotContainer robot, PathPlannerPath path, int targetId, Command toRunAtPreciseAlignment) {
+            RobotContainer robot, PathPlannerPath path, int targetId, Command... toScheduleBeforePreciseAlignment) {
         return Commands.deferredProxy(() -> {
             BranchTarget branchTarget = (FieldMirroringUtils.isSidePresentedAsRed()
                             ? REEF_ALIGNMENT_POSITIONS_RED
@@ -146,18 +140,16 @@ public class ReefAlignment {
             return AutoAlignment.followPathAndAutoAlignStatic(
                             robot.drive,
                             robot.aprilTagVision,
+                            robot.ledStatusLight,
                             path,
                             branchTarget.autoAlignmentTarget(),
                             DriveControlLoops.REEF_ALIGNMENT_CONFIG_AUTONOMOUS,
-                            preciseAlignmentLight(robot.ledStatusLight),
-                            toRunAtPreciseAlignment)
+                            toScheduleBeforePreciseAlignment)
                     .beforeStarting(() -> {
                         selectedReefPartId = targetId / 2;
                         selectedSide = targetId % 2 == 0 ? SelectedSide.LEFT : SelectedSide.RIGHT;
                     })
-                    .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED)
-                    .finallyDo(() -> alignmentComplete(robot.ledStatusLight, robot.driver)
-                            .schedule());
+                    .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED);
         });
     }
 
@@ -165,21 +157,17 @@ public class ReefAlignment {
             HolonomicDriveSubsystem drive,
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
-            DriverMap driver,
             boolean rightSide,
-            Supplier<Command> toRunAtPreciseAlignment) {
+            Command... toScheduleAtPreciseAlignment) {
         return Commands.deferredProxy(() -> AutoAlignment.pathFindAndAutoAlign(
                         drive,
                         aprilTagVision,
+                        statusLight,
                         ReefAlignment.getReefAlignmentTarget(rightSide).autoAlignmentTarget(),
-                        roughAlignmentLight(statusLight),
-                        preciseAlignmentLight(statusLight).alongWith(toRunAtPreciseAlignment.get()),
-                        DriveControlLoops.REEF_ALIGNMENT_CONFIG))
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG,
+                        toScheduleAtPreciseAlignment))
                 .beforeStarting(() -> selectedSide = rightSide ? SelectedSide.RIGHT : SelectedSide.LEFT)
-                .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED)
-                .finallyDo((interrupted) -> {
-                    if (!interrupted) alignmentComplete(statusLight, driver).schedule();
-                });
+                .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED);
     }
 
     private enum SelectedSide {
@@ -192,20 +180,5 @@ public class ReefAlignment {
 
     public static void updateDashboard() {
         Logger.recordOutput("Reef/SelectedBranch", ReefAlignment.displaySelectedBranch());
-    }
-
-    private static Command roughAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight.playAnimation(new LEDAnimation.Rainbow(), 1).repeatedly();
-    }
-
-    private static Command preciseAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 3);
-    }
-
-    private static Command alignmentComplete(LEDStatusLight statusLight, DriverMap driver) {
-        return statusLight
-                .playAnimation(new LEDAnimation.ShowColor(Color.kGreen), 0.5)
-                // .alongWith(driver.rumbleLeftRight(0.25))
-                .ignoringDisable(true);
     }
 }

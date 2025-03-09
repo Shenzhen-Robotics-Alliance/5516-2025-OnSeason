@@ -276,7 +276,7 @@ public class RobotContainer {
 
     private boolean isDSPresentedAsRed = FieldMirroringUtils.isSidePresentedAsRed();
     private Command autonomousCommand = Commands.none();
-    private Auto previouslySelectedAuto = null;
+    private Auto previouslySelectedAuto = Auto.none();
     /** reconfigures button bindings if alliance station has changed re-create autos if not yet created */
     public void checkForCommandChanges() {
         final Auto selectedAuto = autoChooser.get();
@@ -370,11 +370,9 @@ public class RobotContainer {
 
         /* auto alignment example, delete it for your project */
         driver.autoAlignmentButtonLeft()
-                .whileTrue(ReefAlignment.alignmentToBranch(
-                        drive, aprilTagVision, ledStatusLight, driver, false, Commands::none));
+                .whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, ledStatusLight, false));
         driver.autoAlignmentButtonRight()
-                .whileTrue(ReefAlignment.alignmentToBranch(
-                        drive, aprilTagVision, ledStatusLight, driver, true, Commands::none));
+                .whileTrue(ReefAlignment.alignmentToBranch(drive, aprilTagVision, ledStatusLight, true));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 

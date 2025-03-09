@@ -6,6 +6,7 @@ import static edu.wpi.first.units.Units.Meters;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
+import frc.robot.Robot;
 import frc.robot.commands.reefscape.ReefAlignment;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,12 +20,19 @@ public class ReefConstants {
         ReefAlignment.BranchTarget target2 = REEF_ALIGNMENT_POSITIONS_RED[0];
     }
 
-    public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_BLUE = generateReefConstants(
-            new ReefAlignment.BranchTarget(
-                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.22, 4.18), 18, false),
-            new ReefAlignment.BranchTarget(
-                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.21, 3.87), 18, true),
-            DriverStation.Alliance.Blue);
+    private static final ReefAlignment.BranchTarget MEASURED_TARGET_LEFT = Robot.CURRENT_ROBOT_MODE == RobotMode.SIM
+            ? new ReefAlignment.BranchTarget(
+                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.28, 4.18), 18, false)
+            : new ReefAlignment.BranchTarget(
+                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.22, 4.18), 18, false);
+
+    private static final ReefAlignment.BranchTarget MEASURED_TARGET_RIGHT = Robot.CURRENT_ROBOT_MODE == RobotMode.SIM
+            ? new ReefAlignment.BranchTarget(
+                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.28, 3.87), 18, true)
+            : new ReefAlignment.BranchTarget(
+                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.21, 3.87), 18, true);
+    public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_BLUE =
+            generateReefConstants(MEASURED_TARGET_LEFT, MEASURED_TARGET_RIGHT, DriverStation.Alliance.Blue);
     //            new ReefAlignment.BranchTarget[] {
     //        new ReefAlignment.BranchTarget(
     //                Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.22, 4.18), 18, false),
@@ -79,12 +87,8 @@ public class ReefConstants {
     //                Rotation2d.fromDegrees(-60), new Translation2d(3.6, 5.8), new Translation2d(3.70, 5.04), 19, true)
     //    };
 
-    public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_RED = generateReefConstants(
-            new ReefAlignment.BranchTarget(
-                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.22, 4.18), 18, false),
-            new ReefAlignment.BranchTarget(
-                    Rotation2d.fromDegrees(0), new Translation2d(2.4, 4.0), new Translation2d(3.21, 3.87), 18, true),
-            DriverStation.Alliance.Red);
+    public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_RED =
+            generateReefConstants(MEASURED_TARGET_LEFT, MEASURED_TARGET_RIGHT, DriverStation.Alliance.Red);
     //            new ReefAlignment.BranchTarget[] {
     //        new ReefAlignment.BranchTarget(
     //                Rotation2d.fromDegrees(180), new Translation2d(15, 3.8), new Translation2d(14.34, 3.87), 7,
