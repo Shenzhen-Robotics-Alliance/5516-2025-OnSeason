@@ -1,15 +1,20 @@
 package frc.robot.commands.reefscape;
 
+import static edu.wpi.first.units.Units.Centimeters;
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.constants.ReefConstants.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import frc.robot.commands.drive.AutoAlignment;
 import frc.robot.constants.DriveControlLoops;
+import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
@@ -20,6 +25,8 @@ import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
 public class ReefAlignment {
+    public static final Distance ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE = Meters.of(1.25);
+    public static final Distance ROUGH_APPROACH_POSE_TO_TARGET_MARGIN = Centimeters.of(15);
     private static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.5, 4);
 
     public record BranchTarget(
@@ -46,6 +53,27 @@ public class ReefAlignment {
                     OptionalInt.of(tagId),
                     rightSide ? 0 : 1,
                     rightSide ? 2 : 3);
+        }
+
+        public static BranchTarget measured(
+                int tagID, boolean rightSide, Distance distanceToTag, Distance biasFromCenter) {
+            Pose2d tagPose =
+                    VisionConstants.fieldLayout.getTagPose(tagID).orElseThrow().toPose2d();
+            Twist2d tagToTarget =
+                    new Twist2d(distanceToTag.in(Meters), (rightSide ? 1 : -1) * biasFromCenter.in(Meters), 0);
+            Twist2d tagToRoughTarget = new Twist2d(
+                    ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE.in(Meters),
+                    (rightSide ? 1 : -1) * ROUGH_APPROACH_POSE_TO_TARGET_MARGIN.in(Meters),
+                    0);
+            Translation2d targetPosition = tagPose.exp(tagToTarget).getTranslation();
+            Translation2d roughTargetPosition = tagPose.exp(tagToRoughTarget).getTranslation();
+
+            return new ReefAlignment.BranchTarget(
+                    tagPose.getRotation().rotateBy(Rotation2d.k180deg),
+                    roughTargetPosition,
+                    targetPosition,
+                    tagID,
+                    rightSide);
         }
     }
 
@@ -180,5 +208,14 @@ public class ReefAlignment {
 
     public static void updateDashboard() {
         Logger.recordOutput("Reef/SelectedBranch", ReefAlignment.displaySelectedBranch());
+        int selectedBranchTagID = getReefAlignmentTarget(false).tagId;
+        Optional<Pose3d> tagPose3d = VisionConstants.fieldLayout.getTagPose(selectedBranchTagID);
+        if (tagPose3d.isEmpty()) return;
+        Pose2d tagRawPose = tagPose3d.get().toPose2d();
+        Pose2d tagPose =
+                new Pose2d(tagRawPose.getTranslation(), tagRawPose.getRotation().rotateBy(Rotation2d.k180deg));
+        Logger.recordOutput(
+                "Reef/RobotToSelectedBranchTag",
+                RobotState.getInstance().getVisionPose().log(tagPose));
     }
 }
