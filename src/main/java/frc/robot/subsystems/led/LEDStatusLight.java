@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
@@ -16,9 +17,12 @@ public class LEDStatusLight extends SubsystemBase {
     private final String[] dashboardColorsHex;
     private final AddressableLEDBuffer buffer;
     private final AddressableLEDBufferView[] views;
+    private final boolean[] viewsReversed;
 
     public LEDStatusLight(int port, int lengthOfEachSide, boolean... viewsReversed) {
-        // make sure length is even
+        if (Robot.isSimulation()) Arrays.fill(viewsReversed, true);
+        this.viewsReversed = viewsReversed;
+
         int length = lengthOfEachSide * viewsReversed.length;
 
         this.ledColors = new Color[lengthOfEachSide];
@@ -29,12 +33,8 @@ public class LEDStatusLight extends SubsystemBase {
         this.buffer = new AddressableLEDBuffer(length);
 
         views = new AddressableLEDBufferView[viewsReversed.length];
-        int tmp = 0;
-        for (int i = 0; i < viewsReversed.length; i++) {
-            views[i] = buffer.createView(tmp, lengthOfEachSide);
-            if (viewsReversed[i]) views[i] = views[i].reversed();
-            tmp += lengthOfEachSide;
-        }
+        for (int i = 0; i < viewsReversed.length; i++)
+            views[i] = buffer.createView(i * lengthOfEachSide, lengthOfEachSide);
 
         if (led != null) led.close();
         led = new AddressableLED(port);
@@ -45,8 +45,9 @@ public class LEDStatusLight extends SubsystemBase {
 
     @Override
     public void periodic() {
-        for (AddressableLEDBufferView view : views)
-            for (int i = 0; i < ledColors.length; i++) view.setLED(i, ledColors[i]);
+        for (int led = 0; led < viewsReversed.length; led++)
+            for (int i = 0; i < ledColors.length; i++)
+                views[led].setLED(viewsReversed[led] ? ledColors.length - i - 1 : i, ledColors[i]);
         led.setData(buffer);
         for (int i = 0; i < DASHBOARD_DISPLAY_LENGTH; i++) dashboardColorsHex[i] = dashboardColors[i].toHexString();
         Logger.recordOutput("Status Light", dashboardColorsHex);
