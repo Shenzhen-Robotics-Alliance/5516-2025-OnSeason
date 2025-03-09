@@ -25,8 +25,8 @@ public class SuperStructure {
         INTAKE(0, Degrees.of(136)),
         SCORE_L2(0.22, Degrees.of(110)),
         SCORE_L3(0.66, Degrees.of(110)),
-        SCORE_L4(1.28, Degrees.of(88)),
-        SCORE_L4_COMPLETE(1.32, Degrees.of(82)),
+        SCORE_L4(1.24, Degrees.of(98)),
+        SCORE_L4_COMPLETE(1.30, Degrees.of(84)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
@@ -37,7 +37,7 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.30, Degrees.of(110)),
+        HIGH_SWAP(1.26, Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),

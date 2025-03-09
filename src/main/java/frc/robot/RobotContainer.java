@@ -325,13 +325,10 @@ public class RobotContainer {
     }
 
     public Command scoreCoral(double scoringTimeOut) {
-        Command retrieveElevator = superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE);
         return Commands.deferredProxy(() -> superStructure
-                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4_COMPLETE)
-                        .onlyIf(() -> superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_L4)
-                        .beforeStarting(Commands.waitSeconds(0.1))
-                        .alongWith(coralHolder.scoreCoral(scoringTimeOut)))
-                .finallyDo(retrieveElevator::schedule);
+                .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4_COMPLETE)
+                .onlyIf(() -> superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_L4)
+                .alongWith(coralHolder.scoreCoral(scoringTimeOut)));
     }
 
     /**
@@ -409,7 +406,9 @@ public class RobotContainer {
                         .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
-        driver.scoreButton().whileTrue(scoreCoral(3.0));
+        driver.scoreButton()
+                .onTrue(scoreCoral(1.0))
+                .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
         operator.povDown()
                 .and(operator.leftBumper().or(isAlgaeMode))

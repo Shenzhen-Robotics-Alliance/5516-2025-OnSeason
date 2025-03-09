@@ -41,7 +41,7 @@ public class DriveControlLoops {
                     Meters.of(0.2),
                     MetersPerSecond.of(1.6),
                     Meters.of(0.3),
-                    MetersPerSecond.of(0.4),
+                    MetersPerSecond.of(0.2),
                     MetersPerSecondPerSecond.of(2.4));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
@@ -49,7 +49,7 @@ public class DriveControlLoops {
                     Meters.of(0.5),
                     MetersPerSecond.of(1.6),
                     Meters.of(0.6),
-                    MetersPerSecond.of(0.4),
+                    MetersPerSecond.of(0.2),
                     MetersPerSecondPerSecond.of(2.4));
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
