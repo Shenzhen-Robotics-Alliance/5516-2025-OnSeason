@@ -137,6 +137,13 @@ public class CoralHolder extends SubsystemBase {
                 .finallyDo(() -> setVoltage(0.0, 0.0));
     }
 
+    public Command moveCoralToPlace() {
+        return runVolts(VOLTAGE_SETTINGS.SHUFFLE_VOLTS(), 1.0)
+                .until(coralInPlace)
+                .onlyIf(coralInPlace.negate().and(firstSensor))
+                .finallyDo(() -> setVoltage(0.0, 0.0));
+    }
+
     /**
      * Shuffles the coral such that.
      *

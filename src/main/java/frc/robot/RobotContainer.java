@@ -7,7 +7,6 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
 
-import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.*;
@@ -227,26 +226,11 @@ public class RobotContainer {
                 || superStructure.targetPose() == SuperStructure.SuperStructurePose.ALGAE_SWAP_2
                 || superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_ALGAE);
         configureButtonBindings();
-        configureAutoNamedCommands();
         configureLEDEffects();
 
         SmartDashboard.putData("Field", field);
 
         setMotorBrake(true);
-    }
-
-    private void configureAutoNamedCommands() {
-        NamedCommands.registerCommand(
-                "Raise Elevator",
-                superStructure
-                        .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                        .deadlineFor(coralHolder
-                                .intakeCoralSequence()
-                                .withTimeout(0.3)
-                                .andThen(coralHolder.keepCoralShuffledForever()))
-                        // only raise elevator if coral in place to avoid getting jammed
-                        .onlyIf(coralHolder.hasCoral)
-                        .asProxy());
     }
 
     private void configureAutoTriggers(PathPlannerAuto pathPlannerAuto) {}
@@ -332,6 +316,18 @@ public class RobotContainer {
                 .alongWith(coralHolder.scoreCoral(scoringTimeOut)));
     }
 
+    public Command moveToL4() {
+        Command shuffleCoralDuringElevatorMovement = Commands.waitSeconds(0.3)
+                .deadlineFor(coralHolder.moveCoralToPlace())
+                .andThen(coralHolder.keepCoralShuffledForever());
+        return superStructure
+                .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
+                .deadlineFor(shuffleCoralDuringElevatorMovement)
+                // only raise elevator if coral in place to avoid getting jammed
+                .onlyIf(coralHolder.hasCoral)
+                .asProxy();
+    }
+
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link Joystick} or {@link XboxController}), and then passing it to
@@ -392,9 +388,7 @@ public class RobotContainer {
         driver.moveToL3Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
                 .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.moveToL4Button()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
-                .onTrue(coralHolder.keepCoralShuffledForever());
+        driver.moveToL4Button().onTrue(moveToL4());
 
         // Retrieve elevator at the start of teleop
         new Trigger(DriverStation::isTeleopEnabled)

@@ -329,7 +329,7 @@ public class SuperStructure {
     public Command warmUpCommand() {
         return Commands.run(this::testTrajectoryGen)
                 .until(DriverStation::isEnabled)
-                .withTimeout(5)
+                .withTimeout(10)
                 .ignoringDisable(true);
     }
 }

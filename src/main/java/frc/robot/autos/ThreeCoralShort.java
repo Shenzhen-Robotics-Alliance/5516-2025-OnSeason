@@ -2,6 +2,7 @@ package frc.robot.autos;
 
 import static edu.wpi.first.units.Units.Seconds;
 
+import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -49,19 +50,14 @@ public class ThreeCoralShort implements Auto {
         Command intakeCoral = robot.coralHolder
                 .intakeCoralSequence()
                 .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+        NamedCommands.registerCommand("Raise Elevator", robot.moveToL4());
 
         int firstGoal = isRightSide ? 4 : 9;
         int secondGoal = isRightSide ? 3 : 10;
         int thirdGoalAndFourthGoal = isRightSide ? 2 : 11;
 
         // Score preloaded
-        Command raiseElevatorForPreloaded = robot.superStructure
-                .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                .deadlineFor(Commands.waitSeconds(0.3).andThen(robot.coralHolder.keepCoralShuffledForever()))
-                // only raise elevator if coral in place to avoid getting jammed
-                .onlyIf(robot.coralHolder.secondSensor)
-                .asProxy();
-        Command waitAndRaiseElevator = Commands.waitSeconds(0.7).andThen(raiseElevatorForPreloaded);
+        Command waitAndRaiseElevator = Commands.waitSeconds(0.7).andThen(robot.moveToL4());
         commandGroup.addCommands(Commands.runOnce(waitAndRaiseElevator::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, Commands.none()));
