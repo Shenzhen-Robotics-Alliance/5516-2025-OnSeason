@@ -21,6 +21,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.*;
@@ -173,6 +174,9 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         Logger.recordOutput(
                 "RobotState/TippingAngleDeg",
                 Math.toDegrees(TipOverDetection.getTippingAngleRad(getDriveTrain3dOrientation())));
+
+        if (DriverStation.isDisabled())
+            this.setpoint = new SwerveSetpoint(new ChassisSpeeds(), getModuleStates(), DriveFeedforwards.zeros(4));
     }
 
     private void fetchOdometryInputs() {
