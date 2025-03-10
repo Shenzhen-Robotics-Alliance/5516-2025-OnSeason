@@ -104,7 +104,7 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 driveSimulation = null;
 
-                powerDistribution = LoggedPowerDistribution.getInstance(0, PowerDistribution.ModuleType.kCTRE);
+                powerDistribution = LoggedPowerDistribution.getInstance(1, PowerDistribution.ModuleType.kRev);
 
                 /* CTRE Chassis: */
                 drive = new SwerveDrive(
