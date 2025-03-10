@@ -57,10 +57,10 @@ public class ThreeCoralShort implements Auto {
         int thirdGoalAndFourthGoal = isRightSide ? 2 : 11;
 
         // Score preloaded
-        Command waitAndRaiseElevator = Commands.waitSeconds(0.7).andThen(robot.moveToL4());
+        Command waitAndRaiseElevator = Commands.waitSeconds(0.6).andThen(robot.moveToL4());
         commandGroup.addCommands(Commands.runOnce(waitAndRaiseElevator::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                robot, Auto.getChoreoPath("place first", isRightSide), firstGoal, Commands.none()));
+                robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, Commands.none()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(robot.scoreCoral(SCORING_TIME.in(Seconds)));

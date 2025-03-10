@@ -41,7 +41,7 @@ public class PPWarmUp {
     public static Command choreoWarmUp(HolonomicDriveSubsystem driveSubsystem) {
         PathPlannerPath path;
         try {
-            path = PathPlannerPath.fromChoreoTrajectory("place first");
+            path = PathPlannerPath.fromChoreoTrajectory("place preload");
         } catch (Exception e) {
             return Commands.none();
         }

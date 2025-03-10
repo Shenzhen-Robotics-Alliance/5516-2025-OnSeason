@@ -48,11 +48,12 @@
             "/AdvantageKit/RealOutputs/FieldSimulation/Coral/0",
             "/AdvantageKit/RealOutputs/FieldSimulation/Coral/0/translation",
             "/AdvantageKit/RealOutputs/Reef",
-            "/AdvantageKit/RealOutputs/Reef/RobotToSelectedBranchTag"
+            "/AdvantageKit/RealOutputs/Reef/RobotToSelectedBranchTag",
+            "/AdvantageKit/RealOutputs/SwerveStates"
           ]
         },
         "tabs": {
-          "selected": 4,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -171,6 +172,16 @@
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {}
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/SetpointsOptimized",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "arrangement": "0,1,2,3"
+                    }
                   },
                   {
                     "type": "ghost",
@@ -316,6 +327,16 @@
                     "options": {
                       "color": "#00ff00",
                       "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "NT:/AdvantageKit/RealOutputs/SwerveStates/Setpoints",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "arrangement": "0,1,2,3"
                     }
                   },
                   {
@@ -570,19 +591,19 @@
   ],
   "satellites": [
     {
-      "x": 305,
-      "y": -557,
-      "width": 903,
-      "height": 503,
+      "x": 304,
+      "y": -558,
+      "width": 908,
+      "height": 508,
       "state": {
         "type": 3,
         "visualizer": {
           "cameraIndex": -1,
           "orbitFov": 50,
           "cameraPosition": [
-            0.000006554201630917788,
+            0.000006553765289521601,
             -12.700378782437484,
-            -0.00001145829136793999
+            -0.000011457528540194528
           ],
           "cameraTarget": [
             0,
