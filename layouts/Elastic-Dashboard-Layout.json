@@ -25,24 +25,6 @@
             }
           },
           {
-            "title": "BatteryVoltage",
-            "x": 1152.0,
-            "y": 0.0,
-            "width": 256.0,
-            "height": 256.0,
-            "type": "Graph",
-            "properties": {
-              "topic": "/AdvantageKit/SystemStats/BatteryVoltage",
-              "period": 0.033,
-              "data_type": "double",
-              "time_displayed": 5.0,
-              "min_value": 6.0,
-              "max_value": 15.0,
-              "color": 4280193279,
-              "line_width": 4.0
-            }
-          },
-          {
             "title": "BrownedOut",
             "x": 640.0,
             "y": 640.0,
@@ -70,11 +52,11 @@
               "topic": "/AdvantageKit/PowerDistribution/TotalCurrent",
               "period": 0.033,
               "data_type": "double",
-              "time_displayed": 5.0,
+              "time_displayed": 10.0,
               "min_value": 0.0,
-              "max_value": 240.0,
+              "max_value": 150.0,
               "color": 4294901963,
-              "line_width": 4.0
+              "line_width": 3.5
             }
           },
           {
@@ -242,6 +224,24 @@
               "topic": "/SmartDashboard/Enable Motor Brake",
               "period": 0.06,
               "show_type": false
+            }
+          },
+          {
+            "title": "Voltage",
+            "x": 1152.0,
+            "y": 0.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "Graph",
+            "properties": {
+              "topic": "/AdvantageKit/PowerDistribution/Voltage",
+              "period": 0.033,
+              "data_type": "double",
+              "time_displayed": 10.0,
+              "min_value": 8.0,
+              "max_value": 14.0,
+              "color": 4292083716,
+              "line_width": 3.5
             }
           }
         ]

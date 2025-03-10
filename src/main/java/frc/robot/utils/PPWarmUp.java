@@ -35,7 +35,7 @@ public class PPWarmUp {
                                         0.048, 5.0, 1.2, DCMotor.getKrakenX60(1).withReduction(6.14), 60.0, 1),
                                 DriveTrainConstants.MODULE_TRANSLATIONS))
                 .repeatedly()
-                .withTimeout(4);
+                .withTimeout(8);
     }
 
     public static Command choreoWarmUp(HolonomicDriveSubsystem driveSubsystem) {
@@ -60,7 +60,7 @@ public class PPWarmUp {
                                 DriveTrainConstants.MODULE_TRANSLATIONS),
                         () -> false)
                 .repeatedly()
-                .withTimeout(4);
+                .withTimeout(5);
     }
 
     public static Command alignmentWarmUp() {
