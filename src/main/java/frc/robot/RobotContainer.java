@@ -108,9 +108,7 @@ public class RobotContainer {
 
                 /* CTRE Chassis: */
                 drive = new SwerveDrive(
-                        Objects.equals(TunerConstants.kCANBus.getName(), "rio")
-                                ? SwerveDrive.DriveType.CTRE_ON_RIO
-                                : SwerveDrive.DriveType.CTRE_ON_CANIVORE,
+                        SwerveDrive.DriveType.CTRE_TIME_SYNCHRONIZED,
                         new GyroIOPigeon2(TunerConstants.DrivetrainConstants),
                         new CanBusIOReal(TunerConstants.kCANBus),
                         new ModuleIOTalon(TunerConstants.FrontLeft, "FrontLeft"),

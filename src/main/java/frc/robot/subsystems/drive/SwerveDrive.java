@@ -44,8 +44,8 @@ import org.littletonrobotics.junction.Logger;
 public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsystem {
     public enum DriveType {
         GENERIC,
-        CTRE_ON_RIO,
-        CTRE_ON_CANIVORE
+        CTRE,
+        CTRE_TIME_SYNCHRONIZED
     }
 
     private final GyroIO gyroIO;

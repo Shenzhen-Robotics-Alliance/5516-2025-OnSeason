@@ -8,6 +8,7 @@ package frc.robot;
 // the root directory of this project.
 
 import static edu.wpi.first.units.Units.*;
+import static frc.robot.constants.DriveControlLoops.*;
 import static frc.robot.constants.DriveTrainConstants.*;
 import static frc.robot.constants.VisionConstants.*;
 
@@ -25,7 +26,6 @@ import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Subsystem;
-import frc.robot.constants.DriveControlLoops;
 import frc.robot.subsystems.vision.apriltags.MapleMultiTagPoseEstimator;
 import frc.robot.utils.AlertsManager;
 import java.util.NoSuchElementException;
@@ -210,17 +210,26 @@ public class RobotState {
     public Pose2d getPoseWithLookAhead() {
         Pose2d currentPose = getPose();
         ChassisSpeeds speeds = getRobotRelativeSpeeds();
+        double translationalLookaheadTimeSeconds =
+                switch (navigationMode) {
+                    case SENSOR_LESS_ODOMETRY -> TRANSLATIONAL_LOOKAHEAD_TIME_SENSOR_LESS.in(Seconds);
+                    case VISION_FUSED_ODOMETRY, VISION_GUIDED -> TRANSLATIONAL_LOOKAHEAD_TIME_VISION.in(Seconds);
+                };
+        double rotationalLookaheadTimeSeconds =
+                switch (navigationMode) {
+                    case SENSOR_LESS_ODOMETRY -> ROTATIONAL_LOOKAHEAD_TIME_SENSOR_LESS.in(Seconds);
+                    case VISION_FUSED_ODOMETRY, VISION_GUIDED -> ROTATIONAL_LOOKAHEAD_TIME_VISION.in(Seconds);
+                };
         Twist2d lookAhead = new Twist2d(
-                speeds.vxMetersPerSecond * DriveControlLoops.TRANSLATIONAL_LOOKAHEAD_TIME,
-                speeds.vyMetersPerSecond * DriveControlLoops.TRANSLATIONAL_LOOKAHEAD_TIME,
-                speeds.omegaRadiansPerSecond * DriveControlLoops.ROTATIONAL_LOOKAHEAD_TIME);
+                speeds.vxMetersPerSecond * translationalLookaheadTimeSeconds,
+                speeds.vyMetersPerSecond * translationalLookaheadTimeSeconds,
+                speeds.omegaRadiansPerSecond * rotationalLookaheadTimeSeconds);
 
         return currentPose.exp(lookAhead);
     }
 
     public void mergeVisionOdometry() {
-        this.odometryPoseSensorLess = this.primaryEstimatorPose = this.visionSensitivePose;
-        poseBuffer.clear();
+        resetPose(visionSensitivePose);
     }
 
     public Command withNavigationMode(NavigationMode mode) {

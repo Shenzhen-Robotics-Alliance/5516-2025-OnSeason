@@ -14,12 +14,10 @@
             "/AdvantageKit/RealOutputs/Vision/AprilTags",
             "/SmartDashboard/Intake",
             "/AdvantageKit/Arm/absoluteEncoderAngle",
-            "/AdvantageKit/RealOutputs",
             "/AdvantageKit/RealOutputs/SuperStructure/measuredMechanismPoses/2",
             "/AdvantageKit/RealOutputs/SuperStructure/measuredMechanismPoses/2/translation",
             "/AdvantageKit/RealOutputs/SuperStructure/measuredMechanismPoses/2/rotation",
             "/AdvantageKit/RealOutputs/SuperStructure/measuredMechanismPoses/2/rotation/q",
-            "/AdvantageKit/Elevator",
             "/RealOutputs",
             "/RealOutputs/Elevator",
             "/ReplayOutputs",
@@ -36,22 +34,24 @@
             "/AdvantageKit/RealOutputs/SuperStructure",
             "/AdvantageKit/RealOutputs/FieldSimulation",
             "/AdvantageKit/RealOutputs/Elevator/PID",
-            "/AdvantageKit/Arm",
             "/AdvantageKit/RealOutputs/Arm/PID",
             "/AdvantageKit/RealOutputs/SwerveStates",
             "/AdvantageKit/RealOutputs/Vision",
             "/AdvantageKit/RealOutputs/LoggedRobot",
-            "/AdvantageKit/Drive",
             "/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps",
             "/photonvision/.timesync",
             "/AdvantageKit/Drive/Gyro/YawPosition",
-            "/AdvantageKit/Drive/Gyro/OdometryYawPositions",
             "/AdvantageKit/Drive/Gyro/OdometryYawPositions/6",
-            "/AdvantageKit/RealOutputs/CoralHolder"
+            "/AdvantageKit/RealOutputs/CoralHolder",
+            "/AdvantageKit/RealOutputs/Reef",
+            "/AdvantageKit/RealOutputs/Reef/RobotToSelectedBranchTag",
+            "/AdvantageKit/Drive/Gyro",
+            "/AdvantageKit/Drive",
+            "/AdvantageKit/Drive/OdometryThread"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 2,
           "tabs": [
             {
               "type": 0,
@@ -110,9 +110,9 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -27.722088745367934,
-                  14.00136479636214,
-                  -5.154484259051211
+                  -11.663639083586416,
+                  4.591762076132501,
+                  -0.5622242408486137
                 ],
                 "cameraTarget": [
                   1.2644594050437197,
@@ -267,14 +267,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -10.653926671135086,
-                  4.283215811461664,
-                  -9.777025167553953
+                  -2.2964355804746033,
+                  7.815212434414583,
+                  -0.7688052454166288
                 ],
                 "cameraTarget": [
-                  -4.7311125844403605,
-                  -0.1434637357160557,
-                  0.3765014461987262
+                  -1.8392290007728764,
+                  -1.4860433968361362,
+                  -0.7700450503476872
                 ]
               },
               "controlsHeight": 317
@@ -366,7 +366,7 @@
                 "leftSources": [
                   {
                     "type": "smooth",
-                    "logKey": "NT:/AdvantageKit/SystemStats/BatteryVoltage",
+                    "logKey": "NT:/AdvantageKit/PowerDistribution/Voltage",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -375,7 +375,18 @@
                     }
                   }
                 ],
-                "rightSources": [],
+                "rightSources": [
+                  {
+                    "type": "smooth",
+                    "logKey": "NT:/AdvantageKit/PowerDistribution/TotalCurrent",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#e5b31b",
+                      "size": "normal"
+                    }
+                  }
+                ],
                 "discreteSources": [
                   {
                     "type": "stripes",
@@ -581,7 +592,7 @@
                 "sources": [
                   {
                     "type": "independent",
-                    "logKey": "NT:/AdvantageKit/Drive/OdometryThread/MeasurementTimeStamps/length",
+                    "logKey": "NT:/AdvantageKit/Drive/OdometryThread/OdometryTicksCountInPreviousRobotPeriod",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -598,7 +609,7 @@
                     }
                   }
                 ],
-                "timeRange": "visible",
+                "timeRange": "live-10",
                 "rangeMin": 0,
                 "rangeMax": 40,
                 "stepSize": 1
@@ -621,5 +632,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.2"
+  "version": "4.1.4"
 }
