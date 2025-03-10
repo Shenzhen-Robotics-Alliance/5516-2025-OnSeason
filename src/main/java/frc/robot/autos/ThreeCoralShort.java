@@ -22,7 +22,7 @@ import org.json.simple.parser.ParseException;
 public class ThreeCoralShort implements Auto {
     public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.8);
     public static final Time WAIT_FOR_SUPER_STRUCTURE_TIMEOUT = Seconds.of(0.5);
-    public static final Time SCORING_TIME = Seconds.of(0.5);
+    public static final Time SCORING_TIME = Seconds.of(0.3);
 
     private final boolean isRightSide;
 
