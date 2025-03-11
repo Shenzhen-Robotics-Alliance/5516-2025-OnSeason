@@ -209,6 +209,25 @@ public class SuperStructure {
                 .beforeStarting(() -> goal = pose);
     }
 
+    public Command retrieveElevator() {
+        return Commands.deferredProxy(() -> moveToPose(
+                switch (targetPose()) {
+                    case IDLE,
+                            SCORE_L2,
+                            SCORE_L3,
+                            SCORE_L4,
+                            SCORE_L4_COMPLETE,
+                            LOW_SWAP_1,
+                            LOW_SWAP_2,
+                            HIGH_SWAP,
+                            ALGAE_SWAP_1,
+                            ALGAE_SWAP_3 -> SuperStructure.SuperStructurePose.IDLE;
+                    case LOW_ALGAE, HIGH_ALGAE, SCORE_ALGAE, ALGAE_SWAP_2, ALGAE_SWAP_4 -> SuperStructure
+                            .SuperStructurePose.SCORE_ALGAE;
+                    case INTAKE -> SuperStructure.SuperStructurePose.INTAKE;
+                }));
+    }
+
     private Command generateMoveToPoseCommand(SuperStructurePose pose) {
         Optional<List<SuperStructurePose>> trajectory = getTrajectory(pose);
         if (trajectory.isEmpty()) return Commands.none();

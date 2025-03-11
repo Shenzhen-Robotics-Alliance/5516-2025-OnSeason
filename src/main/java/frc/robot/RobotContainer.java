@@ -403,7 +403,8 @@ public class RobotContainer {
 
         // Retrieve elevator when robot is about to tip
         drive.driveTrainTipping
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
+                .and(isAlgaeMode.negate())
+                .onTrue(superStructure.retrieveElevator())
                 .onTrue(ledStatusLight
                         .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
                         .ignoringDisable(true));

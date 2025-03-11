@@ -67,7 +67,7 @@ public class Climb extends SubsystemBase {
 
         @Override
         public void setFlipServo(boolean activated) {
-            servo.set(activated ? 1.0 : 0.4);
+            servo.set(activated ? 0.2 : 0.7);
         }
 
         @Override
