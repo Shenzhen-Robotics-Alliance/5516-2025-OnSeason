@@ -50,7 +50,7 @@ public class ThreeCoralShort implements Auto {
         Command intakeCoral = robot.coralHolder
                 .intakeCoralSequence()
                 .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
-        NamedCommands.registerCommand("Raise Elevator", robot.moveToL4());
+        NamedCommands.registerCommand("Raise Elevator", robot.moveToL4().onlyIf(robot.coralHolder.hasCoral));
 
         int firstGoal = isRightSide ? 4 : 9;
         int secondGoal = isRightSide ? 3 : 10;

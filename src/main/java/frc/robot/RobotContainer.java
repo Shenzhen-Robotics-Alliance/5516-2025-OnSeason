@@ -329,9 +329,7 @@ public class RobotContainer {
                 .andThen(coralHolder.keepCoralShuffledForever());
         return superStructure
                 .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                .deadlineFor(shuffleCoralDuringElevatorMovement)
-                // only raise elevator if coral in place to avoid getting jammed
-                .onlyIf(coralHolder.hasCoral)
+                .deadlineFor(shuffleCoralDuringElevatorMovement.onlyIf(coralHolder.hasCoral))
                 .asProxy();
     }
 
