@@ -103,9 +103,9 @@ public class SwerveModule {
                 force2d.getNorm() * force2d.getAngle().minus(getSteerFacing()).getCos();
         double wheelFeedforwardTorque = moduleFeedforwardForceNewtons * WHEEL_RADIUS.in(Meters);
         double motorFeedforwardTorque = wheelFeedforwardTorque / DRIVE_GEAR_RATIO;
-        if (!USE_TORQUE_FEEDFORWARD) motorFeedforwardTorque = 0;
-        io.requestDriveVelocityControl(
-                RadiansPerSecond.of(desiredMotorVelocityRadPerSec), NewtonMeters.of(motorFeedforwardTorque));
+        double motorFeedforwardVoltage = DRIVE_MOTOR_MODEL.getVoltage(motorFeedforwardTorque, 0);
+        if (!USE_TORQUE_FEEDFORWARD) motorFeedforwardVoltage = 0;
+        io.requestDriveVelocityControl(desiredMotorVelocityRadPerSec, motorFeedforwardVoltage);
         Logger.recordOutput("ModuleFeedforwards/" + name + "/Wheel FF Torque (N*M)", wheelFeedforwardTorque);
         io.requestSteerPositionControl(newSetpoint.angle);
 
@@ -113,8 +113,8 @@ public class SwerveModule {
     }
 
     public void stop() {
-        io.requestDriveOpenLoop(Volts.zero());
-        io.requestSteerOpenLoop(Volts.zero());
+        io.requestDriveOpenLoop(0.0);
+        io.requestSteerOpenLoop(0.0);
     }
 
     private boolean brakeEnabled = true;
@@ -180,23 +180,9 @@ public class SwerveModule {
         return driveMotorSupplyCurrentAmps + steerMotorSupplyCurrentAmps;
     }
 
-    public void runVoltageCharacterization(Rotation2d steerFacing, Voltage driveVoltageOut) {
+    public void runVoltageCharacterization(Rotation2d steerFacing, double driveVoltageOut) {
         setMotorBrake(true);
         io.requestSteerPositionControl(steerFacing);
         io.requestDriveOpenLoop(driveVoltageOut);
-    }
-
-    public void runCurrentCharacterization(Rotation2d steerFacing, Current driveCurrentOut) {
-        setMotorBrake(true);
-        io.requestSteerPositionControl(steerFacing);
-        io.requestDriveOpenLoop(driveCurrentOut);
-    }
-
-    public static Voltage calculateFeedforwardVoltage(Torque feedforwardTorque) {
-        return Volts.of(DRIVE_MOTOR_MODEL.getVoltage(feedforwardTorque.in(NewtonMeters), 0));
-    }
-
-    public static Current calculateFeedforwardCurrent(Torque feedforwardTorque) {
-        return Amps.of(DRIVE_MOTOR_MODEL.getCurrent(feedforwardTorque.in(NewtonMeters)));
     }
 }

@@ -352,7 +352,7 @@ public class RobotContainer {
                 // driver.getController().getHID()::getPOV;
                 () -> -1;
         final JoystickDrive joystickDrive = new JoystickDrive(driveInput, () -> true, pov, drive);
-        drive.setDefaultCommand(joystickDrive);
+        drive.setDefaultCommand(joystickDrive.ignoringDisable(true));
         JoystickDrive.instance = Optional.of(joystickDrive);
 
         /* reset gyro heading manually (in case the vision does not work) */

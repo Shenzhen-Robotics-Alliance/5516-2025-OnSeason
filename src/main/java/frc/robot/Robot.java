@@ -5,11 +5,14 @@
 
 package frc.robot;
 
+import com.ctre.phoenix6.SignalLogger;
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.constants.ReefConstants;
 import frc.robot.constants.RobotMode;
+import frc.robot.constants.VisionConstants;
 import org.littletonrobotics.junction.LogFileUtil;
 import org.littletonrobotics.junction.LoggedRobot;
 import org.littletonrobotics.junction.Logger;
@@ -53,8 +56,6 @@ public class Robot extends LoggedRobot {
                 break;
         }
 
-        ReefConstants.loadStatic();
-
         // Set up data receivers & replay source
         switch (CURRENT_ROBOT_MODE) {
             case REAL -> {
@@ -85,6 +86,12 @@ public class Robot extends LoggedRobot {
 
         // Start AdvantageKit logger
         Logger.start();
+
+        // Performance Optimization
+        ReefConstants.loadStatic();
+        SignalLogger.enableAutoLogging(false);
+        Thread.currentThread().setPriority(10);
+        AprilTagFieldLayout.loadField(VisionConstants.CURRENT_FIELD);
     }
 
     /** This function is called periodically during all modes. */

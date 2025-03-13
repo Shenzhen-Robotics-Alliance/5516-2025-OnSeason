@@ -26,7 +26,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import frc.robot.generated.TunerConstants;
-import frc.robot.subsystems.drive.SwerveModule;
 
 public class ModuleIOTalon implements ModuleIO {
     private final String name;
@@ -200,44 +199,31 @@ public class ModuleIOTalon implements ModuleIO {
         this.steerBrakeEnabled = enableSteerBrake;
     }
 
+    private final VoltageOut voltageOut = new VoltageOut(0.0);
+
     @Override
-    public void requestDriveOpenLoop(Voltage output) {
-        driveTalon.setControl(new VoltageOut(output));
+    public void requestDriveOpenLoop(double outputVolts) {
+        driveTalon.setControl(voltageOut.withOutput(outputVolts));
     }
 
     @Override
-    public void requestDriveOpenLoop(Current output) {
-        driveTalon.setControl(new TorqueCurrentFOC(output));
+    public void requestSteerOpenLoop(double outputVolts) {
+        steerTalon.setControl(voltageOut.withOutput(outputVolts));
     }
 
-    @Override
-    public void requestSteerOpenLoop(Voltage output) {
-        steerTalon.setControl(new VoltageOut(output));
-    }
+    private final VelocityVoltage velocityVoltage = new VelocityVoltage(0.0);
 
     @Override
-    public void requestSteerOpenLoop(Current output) {
-        steerTalon.setControl(new TorqueCurrentFOC(output));
+    public void requestDriveVelocityControl(double desiredMotorVelocityRadPerSec, double feedforwardMotorVoltage) {
+        driveTalon.setControl(velocityVoltage
+                .withVelocity(Units.radiansToRotations(desiredMotorVelocityRadPerSec))
+                .withFeedForward(feedforwardMotorVoltage));
     }
 
-    @Override
-    public void requestDriveVelocityControl(AngularVelocity desiredMotorVelocity, Torque feedforwardMotorTorque) {
-        driveTalon.setControl(
-                switch (moduleConstants.DriveMotorClosedLoopOutput) {
-                    case Voltage -> new VelocityVoltage(desiredMotorVelocity)
-                            .withFeedForward(SwerveModule.calculateFeedforwardVoltage(feedforwardMotorTorque));
-                    case TorqueCurrentFOC -> new VelocityTorqueCurrentFOC(desiredMotorVelocity)
-                            .withFeedForward(SwerveModule.calculateFeedforwardCurrent(feedforwardMotorTorque));
-                });
-    }
+    private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
 
     @Override
     public void requestSteerPositionControl(Rotation2d desiredSteerAbsoluteFacing) {
-        double steerPosition = desiredSteerAbsoluteFacing.getRotations();
-        steerTalon.setControl(
-                switch (moduleConstants.SteerMotorClosedLoopOutput) {
-                    case Voltage -> new PositionVoltage(steerPosition);
-                    case TorqueCurrentFOC -> new PositionTorqueCurrentFOC(steerPosition);
-                });
+        steerTalon.setControl(positionVoltage.withPosition(desiredSteerAbsoluteFacing.getRotations()));
     }
 }
