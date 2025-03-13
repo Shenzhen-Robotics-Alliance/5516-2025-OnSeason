@@ -188,12 +188,14 @@ public class ReefAlignment {
             boolean rightSide,
             Command... toScheduleAtPreciseAlignment) {
         return Commands.deferredProxy(() -> AutoAlignment.pathFindAndAutoAlign(
-                        drive,
-                        aprilTagVision,
-                        statusLight,
-                        ReefAlignment.getReefAlignmentTarget(rightSide).autoAlignmentTarget(),
-                        DriveControlLoops.REEF_ALIGNMENT_CONFIG,
-                        toScheduleAtPreciseAlignment))
+                                drive,
+                                aprilTagVision,
+                                statusLight,
+                                ReefAlignment.getReefAlignmentTarget(rightSide).autoAlignmentTarget(),
+                                DriveControlLoops.REEF_ALIGNMENT_CONFIG,
+                                toScheduleAtPreciseAlignment)
+                        .withName("[Reef Alignment] Align to branch "
+                                + ReefAlignment.getBranchIndexFromReefPartId(rightSide)))
                 .beforeStarting(() -> selectedSide = rightSide ? SelectedSide.RIGHT : SelectedSide.LEFT)
                 .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED);
     }

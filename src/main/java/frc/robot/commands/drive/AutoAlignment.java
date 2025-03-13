@@ -61,7 +61,8 @@ public class AutoAlignment {
                         .beforeStarting(() -> {
                             for (Command toSchedule : toScheduleBeforePreciseAlignment) toSchedule.schedule();
                         }))
-                .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule);
+                .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule)
+                .withName("Path Find & Auto Align");
     }
 
     public static Command followPathAndAutoAlignStatic(
@@ -83,7 +84,9 @@ public class AutoAlignment {
         Command preciseAlignment = preciseAlignment(
                         driveSubsystem, target.preciseTarget(), target.preciseApproachDirection(), config)
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()))
-                .finallyDo(driveSubsystem::stop);
+                .finallyDo(driveSubsystem::stop)
+                .withName("Follow Path & Auto Align");
+        ;
 
         return followPath
                 .andThen(preciseAlignment

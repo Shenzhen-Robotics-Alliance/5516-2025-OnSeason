@@ -3,8 +3,8 @@
     {
       "x": -8,
       "y": -8,
-      "width": 1722,
-      "height": 1034,
+      "width": 1708,
+      "height": 1020,
       "state": {
         "sidebar": {
           "width": 302,
@@ -28,24 +28,24 @@
             "/RealOutputs/Vision",
             "/RealOutputs/Vision/AprilTags",
             "/RealOutputs/SuperStructure",
-            "/RealOutputs/Alerts",
             "/RealOutputs/Arm",
             "/ReplayOutputs",
-            "/ReplayOutputs/Elevator",
             "/SystemStats",
-            "/ReplayOutputs/Elevator/PID",
-            "/ReplayOutputs/LoggedRobot",
             "/Drive/OdometryThread/MeasurementTimeStamps",
-            "/ReplayOutputs/Logger",
             "/RealOutputs/Logger",
-            "/RealOutputs",
             "/RealOutputs/Elevator",
             "/DriverStation",
-            "/Elevator"
+            "/ReplayOutputs/SwerveSetpoint",
+            "/ReplayOutputs/SwerveStates",
+            "/RealOutputs",
+            "/Drive",
+            "/RealOutputs/RobotState",
+            "/RealOutputs/RobotState/PrimaryEstimatorPose",
+            "/RealOutputs/Alerts"
           ]
         },
         "tabs": {
-          "selected": 1,
+          "selected": 10,
           "tabs": [
             {
               "type": 0,
@@ -172,7 +172,7 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
+                "game": "2025 Field (Welded)",
                 "origin": "blue"
               },
               "controllerUUID": "h13qzjioih915spx6e6q3m9sk45n07de",
@@ -194,7 +194,7 @@
             },
             {
               "type": 2,
-              "title": "Odometry",
+              "title": "Navigation",
               "controller": {
                 "sources": [
                   {
@@ -222,6 +222,16 @@
                     "options": {
                       "color": "#00ff00",
                       "size": "normal"
+                    }
+                  },
+                  {
+                    "type": "swerveStates",
+                    "logKey": "/RealOutputs/SwerveStates/SetpointsOptimized",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "arrangement": "0,1,2,3"
                     }
                   },
                   {
@@ -262,13 +272,73 @@
                     }
                   }
                 ],
-                "game": "2025 Field",
+                "game": "2025 Field (Welded)",
                 "bumpers": "auto",
                 "origin": "blue",
                 "orientation": 0,
                 "size": 27
               },
               "controllerUUID": "fjrkc7vdm4tx5nzznoe3fdcx7wwk59ew",
+              "renderer": null,
+              "controlsHeight": 226
+            },
+            {
+              "type": 9,
+              "title": "Swerve",
+              "controller": {
+                "sources": [
+                  {
+                    "type": "rotation",
+                    "logKey": "/RealOutputs/RobotState/PrimaryEstimatorPose/rotation",
+                    "logType": "Rotation2d",
+                    "visible": true,
+                    "options": {}
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "/ReplayOutputs/SwerveStates/Measured",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff0000",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "states",
+                    "logKey": "/RealOutputs/SwerveStates/SetpointsOptimized",
+                    "logType": "SwerveModuleState[]",
+                    "visible": true,
+                    "options": {
+                      "color": "#00ff00",
+                      "arrangement": "0,1,2,3"
+                    }
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/ReplayOutputs/SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#ff00ff"
+                    }
+                  },
+                  {
+                    "type": "chassisSpeeds",
+                    "logKey": "/ReplayOutputs/SwerveSetpoint/desiredSpeeds",
+                    "logType": "ChassisSpeeds",
+                    "visible": true,
+                    "options": {
+                      "color": "#ffff00"
+                    }
+                  }
+                ],
+                "maxSpeed": 5,
+                "sizeX": 0.65,
+                "sizeY": 0.65,
+                "orientation": 1
+              },
+              "controllerUUID": "z0au5mcgywja7btyn22hazbgmlyinuqr",
               "renderer": null,
               "controlsHeight": 200
             },
@@ -550,7 +620,7 @@
             },
             {
               "type": 8,
-              "title": "Joysticks",
+              "title": "Driver Inputs",
               "controller": [
                 "Xbox Controller (Blue)",
                 "Xbox Controller (White)",
@@ -574,22 +644,19 @@
               "controlsHeight": 0
             },
             {
-              "type": 4,
-              "title": "Alerts",
-              "controller": [
-                "/RealOutputs/Alerts/errors",
-                "/RealOutputs/Alerts/warnings",
-                "/RealOutputs/Alerts/infos"
-              ],
-              "controllerUUID": "dmzbyvz6qhl0gzudwn1iru9qhwpzsyh2",
-              "renderer": null,
-              "controlsHeight": 0
-            },
-            {
               "type": 6,
               "title": "Performance",
               "controller": {
                 "sources": [
+                  {
+                    "type": "independent",
+                    "logKey": "/Drive/OdometryThread/OdometryTicksCountInPreviousRobotPeriod",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  },
                   {
                     "type": "independent",
                     "logKey": "/RealOutputs/LoggedRobot/FullCycleMS",
@@ -597,15 +664,6 @@
                     "visible": true,
                     "options": {
                       "color": "#2b66a2"
-                    }
-                  },
-                  {
-                    "type": "independent",
-                    "logKey": "/Drive/OdometryThread/MeasurementTimeStamps/length",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#e5b31b"
                     }
                   }
                 ],
@@ -617,12 +675,35 @@
               "controllerUUID": "b6gv92esj6gjy459dq0hbmo5r20cyde4",
               "renderer": null,
               "controlsHeight": 200
+            },
+            {
+              "type": 4,
+              "title": "Alerts",
+              "controller": [
+                "/RealOutputs/Alerts/warnings",
+                "/RealOutputs/Alerts/errors"
+              ],
+              "controllerUUID": "wzc3idxwhv7m1awjwayptmbi3ulxb1lf",
+              "renderer": null,
+              "controlsHeight": 0
             }
           ]
         }
       }
     }
   ],
-  "satellites": [],
-  "version": "4.1.2"
+  "satellites": [
+    {
+      "x": 215,
+      "y": 241,
+      "width": 659,
+      "height": 682,
+      "state": {
+        "type": 9,
+        "visualizer": null
+      },
+      "uuid": "z0au5mcgywja7btyn22hazbgmlyinuqr"
+    }
+  ],
+  "version": "4.1.4"
 }

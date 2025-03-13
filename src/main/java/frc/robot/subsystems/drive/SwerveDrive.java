@@ -219,6 +219,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     @Override
     public void runRobotCentricChassisSpeeds(ChassisSpeeds speeds) {
+        Logger.recordOutput("SwerveSetpoint/desiredSpeeds", speeds);
         if (!ENABLE_SOFTWARE_CONSTRAIN) {
             runRobotCentricSpeedsWithFeedforwards(speeds, DriveFeedforwards.zeros(4));
             return;
@@ -250,20 +251,30 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     @Override
     public void runRobotCentricSpeedsWithFeedforwards(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
+        Logger.recordOutput("SwerveSetpoint/desiredSpeeds", speeds);
         this.setpoint = new SwerveSetpoint(speeds, getModuleStates(), feedforwards);
         executeSetpoint();
     }
 
+    private SwerveSetpoint constrainSetpoint(SwerveSetpoint setpoint) {
+        ChassisSpeeds speeds = HolonomicDriveSubsystem.constrainSpeeds(setpoint.robotRelativeSpeeds());
+        SwerveDriveKinematics.desaturateWheelSpeeds(setpoint.moduleStates(), CHASSIS_MAX_VELOCITY);
+        return new SwerveSetpoint(speeds, setpoint.moduleStates(), setpoint.feedforwards());
+    }
+
     private void executeSetpoint() {
-        OptionalDouble angularVelocityOverride =
-                ChassisHeadingController.getInstance().calculate(getMeasuredChassisSpeedsFieldRelative(), getPose());
+        setpoint = constrainSetpoint(setpoint);
+        Logger.recordOutput("SwerveSetpoint/currentSwerveSpeeds", setpoint.robotRelativeSpeeds());
         ChassisSpeeds speeds = setpoint.robotRelativeSpeeds();
 
-        if (angularVelocityOverride.isPresent()) {
+        OptionalDouble angularVelocityOverride =
+                ChassisHeadingController.getInstance().calculate(getMeasuredChassisSpeedsFieldRelative(), getPose());
+        if (angularVelocityOverride.isPresent())
             speeds = new ChassisSpeeds(
                     speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, angularVelocityOverride.getAsDouble());
-            speeds = ChassisSpeeds.discretize(speeds, Robot.defaultPeriodSecs);
-        }
+        Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverride", speeds);
+        speeds = HolonomicDriveSubsystem.constrainSpeeds(speeds);
+        Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained", speeds);
 
         SwerveModuleState[] setPointStates = DRIVE_KINEMATICS.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setPointStates, CHASSIS_MAX_VELOCITY);
