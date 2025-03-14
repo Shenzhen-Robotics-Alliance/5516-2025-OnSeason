@@ -26,11 +26,15 @@ public class GyroIOPigeon2 implements GyroIO {
 
     private final boolean configurationOK;
 
-    public GyroIOPigeon2(SwerveDrivetrainConstants drivetrainConstants) {
-        this(drivetrainConstants.Pigeon2Id, drivetrainConstants.CANBusName, drivetrainConstants.Pigeon2Configs);
+    public GyroIOPigeon2(SwerveDrivetrainConstants drivetrainConstants, boolean timeSync) {
+        this(
+                drivetrainConstants.Pigeon2Id,
+                drivetrainConstants.CANBusName,
+                drivetrainConstants.Pigeon2Configs,
+                timeSync);
     }
 
-    public GyroIOPigeon2(int Pigeon2Id, String CANbusName, Pigeon2Configuration Pigeon2Configs) {
+    public GyroIOPigeon2(int Pigeon2Id, String CANbusName, Pigeon2Configuration Pigeon2Configs, boolean timeSync) {
         pigeon = new Pigeon2(Pigeon2Id, CANbusName);
         final Pigeon2Configuration configs = Objects.requireNonNullElseGet(Pigeon2Configs, Pigeon2Configuration::new);
         configurationOK = tryUntilOk(5, () -> pigeon.getConfigurator().apply(configs, 0.2));
@@ -40,7 +44,9 @@ public class GyroIOPigeon2 implements GyroIO {
         pitch = pigeon.getPitch();
         roll = pigeon.getRoll();
         yawVelocity = pigeon.getAngularVelocityZWorld();
-        yawPositionInput = OdometryThread.registerSignalSignal(yaw);
+        yawPositionInput = timeSync
+                ? OdometryThread.registerSignalSignal(yaw)
+                : OdometryThread.registerInput(() -> yaw.refresh().getValueAsDouble());
 
         BaseStatusSignal.setUpdateFrequencyForAll(100.0, pitch, roll, yawVelocity);
         BaseStatusSignal.setUpdateFrequencyForAll(ODOMETRY_FREQUENCY, yaw);

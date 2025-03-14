@@ -66,7 +66,10 @@ public class JoystickDrive extends Command {
     public void execute() {
         ChassisSpeeds pilotInputSpeeds = input.getJoystickChassisSpeeds(
                 maxMovementVelMPS * translationalSensitivity, maxRotationVelRadPerSed * rotationalSensitivity);
-        if (DriverStation.isDisabled()) pilotInputSpeeds = new ChassisSpeeds();
+        if (DriverStation.isDisabled()) {
+            pilotInputSpeeds = new ChassisSpeeds();
+            currentRotationMaintenanceSetpoint = driveSubsystem.getFacing();
+        }
 
         if (Math.abs(pilotInputSpeeds.omegaRadiansPerSecond) > 0.05) previousRotationalInputTimer.reset();
 

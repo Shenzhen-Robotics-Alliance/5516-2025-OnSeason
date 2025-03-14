@@ -110,7 +110,7 @@ public class RobotContainer {
                 /* CTRE Chassis: */
                 drive = new SwerveDrive(
                         SwerveDrive.DriveType.CTRE_TIME_SYNCHRONIZED,
-                        new GyroIOPigeon2(TunerConstants.DrivetrainConstants),
+                        new GyroIOPigeon2(TunerConstants.DrivetrainConstants, false),
                         new CanBusIOReal(TunerConstants.kCANBus),
                         new ModuleIOTalon(TunerConstants.FrontLeft, "FrontLeft"),
                         new ModuleIOTalon(TunerConstants.FrontRight, "FrontRight"),
