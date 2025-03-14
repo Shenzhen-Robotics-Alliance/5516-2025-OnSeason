@@ -51,6 +51,7 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     private Optional<MapleMultiTagPoseEstimator.VisionObservation> result = Optional.empty();
+    private OptionalInt nearestTag = OptionalInt.empty();
 
     @Override
     public void periodic() {
@@ -66,11 +67,26 @@ public class AprilTagVision extends SubsystemBase {
         result = multiTagPoseEstimator.estimateRobotPose(
                 inputs.camerasInputs, RobotState.getInstance().getPrimaryEstimatorPose(), getResultsTimeStamp());
         result.ifPresent(RobotState.getInstance()::addVisionObservation);
+        findNearestTag(inputs.camerasInputs);
 
+        Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/NearestVisibleTag", nearestTag.orElse(-1));
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Results/Estimated Pose", displayVisionPointEstimateResult(result));
         SmartDashboard.putBoolean("Vision Result Trustable", resultPresent);
         Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/Presented", resultPresent);
+    }
+
+    private void findNearestTag(AprilTagVisionIO.CameraInputs[] cameraInputs) {
+        nearestTag = OptionalInt.empty();
+        double smallestTagDistanceMeters = Double.POSITIVE_INFINITY;
+        for (AprilTagVisionIO.CameraInputs cameraInput : cameraInputs)
+            for (int i = 0; i < cameraInput.fiducialMarksID.length; i++)
+                if (cameraInput.bestCameraToTargets[i].getTranslation().getNorm() < smallestTagDistanceMeters
+                        && cameraInput.fiducialMarksID[i] != -1) {
+                    nearestTag = OptionalInt.of(cameraInput.fiducialMarksID[i]);
+                    smallestTagDistanceMeters =
+                            cameraInput.bestCameraToTargets[i].getTranslation().getNorm();
+                }
     }
 
     private static final Pose2d EMPTY_DISPLAY = new Pose2d(-114514, -114514, new Rotation2d());
@@ -119,4 +135,8 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     public final Trigger cameraDisconnected = new Trigger(this::hasCameraDisconnection);
+
+    public OptionalInt nearestVisibleTag() {
+        return nearestTag;
+    }
 }

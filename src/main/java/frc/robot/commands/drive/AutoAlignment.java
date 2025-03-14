@@ -46,10 +46,19 @@ public class AutoAlignment {
                         target.roughTarget(), target.faceToTargetDuringRoughApproach(), config)
                 .onlyIf(() -> RobotState.getInstance()
                                 .getVisionPose()
+                                .minus(target.roughTarget())
+                                .getTranslation()
+                                .getNorm()
+                        > config.distanceStartPreciseApproach.in(Meters))
+                .onlyIf(() -> RobotState.getInstance()
+                                .getVisionPose()
                                 .minus(target.preciseTarget())
                                 .getTranslation()
                                 .getNorm()
-                        > config.distanceStartPreciseApproach.in(Meters));
+                        > target.roughTarget()
+                                .minus(target.preciseTarget())
+                                .getTranslation()
+                                .getNorm());
         Command preciseAlignment = preciseAlignment(
                         driveSubsystem, target.preciseTarget(), target.preciseApproachDirection(), config)
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()));
