@@ -46,7 +46,7 @@ public class SuperStructure {
 
         LOW_ALGAE(0.65, Degrees.of(-45)),
         HIGH_ALGAE(1.1, Degrees.of(-45)),
-        SCORE_ALGAE(0.2, Degrees.of(-45)),
+        SCORE_ALGAE(0.12, Degrees.of(-45)),
         ALGAE_SWAP_1(0.3, Degrees.of(110)),
         ALGAE_SWAP_2(0.3, Degrees.of(-45)),
         ALGAE_SWAP_3(0.9, Degrees.of(110)),
