@@ -422,7 +422,7 @@ public class RobotContainer {
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
         operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runVolts(-3, 0));
         operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runVolts(6, 0));
-        isAlgaeMode.onFalse(coralHolder.runVolts(-2, 0).withTimeout(0.5));
+        isAlgaeMode.onFalse(coralHolder.runVolts(-1.5, 0).withTimeout(0.5));
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
 
         // climbing
