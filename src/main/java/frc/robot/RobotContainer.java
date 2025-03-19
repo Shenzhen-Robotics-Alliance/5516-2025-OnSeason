@@ -498,22 +498,16 @@ public class RobotContainer {
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
 
-    private boolean motorBrakeEnabled = false;
+    public static boolean motorBrakeEnabled = false;
 
     public void setMotorBrake(boolean brakeModeEnabled) {
-        if (this.motorBrakeEnabled == brakeModeEnabled) return;
+        if (motorBrakeEnabled == brakeModeEnabled) return;
 
         System.out.println("Set motor brake: " + brakeModeEnabled);
         drive.setMotorBrake(brakeModeEnabled);
         arm.setMotorBrake(brakeModeEnabled);
         elevator.setMotorBrake(brakeModeEnabled);
-        if (brakeModeEnabled) ledStatusLight.showEnableDisableState().schedule();
-        else
-            ledStatusLight
-                    .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kWhite), 1)
-                    .ignoringDisable(true)
-                    .schedule();
 
-        this.motorBrakeEnabled = brakeModeEnabled;
+        motorBrakeEnabled = brakeModeEnabled;
     }
 }

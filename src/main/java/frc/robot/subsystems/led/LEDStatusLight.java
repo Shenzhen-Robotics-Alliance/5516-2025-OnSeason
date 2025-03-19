@@ -7,6 +7,8 @@ import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import java.util.Arrays;
+
+import frc.robot.RobotContainer;
 import org.littletonrobotics.junction.Logger;
 
 public class LEDStatusLight extends SubsystemBase {
@@ -75,13 +77,15 @@ public class LEDStatusLight extends SubsystemBase {
     }
 
     public Command showEnableDisableState() {
-        return new ConditionalCommand(
-                        playAnimation(new LEDAnimation.SlideBackAndForth(new Color(0, 200, 255)), 5)
-                                .until(RobotState::isDisabled),
-                        playAnimation(new LEDAnimation.Breathe(new Color(0, 200, 255)), 3)
-                                .until(RobotState::isEnabled),
-                        RobotState::isEnabled)
-                .repeatedly()
-                .ignoringDisable(true);
+        return defer(() -> {
+            if (DriverStation.isEnabled())
+                return playAnimation(new LEDAnimation.SlideBackAndForth(new Color(0, 200, 255)), 3)
+                        .until(DriverStation::isDisabled);
+            if (RobotContainer.motorBrakeEnabled)
+                return playAnimation(new LEDAnimation.Breathe(new Color(0, 200, 255)), 3)
+                        .until(RobotState::isEnabled);
+            return playAnimation(new LEDAnimation.Breathe(new Color(255, 255, 255)), 3)
+                    .until(RobotState::isEnabled);
+        });
     }
 }
