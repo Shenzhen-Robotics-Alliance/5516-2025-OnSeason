@@ -7,20 +7,25 @@ import static frc.robot.constants.ReefConstants.*;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
 import frc.robot.commands.drive.AutoAlignment;
+import frc.robot.commands.drive.JoystickDriveAndAimAtTarget;
 import frc.robot.constants.DriveControlLoops;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
+import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
+
+import frc.robot.utils.MapleJoystickDriveInput;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -88,15 +93,21 @@ public class ReefAlignment {
                 : REEF_ALIGNMENT_POSITIONS_BLUE[branchIndex];
     }
 
-    public static Optional<BranchTarget> getNearestReefAlignmentTarget(OptionalInt nearestTag, boolean rightSide) {
-        if (nearestTag.isEmpty()) return Optional.empty();
+    public static BranchTarget getNearestReefAlignmentTarget(Translation2d robotPosition, boolean rightSide) {
+        BranchTarget minDistanceTarget = null;
+        double minDistance = Double.POSITIVE_INFINITY;
         for (int i = 0; i < 12; i++) {
             BranchTarget target = FieldMirroringUtils.isSidePresentedAsRed()
                     ? REEF_ALIGNMENT_POSITIONS_RED[i]
                     : REEF_ALIGNMENT_POSITIONS_BLUE[i];
-            if (target.tagId == nearestTag.getAsInt() && rightSide == target.rightSide) return Optional.of(target);
+            double robotToTargetDistance = target.roughApproachPosition().minus(robotPosition).getNorm();
+            if (robotToTargetDistance > minDistance || rightSide != target.rightSide)
+                continue;
+            minDistance = robotToTargetDistance;
+            minDistanceTarget = target;
+
         }
-        return Optional.empty();
+        return minDistanceTarget;
     }
 
     private static int getBranchIndexFromReefPartId(boolean rightSide) {
@@ -209,43 +220,40 @@ public class ReefAlignment {
                 .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED);
     }
 
-    private static Optional<BranchTarget> nearestBranch = Optional.empty();
-    private static final double waitTimeSecondsBeforeStart = 0.1;
-
+    private static final double AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD = 0.5;
     public static Command alignToNearestBranch(
             HolonomicDriveSubsystem drive,
+            MapleJoystickDriveInput driveInput,
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
             boolean rightSide,
             Command... toScheduleAtPreciseAlignment) {
-        return Commands.runOnce(() -> nearestBranch = Optional.empty())
-                .andThen(Commands.run(() -> {
-                            nearestBranch =
-                                    getNearestReefAlignmentTarget(aprilTagVision.nearestVisibleTag(), rightSide);
-                            System.out.println("nearest branch: " + nearestBranch.orElse(null));
-                        })
-                        .until(() -> nearestBranch.isPresent()))
-                .andThen(Commands.run(() -> {
-                            Optional<BranchTarget> newNearestBranch =
-                                    getNearestReefAlignmentTarget(aprilTagVision.nearestVisibleTag(), rightSide);
-                            if (newNearestBranch.isEmpty() || nearestBranch.isEmpty()) return;
-                            Translation2d robotPosition = drive.getPose().getTranslation();
-                            if (newNearestBranch
-                                            .get()
-                                            .preciseAlignmentPosition
-                                            .minus(robotPosition)
-                                            .getNorm()
-                                    < nearestBranch
-                                            .get()
-                                            .preciseAlignmentPosition
-                                            .minus(robotPosition)
-                                            .getNorm()) nearestBranch = newNearestBranch;
-                        })
-                        .withTimeout(waitTimeSecondsBeforeStart))
-                .andThen(Commands.deferredProxy(() -> nearestBranch.isPresent()
-                        ? alignToBranchStatic(
-                                drive, aprilTagVision, statusLight, nearestBranch.get(), toScheduleAtPreciseAlignment)
-                        : Commands.none()));
+        Command faceToReefAndDrive = JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
+                driveInput,
+                drive,
+                () -> FieldMirroringUtils.toCurrentAllianceTranslation(REEF_CENTER_BLUE),
+                null,
+                0.8,
+                false);
+
+        Command waitingForVisionResultsLED = statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 1);
+        Command visionReadyLED = statusLight.playAnimationPeriodically(new LEDAnimation.Breathe(Color.kHotPink), 1);
+
+        Command waitUntilAlignmentReady = Commands.sequence(
+                Commands.waitUntil(() -> aprilTagVision.averagePoseEstimationsCount() > AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD)
+                        .deadlineFor(waitingForVisionResultsLED),
+                Commands.waitUntil(driveInput::isZeroInput)
+                        .deadlineFor(visionReadyLED));
+        // TODO: make precise alignment schedules happen at final approach (straight line path)
+        //  make drive control loops decisive
+        //  BTW: don't do path-finding for aligning to nearest reef target, refuse to align if target too far
+        return Commands.sequence(
+                waitUntilAlignmentReady.deadlineFor(faceToReefAndDrive),
+                Commands.deferredProxy(() ->
+                        alignToBranchStatic(
+                                drive, aprilTagVision, statusLight,
+                                getNearestReefAlignmentTarget(RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
+                                toScheduleAtPreciseAlignment)));
     }
 
     private static Command alignToBranchStatic(
