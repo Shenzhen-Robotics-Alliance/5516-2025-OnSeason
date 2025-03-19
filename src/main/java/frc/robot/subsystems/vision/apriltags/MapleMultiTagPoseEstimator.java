@@ -12,6 +12,8 @@ import edu.wpi.first.math.numbers.N1;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
+import frc.robot.Robot;
+import frc.robot.constants.RobotMode;
 import frc.robot.utils.CustomMaths.Statistics;
 import java.util.*;
 import org.littletonrobotics.junction.Logger;
@@ -19,8 +21,7 @@ import org.littletonrobotics.junction.Logger;
 public class MapleMultiTagPoseEstimator {
     private OptionalInt tagToFocus;
     private List<Integer> cameraToFocus;
-    public static final boolean LOG_DETAILED_FILTERING_DATA = true;
-    // Robot.CURRENT_ROBOT_MODE != RobotMode.REAL;
+    public static final boolean LOG_DETAILED_FILTERING_DATA = Robot.CURRENT_ROBOT_MODE != RobotMode.REAL;
 
     private final AprilTagFieldLayout fieldLayout;
     private final VisionResultsFilter filter;
@@ -299,6 +300,10 @@ public class MapleMultiTagPoseEstimator {
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Filtering/AprilTagsObservedPositions/",
                 observedAprilTagsPoses.toArray(Pose3d[]::new));
+    }
+
+    public int validPoseEstimationsCount() {
+        return validRobotPoseEstimationsMultiTag.size() + validRobotPoseEstimationsSingleTag.size();
     }
 
     public record VisionObservation(Pose2d visionPose, Matrix<N3, N1> stdDevs, double timestamp) {
