@@ -281,14 +281,16 @@ public class ReefAlignment {
 
     public static void updateDashboard() {
         Logger.recordOutput("Reef/SelectedBranch", ReefAlignment.displaySelectedBranch());
-        int selectedBranchTagID = getSelectedReefAlignmentTarget(false).tagId;
-        Optional<Pose3d> tagPose3d = VisionConstants.fieldLayout.getTagPose(selectedBranchTagID);
+        int nearestBranchTagID = getNearestReefAlignmentTarget(
+                        RobotState.getInstance().getVisionPose().getTranslation(), false)
+                .tagId;
+        Optional<Pose3d> tagPose3d = VisionConstants.fieldLayout.getTagPose(nearestBranchTagID);
         if (tagPose3d.isEmpty()) return;
         Pose2d tagRawPose = tagPose3d.get().toPose2d();
         Pose2d tagPose =
                 new Pose2d(tagRawPose.getTranslation(), tagRawPose.getRotation().rotateBy(Rotation2d.k180deg));
         Logger.recordOutput(
-                "Reef/RobotToSelectedBranchTag",
+                "Reef/RobotToNearestBranchTag",
                 RobotState.getInstance().getVisionPose().log(tagPose));
     }
 }
