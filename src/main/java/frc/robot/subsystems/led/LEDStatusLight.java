@@ -76,14 +76,18 @@ public class LEDStatusLight extends SubsystemBase {
 
     public Command showEnableDisableState() {
         return defer(() -> {
-            if (DriverStation.isEnabled())
-                return playAnimation(new LEDAnimation.SlideBackAndForth(new Color(0, 200, 255)), 3)
-                        .until(DriverStation::isDisabled);
-            if (RobotContainer.motorBrakeEnabled)
-                return playAnimation(new LEDAnimation.Breathe(new Color(0, 200, 255)), 3)
-                        .until(RobotState::isEnabled);
-            return playAnimation(new LEDAnimation.Breathe(new Color(255, 255, 255)), 3)
-                    .until(RobotState::isEnabled);
-        });
+                    if (DriverStation.isEnabled())
+                        return playAnimation(new LEDAnimation.SlideBackAndForth(new Color(0, 200, 255)), 2)
+                                .until(DriverStation::isDisabled);
+                    if (RobotContainer.motorBrakeEnabled)
+                        return playAnimation(new LEDAnimation.Breathe(new Color(0, 200, 255)), 3)
+                                .until(RobotState::isEnabled)
+                                .until(() -> !RobotContainer.motorBrakeEnabled);
+                    return playAnimation(new LEDAnimation.Breathe(new Color(255, 255, 255)), 3)
+                            .until(RobotState::isEnabled)
+                            .until(() -> RobotContainer.motorBrakeEnabled);
+                })
+                .repeatedly()
+                .ignoringDisable(true);
     }
 }
