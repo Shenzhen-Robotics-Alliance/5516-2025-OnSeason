@@ -76,7 +76,8 @@ public class AprilTagVision extends SubsystemBase {
         SmartDashboard.putBoolean("Vision Result Trustable", resultPresent);
         Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/Presented", resultPresent);
 
-        averagePoseEstimationsCount = poseEstimationsCountMovingAverage.calculate(multiTagPoseEstimator.validPoseEstimationsCount());
+        averagePoseEstimationsCount =
+                poseEstimationsCountMovingAverage.calculate(multiTagPoseEstimator.validPoseEstimationsCount());
         Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/AverageEstimationsRate", averagePoseEstimationsCount);
     }
 

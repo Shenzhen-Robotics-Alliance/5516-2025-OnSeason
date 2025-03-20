@@ -21,11 +21,10 @@ import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
 import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
+import frc.robot.utils.MapleJoystickDriveInput;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
-
-import frc.robot.utils.MapleJoystickDriveInput;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
@@ -100,12 +99,11 @@ public class ReefAlignment {
             BranchTarget target = FieldMirroringUtils.isSidePresentedAsRed()
                     ? REEF_ALIGNMENT_POSITIONS_RED[i]
                     : REEF_ALIGNMENT_POSITIONS_BLUE[i];
-            double robotToTargetDistance = target.roughApproachPosition().minus(robotPosition).getNorm();
-            if (robotToTargetDistance > minDistance || rightSide != target.rightSide)
-                continue;
+            double robotToTargetDistance =
+                    target.roughApproachPosition().minus(robotPosition).getNorm();
+            if (robotToTargetDistance > minDistance || rightSide != target.rightSide) continue;
             minDistance = robotToTargetDistance;
             minDistanceTarget = target;
-
         }
         return minDistanceTarget;
     }
@@ -209,7 +207,7 @@ public class ReefAlignment {
             LEDStatusLight statusLight,
             boolean rightSide,
             Command... toScheduleAtPreciseAlignment) {
-        return Commands.deferredProxy(() -> alignToBranchStatic(
+        return Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
                         drive,
                         aprilTagVision,
                         statusLight,
@@ -220,7 +218,8 @@ public class ReefAlignment {
                 .finallyDo(() -> selectedSide = SelectedSide.NOT_SELECTED);
     }
 
-    private static final double AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD = 0.5;
+    private static final double AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD = 0.3;
+
     public static Command alignToNearestBranch(
             HolonomicDriveSubsystem drive,
             MapleJoystickDriveInput driveInput,
@@ -236,27 +235,27 @@ public class ReefAlignment {
                 0.8,
                 false);
 
-        Command waitingForVisionResultsLED = statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 1);
+        Command waitingForVisionResultsLED =
+                statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 1);
         Command visionReadyLED = statusLight.playAnimationPeriodically(new LEDAnimation.Breathe(Color.kHotPink), 1);
 
         Command waitUntilAlignmentReady = Commands.sequence(
-                Commands.waitUntil(() -> aprilTagVision.averagePoseEstimationsCount() > AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD)
+                Commands.waitUntil(() ->
+                                aprilTagVision.averagePoseEstimationsCount() > AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD)
                         .deadlineFor(waitingForVisionResultsLED),
-                Commands.waitUntil(driveInput::isZeroInput)
-                        .deadlineFor(visionReadyLED));
-        // TODO: make precise alignment schedules happen at final approach (straight line path)
-        //  make drive control loops decisive
-        //  BTW: don't do path-finding for aligning to nearest reef target, refuse to align if target too far
+                Commands.waitUntil(driveInput::isZeroInput).deadlineFor(visionReadyLED));
         return Commands.sequence(
                 waitUntilAlignmentReady.deadlineFor(faceToReefAndDrive),
-                Commands.deferredProxy(() ->
-                        alignToBranchStatic(
-                                drive, aprilTagVision, statusLight,
-                                getNearestReefAlignmentTarget(RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
-                                toScheduleAtPreciseAlignment)));
+                Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
+                        drive,
+                        aprilTagVision,
+                        statusLight,
+                        getNearestReefAlignmentTarget(
+                                RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
+                        toScheduleAtPreciseAlignment)));
     }
 
-    private static Command alignToBranchStatic(
+    private static Command pathFindAndAlignToBranchStatic(
             HolonomicDriveSubsystem drive,
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,

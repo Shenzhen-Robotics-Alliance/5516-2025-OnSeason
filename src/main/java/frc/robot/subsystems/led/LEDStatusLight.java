@@ -3,12 +3,10 @@ package frc.robot.subsystems.led;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
-import java.util.Arrays;
-
 import frc.robot.RobotContainer;
+import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
 public class LEDStatusLight extends SubsystemBase {
