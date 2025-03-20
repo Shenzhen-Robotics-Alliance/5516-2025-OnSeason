@@ -35,7 +35,7 @@ public class AutoAlignment {
      * creates a precise auto-alignment command NOTE: AutoBuilder must be configured! the command has two steps: 1.
      * path-find to the target pose, roughly 2. accurate auto alignment
      */
-    public static Command pathFindAndAutoAlign(
+    public static Command pathFindAndAutoAlignStatic(
             HolonomicDriveSubsystem driveSubsystem,
             AprilTagVision vision,
             LEDStatusLight statusLight,
@@ -155,15 +155,14 @@ public class AutoAlignment {
             Rotation2d preciseTargetApproachDirection,
             AutoAlignmentConfigurations config,
             Command... toScheduleAtFinalApproach) {
-        return Commands.defer(
-                        () -> AutoBuilder.followPath(getPreciseAlignmentPath(
-                                driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
-                                driveSubsystem.getPose(),
-                                preciseTarget,
-                                preciseTargetApproachDirection,
-                                config,
-                                toScheduleAtFinalApproach)),
-                        Set.of(driveSubsystem))
+        return driveSubsystem
+                .defer(() -> AutoBuilder.followPath(getPreciseAlignmentPath(
+                        driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
+                        driveSubsystem.getPose(),
+                        preciseTarget,
+                        preciseTargetApproachDirection,
+                        config,
+                        toScheduleAtFinalApproach)))
                 .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED));
     }
 

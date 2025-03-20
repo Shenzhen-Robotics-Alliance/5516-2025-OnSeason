@@ -245,7 +245,7 @@ public class ReefAlignment {
                         .deadlineFor(waitingForVisionResultsLED),
                 Commands.waitUntil(driveInput::isZeroInput).deadlineFor(visionReadyLED));
         return Commands.sequence(
-                waitUntilAlignmentReady.deadlineFor(faceToReefAndDrive),
+                waitUntilAlignmentReady.deadlineFor(faceToReefAndDrive).asProxy(),
                 Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
                         drive,
                         aprilTagVision,
@@ -261,7 +261,7 @@ public class ReefAlignment {
             LEDStatusLight statusLight,
             BranchTarget branch,
             Command... toScheduleAtPreciseAlignment) {
-        return AutoAlignment.pathFindAndAutoAlign(
+        return AutoAlignment.pathFindAndAutoAlignStatic(
                         drive,
                         aprilTagVision,
                         statusLight,
