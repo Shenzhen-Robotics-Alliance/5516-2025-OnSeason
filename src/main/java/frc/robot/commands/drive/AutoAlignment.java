@@ -61,6 +61,7 @@ public class AutoAlignment {
                                 .getNorm());
         Command preciseAlignment = preciseAlignment(
                         driveSubsystem,
+                        statusLight,
                         target.preciseTarget(),
                         target.preciseApproachDirection(),
                         config,
@@ -68,8 +69,8 @@ public class AutoAlignment {
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()));
 
         return pathFindToRoughTarget
-                .deadlineFor(autoAlignmentLight(statusLight))
-                .andThen(preciseAlignment.deadlineFor(autoAlignmentLight(statusLight)))
+                .andThen(preciseAlignment)
+                .beforeStarting(autoAlignmentLight(statusLight)::schedule)
                 .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule)
                 .withName("Path Find & Auto Align")
                 .deadlineFor(Commands.print("aligning...").repeatedly());
@@ -93,6 +94,7 @@ public class AutoAlignment {
 
         Command preciseAlignment = preciseAlignment(
                         driveSubsystem,
+                        statusLight,
                         target.preciseTarget(),
                         target.preciseApproachDirection(),
                         config,
@@ -102,7 +104,7 @@ public class AutoAlignment {
                 .withName("Follow Path & Auto Align");
 
         return followPath
-                .andThen(preciseAlignment.deadlineFor(autoAlignmentLight(statusLight)))
+                .andThen(preciseAlignment)
                 .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule);
     }
 
@@ -151,10 +153,13 @@ public class AutoAlignment {
 
     public static Command preciseAlignment(
             HolonomicDriveSubsystem driveSubsystem,
+            LEDStatusLight statusLight,
             Pose2d preciseTarget,
             Rotation2d preciseTargetApproachDirection,
             AutoAlignmentConfigurations config,
             Command... toScheduleAtFinalApproach) {
+        Command[] toSchedule = Arrays.copyOf(toScheduleAtFinalApproach, toScheduleAtFinalApproach.length + 1);
+        toSchedule[toScheduleAtFinalApproach.length] = finalApproachLight(statusLight);
         return driveSubsystem
                 .defer(() -> AutoBuilder.followPath(getPreciseAlignmentPath(
                         driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
@@ -162,7 +167,7 @@ public class AutoAlignment {
                         preciseTarget,
                         preciseTargetApproachDirection,
                         config,
-                        toScheduleAtFinalApproach)))
+                        toSchedule)))
                 .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED));
     }
 
@@ -216,13 +221,6 @@ public class AutoAlignment {
         return path;
     }
 
-    private static Command autoAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight
-                .playAnimation(new LEDAnimation.Rainbow(), 1)
-                .repeatedly()
-                .asProxy();
-    }
-
     private static Command alignmentComplete(Supplier<Pose2d> goalPose, LEDStatusLight statusLight) {
         return Commands.either(
                 statusLight.playAnimation(new LEDAnimation.ShowColor(Color.kGreen), 0.5),
@@ -235,6 +233,19 @@ public class AutoAlignment {
                             && Math.abs(error.dy) <= AUTO_ALIGNMENT_SUCCESS_BIAS_TOLERANCE.in(Meters)
                             && Math.abs(error.dx) <= AUTO_ALIGNMENT_SUCCESS_DISTANCE_TOLERANCE.in(Meters);
                 });
+    }
+
+    private static Command autoAlignmentLight(LEDStatusLight statusLight) {
+        return statusLight
+                .playAnimation(new LEDAnimation.Rainbow(), 1)
+                .repeatedly()
+                .asProxy();
+    }
+
+    private static Command finalApproachLight(LEDStatusLight statusLight) {
+        return statusLight
+                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 2.0)
+                .asProxy();
     }
 
     public record AutoAlignmentConfigurations(

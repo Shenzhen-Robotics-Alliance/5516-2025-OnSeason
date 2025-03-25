@@ -7,21 +7,17 @@ import static frc.robot.constants.ReefConstants.*;
 import com.pathplanner.lib.path.PathPlannerPath;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
 import frc.robot.commands.drive.AutoAlignment;
-import frc.robot.commands.drive.JoystickDriveAndAimAtTarget;
 import frc.robot.constants.DriveControlLoops;
 import frc.robot.constants.VisionConstants;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
-import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
-import frc.robot.utils.MapleJoystickDriveInput;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.OptionalInt;
@@ -29,7 +25,7 @@ import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
 public class ReefAlignment {
-    public static final Distance ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE = Meters.of(1.25);
+    public static final Distance ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE = Meters.of(1);
     public static final Distance ROUGH_APPROACH_POSE_TO_TARGET_MARGIN = Centimeters.of(15);
     private static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.5, 4);
 
@@ -222,37 +218,17 @@ public class ReefAlignment {
 
     public static Command alignToNearestBranch(
             HolonomicDriveSubsystem drive,
-            MapleJoystickDriveInput driveInput,
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
             boolean rightSide,
             Command... toScheduleAtPreciseAlignment) {
-        Command faceToReefAndDrive = JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
-                driveInput,
+        return Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
                 drive,
-                () -> FieldMirroringUtils.toCurrentAllianceTranslation(REEF_CENTER_BLUE),
-                null,
-                0.8,
-                false);
-
-        Command waitingForVisionResultsLED =
-                statusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 1);
-        Command visionReadyLED = statusLight.playAnimationPeriodically(new LEDAnimation.Breathe(Color.kHotPink), 1);
-
-        Command waitUntilAlignmentReady = Commands.sequence(
-                Commands.waitUntil(() ->
-                                aprilTagVision.averagePoseEstimationsCount() > AVERAGE_POSE_ESTIMATION_COUNT_THRESHOLD)
-                        .deadlineFor(waitingForVisionResultsLED),
-                Commands.waitUntil(driveInput::isZeroInput).deadlineFor(visionReadyLED));
-        return Commands.sequence(
-                waitUntilAlignmentReady.deadlineFor(faceToReefAndDrive).asProxy(),
-                Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
-                        drive,
-                        aprilTagVision,
-                        statusLight,
-                        getNearestReefAlignmentTarget(
-                                RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
-                        toScheduleAtPreciseAlignment)));
+                aprilTagVision,
+                statusLight,
+                getNearestReefAlignmentTarget(
+                        RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
+                toScheduleAtPreciseAlignment));
     }
 
     private static Command pathFindAndAlignToBranchStatic(
