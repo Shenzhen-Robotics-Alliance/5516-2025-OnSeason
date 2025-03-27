@@ -27,7 +27,7 @@ import org.littletonrobotics.junction.Logger;
 public class ReefAlignment {
     public static final Distance ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE = Meters.of(1);
     public static final Distance ROUGH_APPROACH_POSE_TO_TARGET_MARGIN = Centimeters.of(15);
-    private static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.5, 4);
+    public static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.5, 4);
 
     public record BranchTarget(
             Rotation2d facing,
