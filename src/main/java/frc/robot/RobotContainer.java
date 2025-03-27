@@ -369,10 +369,47 @@ public class RobotContainer {
         driver.lockChassisWithXFormatButton().whileTrue(drive.lockChassisWithXFormation());
 
         /* auto alignment example, delete it for your project */
+        Command prepareElevator = superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN);
         driver.autoAlignmentButtonLeft()
-                .whileTrue(ReefAlignment.alignToNearestBranch(drive, aprilTagVision, ledStatusLight, false));
+                .and(driver.l4Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L4, false, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
         driver.autoAlignmentButtonRight()
-                .whileTrue(ReefAlignment.alignToNearestBranch(drive, aprilTagVision, ledStatusLight, true));
+                .and(driver.l4Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L4, true, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
+
+        driver.autoAlignmentButtonLeft()
+                .and(driver.l3Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L3,
+                        false,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+        driver.autoAlignmentButtonRight()
+                .and(driver.l3Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L3,
+                        true,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+
+        driver.autoAlignmentButtonLeft()
+                .and(driver.l2Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L2,
+                        false,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+        driver.autoAlignmentButtonRight()
+                .and(driver.l2Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L2,
+                        true,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 
@@ -387,13 +424,6 @@ public class RobotContainer {
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
                 .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
-        driver.l2Button()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
-                .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.l3Button()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
-                .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.l4Button().onTrue(moveToL4());
 
         driver.autoRotationButton()
                 .whileTrue(Commands.either(
@@ -438,13 +468,33 @@ public class RobotContainer {
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
 
         // climbing
-        operator.start().and(operator.b()).onTrue(climb.climbCommand(operator::getLeftY));
-        operator.start().and(operator.x()).onTrue(climb.cancelClimb());
+        operator.start().onTrue(climb.climbCommand(operator::getLeftY));
+        operator.start().onTrue(climb.cancelClimb());
 
-        operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
-        operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
-        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
-        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3).ignoringDisable(true));
+        operator.y()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.b()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.a()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.x().onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+    }
+
+    public Command autoAlign(
+            SuperStructure.SuperStructurePose scoringPose,
+            boolean isRightSide,
+            AutoAlignment.AutoAlignmentConfigurations autoAlignmentConfig) {
+        return ReefAlignment.alignToNearestBranch(
+                drive,
+                aprilTagVision,
+                ledStatusLight,
+                isRightSide,
+                autoAlignmentConfig,
+                superStructure.moveToPose(scoringPose),
+                coralHolder.keepCoralShuffledForever());
     }
 
     public void configureLEDEffects() {

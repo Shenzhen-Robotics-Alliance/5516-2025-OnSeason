@@ -225,12 +225,14 @@ public class ReefAlignment {
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
             boolean rightSide,
+            AutoAlignment.AutoAlignmentConfigurations config,
             Command... toScheduleAtPreciseAlignment) {
         return Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
                         drive,
                         aprilTagVision,
                         statusLight,
                         getSelectedReefAlignmentTarget(rightSide),
+                        config,
                         toScheduleAtPreciseAlignment))
                 .withName("[Reef Alignment] Align to branch "
                         + getBranchIndexFromReefPartId(selectedReefPartId, rightSide))
@@ -245,6 +247,7 @@ public class ReefAlignment {
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
             boolean rightSide,
+            AutoAlignment.AutoAlignmentConfigurations config,
             Command... toScheduleAtPreciseAlignment) {
         return Commands.deferredProxy(() -> pathFindAndAlignToBranchStatic(
                 drive,
@@ -252,6 +255,7 @@ public class ReefAlignment {
                 statusLight,
                 getNearestReefAlignmentTarget(
                         RobotState.getInstance().getVisionPose().getTranslation(), rightSide),
+                config,
                 toScheduleAtPreciseAlignment));
     }
 
@@ -260,13 +264,14 @@ public class ReefAlignment {
             AprilTagVision aprilTagVision,
             LEDStatusLight statusLight,
             BranchTarget branch,
+            AutoAlignment.AutoAlignmentConfigurations config,
             Command... toScheduleAtPreciseAlignment) {
         return AutoAlignment.pathFindAndAutoAlignStatic(
                         drive,
                         aprilTagVision,
                         statusLight,
                         branch.autoAlignmentTarget(),
-                        DriveControlLoops.REEF_ALIGNMENT_CONFIG,
+                        config,
                         toScheduleAtPreciseAlignment)
                 .withName("[Reef Alignment] Align to branch");
     }
