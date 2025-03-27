@@ -246,8 +246,8 @@ public class RobotContainer {
     private LoggedDashboardChooser<Auto> buildAutoChooser() {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
-        autoSendableChooser.addOption("[Three Coral - Short] <-- LEFT SIDE <-- ", new ThreeCoralShort(false));
-        autoSendableChooser.addOption("[Three Coral - Short] --> RIGHT SIDE -->", new ThreeCoralShort(true));
+        autoSendableChooser.addOption("[Four Coral - Standard] <-- LEFT SIDE <-- ", new FourCoralStandard(false));
+        autoSendableChooser.addOption("[Four Coral - Standard] --> RIGHT SIDE -->", new FourCoralStandard(true));
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
@@ -379,15 +379,14 @@ public class RobotContainer {
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .whileTrue(Commands.sequence(
-                                superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
+                                Commands.waitUntil(
+                                        () -> superStructure.currentPose() == SuperStructure.SuperStructurePose.IDLE),
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
-                .onFalse(coralHolder
-                        .intakeCoralSequence()
-                        .onlyIf(coralHolder.hasCoral)
-                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE)));
+                .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
         driver.l2Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
                 .onTrue(coralHolder.keepCoralShuffledForever());
