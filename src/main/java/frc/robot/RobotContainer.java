@@ -378,15 +378,14 @@ public class RobotContainer {
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .whileTrue(Commands.sequence(
-                                superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
+                                Commands.waitUntil(
+                                        () -> superStructure.currentPose() == SuperStructure.SuperStructurePose.IDLE),
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
-                .onFalse(coralHolder
-                        .intakeCoralSequence()
-                        .onlyIf(coralHolder.hasCoral)
-                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE)));
+                .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
         driver.moveToL2Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
                 .onTrue(coralHolder.keepCoralShuffledForever());

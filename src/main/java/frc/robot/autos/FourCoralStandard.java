@@ -49,7 +49,7 @@ public class FourCoralStandard implements Auto {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         Command intakeCoral = robot.coralHolder
                 .intakeCoralSequence()
-                .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+                .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN));
         Command scoreCoral = robot.scoreCoral(SCORING_TIME.in(Seconds));
         NamedCommands.registerCommand("ElevatorUp", robot.moveToL4());
 
@@ -71,7 +71,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(
                 followChoreoPath("grab second", RobotState.NavigationMode.SENSOR_LESS_ODOMETRY, isRightSide)
                         .deadlineFor(robot.superStructure
-                                .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                                .moveToPose(SuperStructure.SuperStructurePose.IDLE)
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
@@ -89,7 +89,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(
                 followChoreoPath("grab third", RobotState.NavigationMode.SENSOR_LESS_ODOMETRY, isRightSide)
                         .deadlineFor(robot.superStructure
-                                .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                                .moveToPose(SuperStructure.SuperStructurePose.IDLE)
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
@@ -107,7 +107,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(
                 followChoreoPath("grab fourth", RobotState.NavigationMode.SENSOR_LESS_ODOMETRY, isRightSide)
                         .deadlineFor(robot.superStructure
-                                .moveToPose(SuperStructure.SuperStructurePose.INTAKE)
+                                .moveToPose(SuperStructure.SuperStructurePose.IDLE)
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
@@ -124,7 +124,7 @@ public class FourCoralStandard implements Auto {
         // Move back
         commandGroup.addCommands(robot.drive
                 .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.1, 0, 0)))
-                .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE))
+                .deadlineFor(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .withTimeout(0.5)
                 .asProxy());
 
@@ -135,7 +135,7 @@ public class FourCoralStandard implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.1, 5.9, Rotation2d.fromDegrees(-135));
+        Pose2d poseAtLeft = new Pose2d(7.0, 5.8, Rotation2d.fromDegrees(-135));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }
