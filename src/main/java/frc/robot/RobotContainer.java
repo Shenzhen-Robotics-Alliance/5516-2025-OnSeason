@@ -417,7 +417,7 @@ public class RobotContainer {
                 .and(isAlgaeMode.negate())
                 .onTrue(superStructure.retrieveElevator())
                 .onTrue(ledStatusLight
-                        .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
+                        .playAnimation(new LEDAnimation.Breathe(() -> Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
         driver.scoreButton()
@@ -449,8 +449,9 @@ public class RobotContainer {
     }
 
     public void configureLEDEffects() {
-        ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-        coralHolder.hasCoral.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
+        ledStatusLight.setDefaultCommand(ledStatusLight.showRobotState());
+        coralHolder.hasCoral.onTrue(
+                ledStatusLight.playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.2, 4));
     }
 
     /**

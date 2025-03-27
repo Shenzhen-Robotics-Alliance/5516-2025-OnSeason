@@ -223,8 +223,8 @@ public class AutoAlignment {
 
     private static Command alignmentComplete(Supplier<Pose2d> goalPose, LEDStatusLight statusLight) {
         return Commands.either(
-                statusLight.playAnimation(new LEDAnimation.ShowColor(Color.kGreen), 0.5),
-                statusLight.playAnimation(new LEDAnimation.ShowColor(Color.kRed), 0.5),
+                statusLight.playAnimation(new LEDAnimation.ShowColor(() -> Color.kGreen), 0.5),
+                statusLight.playAnimation(new LEDAnimation.ShowColor(() -> Color.kRed), 0.5),
                 () -> {
                     Twist2d error = RobotState.getInstance().getVisionPose().log(goalPose.get());
                     System.out.println("alignment error: " + error);

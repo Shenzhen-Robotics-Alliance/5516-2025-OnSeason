@@ -31,10 +31,12 @@ import frc.robot.utils.AlertsManager;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.OptionalDouble;
+import org.littletonrobotics.junction.Logger;
 
 public class RobotState {
     private final Alert visionNoResultAlert = AlertsManager.create("Vision No Result", Alert.AlertType.kInfo);
     private double previousVisionResultTimeStamp = 0;
+    public double visionObservationRate = 0.0;
 
     private final TimeInterpolatableBuffer<Pose2d> poseBuffer;
     private final Matrix<N3, N1> primaryEstimatorOdometryStdDevs;
@@ -133,7 +135,7 @@ public class RobotState {
         visionSensitivePose = addVisionObservationToEstimator(
                 observation, sample.get(), visionSensitivePose, visionSensitiveEstimatorOdometryStdDevs);
 
-        previousVisionResultTimeStamp = observation.timestamp();
+        previousVisionResultTimeStamp = Timer.getTimestamp();
     }
 
     private Pose2d addVisionObservationToEstimator(
@@ -255,6 +257,11 @@ public class RobotState {
         if (visionNoResultAlert.get())
             visionNoResultAlert.setText(
                     String.format("No vision pose estimation for %.2f Seconds", timeNotVisionResultSeconds));
+        Logger.recordOutput("Vision Observation Rate", visionObservationRate);
+    }
+
+    public double visionObservationRate() {
+        return visionObservationRate;
     }
 
     public record OdometryObservation(

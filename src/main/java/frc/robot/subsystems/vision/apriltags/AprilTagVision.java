@@ -30,8 +30,7 @@ public class AprilTagVision extends SubsystemBase {
     private final Alert[] camerasNoResultAlerts;
     private final Debouncer[] camerasNoResultDebouncer;
 
-    private double averagePoseEstimationsCount = 0.0;
-    private final LinearFilter poseEstimationsCountMovingAverage = LinearFilter.movingAverage(50); // 0.5 seconds
+    private final LinearFilter visionHasResultAverage = LinearFilter.movingAverage(50);
 
     public AprilTagVision(AprilTagVisionIO io, List<PhotonCameraProperties> camerasProperties) {
         this.io = io;
@@ -70,15 +69,13 @@ public class AprilTagVision extends SubsystemBase {
         result = multiTagPoseEstimator.estimateRobotPose(
                 inputs.camerasInputs, RobotState.getInstance().getPrimaryEstimatorPose(), getResultsTimeStamp());
         result.ifPresent(RobotState.getInstance()::addVisionObservation);
+        RobotState.getInstance().visionObservationRate =
+                visionHasResultAverage.calculate(result.isPresent() ? 1.0 : 0.0);
 
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Results/Estimated Pose", displayVisionPointEstimateResult(result));
         SmartDashboard.putBoolean("Vision Result Trustable", resultPresent);
         Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/Presented", resultPresent);
-
-        averagePoseEstimationsCount =
-                poseEstimationsCountMovingAverage.calculate(multiTagPoseEstimator.validPoseEstimationsCount());
-        Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/AverageEstimationsRate", averagePoseEstimationsCount);
     }
 
     private static final Pose2d EMPTY_DISPLAY = new Pose2d(-114514, -114514, new Rotation2d());
@@ -119,10 +116,6 @@ public class AprilTagVision extends SubsystemBase {
         return startEnd(
                 () -> multiTagPoseEstimator.setFocusMode(tagId, cameraToFocusId),
                 multiTagPoseEstimator::disableFocusMode);
-    }
-
-    public double averagePoseEstimationsCount() {
-        return averagePoseEstimationsCount;
     }
 
     private boolean hasCameraDisconnection() {
