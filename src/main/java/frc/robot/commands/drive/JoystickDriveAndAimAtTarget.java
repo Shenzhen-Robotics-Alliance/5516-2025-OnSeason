@@ -3,7 +3,6 @@ package frc.robot.commands.drive;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
 import frc.robot.utils.ChassisHeadingController;
 import frc.robot.utils.MapleJoystickDriveInput;
@@ -27,16 +26,17 @@ public class JoystickDriveAndAimAtTarget {
             MapleShooterOptimization shooterOptimization,
             double pilotInputMultiplier,
             boolean finishWhenComplete) {
-        return new FunctionalCommand(
-                () -> ChassisHeadingController.getInstance()
-                        .setHeadingRequest(new ChassisHeadingController.FaceToTargetRequest(
-                                targetPositionSupplier, shooterOptimization)),
-                () -> execute(driveSubsystem, input, pilotInputMultiplier),
-                (interrupted) -> ChassisHeadingController.getInstance()
-                        .setHeadingRequest(new ChassisHeadingController.NullRequest()),
-                () -> finishWhenComplete
-                        && ChassisHeadingController.getInstance().atSetPoint(),
-                driveSubsystem);
+        return driveSubsystem
+                .run(() -> {
+                    ChassisHeadingController.getInstance()
+                            .setHeadingRequest(new ChassisHeadingController.FaceToTargetRequest(
+                                    targetPositionSupplier, shooterOptimization));
+                    execute(driveSubsystem, input, pilotInputMultiplier);
+                })
+                .finallyDo(() -> ChassisHeadingController.getInstance()
+                        .setHeadingRequest(new ChassisHeadingController.NullRequest()))
+                .until(() -> finishWhenComplete
+                        && ChassisHeadingController.getInstance().atSetPoint());
     }
 
     public static Command driveAndAimAtDirection(
@@ -45,15 +45,17 @@ public class JoystickDriveAndAimAtTarget {
             Supplier<Rotation2d> rotationTarget,
             double pilotInputMultiplier,
             boolean finishWhenComplete) {
-        return new FunctionalCommand(
-                () -> ChassisHeadingController.getInstance()
-                        .setHeadingRequest(new ChassisHeadingController.FaceToRotationRequest(rotationTarget.get())),
-                () -> execute(driveSubsystem, input, pilotInputMultiplier),
-                (interrupted) -> ChassisHeadingController.getInstance()
-                        .setHeadingRequest(new ChassisHeadingController.NullRequest()),
-                () -> finishWhenComplete
-                        && ChassisHeadingController.getInstance().atSetPoint(),
-                driveSubsystem);
+        return driveSubsystem
+                .run(() -> {
+                    ChassisHeadingController.getInstance()
+                            .setHeadingRequest(
+                                    new ChassisHeadingController.FaceToRotationRequest(rotationTarget.get()));
+                    execute(driveSubsystem, input, pilotInputMultiplier);
+                })
+                .finallyDo(() -> ChassisHeadingController.getInstance()
+                        .setHeadingRequest(new ChassisHeadingController.NullRequest()))
+                .until(() -> finishWhenComplete
+                        && ChassisHeadingController.getInstance().atSetPoint());
     }
 
     public static void execute(

@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.*;
 import frc.robot.commands.drive.*;
+import frc.robot.commands.reefscape.FaceCoralStation;
 import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
@@ -386,13 +387,25 @@ public class RobotContainer {
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
                 .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
-        driver.moveToL2Button()
+        driver.l2Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
                 .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.moveToL3Button()
+        driver.l3Button()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
                 .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.moveToL4Button().onTrue(moveToL4());
+        driver.l4Button().onTrue(moveToL4());
+
+        driver.autoRotationButton()
+                .whileTrue(Commands.either(
+                        JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
+                                driveInput,
+                                drive,
+                                () -> FieldMirroringUtils.toCurrentAllianceTranslation(ReefAlignment.REEF_CENTER_BLUE),
+                                null,
+                                JoystickConfigs.DEFAULT_TRANSLATIONAL_SENSITIVITY,
+                                false),
+                        FaceCoralStation.faceCoralStation(drive, driveInput),
+                        coralHolder.hasCoral));
 
         // Retrieve elevator at the start of teleop
         new Trigger(DriverStation::isTeleopEnabled)
@@ -403,7 +416,7 @@ public class RobotContainer {
                 .and(isAlgaeMode.negate())
                 .onTrue(superStructure.retrieveElevator())
                 .onTrue(ledStatusLight
-                        .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
+                        .playAnimation(new LEDAnimation.Breathe(() -> Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
         driver.scoreButton()
@@ -435,8 +448,9 @@ public class RobotContainer {
     }
 
     public void configureLEDEffects() {
-        ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-        coralHolder.hasCoral.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
+        ledStatusLight.setDefaultCommand(ledStatusLight.showRobotState());
+        coralHolder.hasCoral.onTrue(
+                ledStatusLight.playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.2, 4));
     }
 
     /**

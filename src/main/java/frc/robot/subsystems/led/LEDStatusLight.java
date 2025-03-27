@@ -1,11 +1,16 @@
 package frc.robot.subsystems.led;
 
-import edu.wpi.first.wpilibj.*;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.AddressableLEDBufferView;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
+import frc.robot.RobotState;
 import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
@@ -74,18 +79,22 @@ public class LEDStatusLight extends SubsystemBase {
         return this.playAnimation(animation, timeSeconds).repeatedly().ignoringDisable(true);
     }
 
-    public Command showEnableDisableState() {
+    public Command showRobotState() {
         return defer(() -> {
                     if (DriverStation.isEnabled())
-                        return playAnimation(new LEDAnimation.SlideBackAndForth(new Color(0, 200, 255)), 2)
+                        return playAnimation(
+                                        new LEDAnimation.SlideBackAndForth(
+                                                () -> RobotState.getInstance().visionObservationRate() > 0.25
+                                                        ? new Color(0, 200, 255)
+                                                        : new Color(255, 255, 255)),
+                                        2.5)
                                 .until(DriverStation::isDisabled);
-                    if (RobotContainer.motorBrakeEnabled)
-                        return playAnimation(new LEDAnimation.Breathe(new Color(0, 200, 255)), 3)
-                                .until(RobotState::isEnabled)
-                                .until(() -> !RobotContainer.motorBrakeEnabled);
-                    return playAnimation(new LEDAnimation.Breathe(new Color(255, 255, 255)), 3)
-                            .until(RobotState::isEnabled)
-                            .until(() -> RobotContainer.motorBrakeEnabled);
+                    return playAnimation(
+                                    new LEDAnimation.Breathe(() -> RobotContainer.motorBrakeEnabled
+                                            ? new Color(0, 200, 255)
+                                            : new Color(255, 255, 255)),
+                                    3)
+                            .until(DriverStation::isEnabled);
                 })
                 .repeatedly()
                 .ignoringDisable(true);
