@@ -59,7 +59,7 @@ public class FourCoralStandard implements Auto {
         int fourthGoal = isRightSide ? 1 : 0;
 
         // Score preloaded
-        commandGroup.addCommands(Commands.runOnce(Commands.waitSeconds(0.7).andThen(robot.moveToL4())::schedule));
+        commandGroup.addCommands(Commands.runOnce(Commands.waitSeconds(0.5).andThen(robot.moveToL4())::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
@@ -135,7 +135,7 @@ public class FourCoralStandard implements Auto {
 
     @Override
     public Pose2d getStartingPoseAtBlueAlliance() {
-        Pose2d poseAtLeft = new Pose2d(7.0, 5.8, Rotation2d.fromDegrees(-135));
+        Pose2d poseAtLeft = new Pose2d(7.0, 5.6, Rotation2d.fromDegrees(-135));
         return isRightSide ? Auto.flipLeftRight(poseAtLeft) : poseAtLeft;
     }
 }
