@@ -42,7 +42,7 @@ public class DriveControlLoops {
     public static final Angle AUTO_ALIGNMENT_SUCCESS_TOLERANCE_ROTATIONAL = Degrees.of(2);
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
-                    Meters.of(0.2),
+                    Meters.of(0.1),
                     MetersPerSecond.of(1.6),
                     Meters.of(0.3),
                     MetersPerSecond.of(0.2),
