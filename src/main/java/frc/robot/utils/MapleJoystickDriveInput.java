@@ -6,6 +6,7 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import frc.robot.subsystems.drive.HolonomicDriveSubsystem;
 import java.util.function.DoubleSupplier;
 import org.ironmaple.utils.mathutils.MapleCommonMath;
 
@@ -38,6 +39,10 @@ public class MapleJoystickDriveInput {
 
         return new ChassisSpeeds(
                 linearSpeedMetersPerSec.getX(), linearSpeedMetersPerSec.getY(), rotationSpeedRadPerSec);
+    }
+
+    public boolean isZeroInput() {
+        return HolonomicDriveSubsystem.isZero(getJoystickChassisSpeeds(3.0, 3.0));
     }
 
     /** @return the translational speeds, in meters/second */

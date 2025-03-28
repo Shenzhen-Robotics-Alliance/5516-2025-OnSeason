@@ -15,7 +15,7 @@ public class ReefConstants {
 
     private static final Distance ROBOT_TO_TARGET_DISTANCE = Robot.CURRENT_ROBOT_MODE == RobotMode.SIM
             // for simulation
-            ? Centimeters.of(37.5)
+            ? Centimeters.of(40.0)
             // for real robot (measure this on field)
             // "AdvantageKit/RealOutputs/RobotToSelectedBranchTarget" - X Axis
             : Centimeters.of(45.2);

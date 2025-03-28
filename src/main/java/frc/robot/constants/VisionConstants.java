@@ -17,7 +17,7 @@ public class VisionConstants {
     public static final AprilTagFields CURRENT_FIELD = AprilTagFields.k2025ReefscapeAndyMark;
     public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadField(CURRENT_FIELD);
     public static final Time POSE_BUFFER_DURATION = Seconds.of(2.5);
-    public static final Time ADDITIONAL_LATENCY_COMPENSATION = Milliseconds.of(30);
+    public static final Time ADDITIONAL_LATENCY_COMPENSATION = Milliseconds.of(0);
 
     // for filtering
     public static final Distance ROBOT_HEIGHT_TOLERANCE = Meters.of(0.1);

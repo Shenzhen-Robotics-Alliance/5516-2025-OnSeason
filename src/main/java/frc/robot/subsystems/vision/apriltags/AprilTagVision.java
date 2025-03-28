@@ -5,6 +5,7 @@ import static frc.robot.constants.LogPaths.*;
 import static frc.robot.constants.VisionConstants.*;
 
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.Alert;
@@ -29,6 +30,8 @@ public class AprilTagVision extends SubsystemBase {
     private final Alert[] camerasNoResultAlerts;
     private final Debouncer[] camerasNoResultDebouncer;
 
+    private final LinearFilter visionHasResultAverage = LinearFilter.movingAverage(50);
+
     public AprilTagVision(AprilTagVisionIO io, List<PhotonCameraProperties> camerasProperties) {
         this.io = io;
         this.inputs = new AprilTagVisionIO.VisionInputs(camerasProperties.size());
@@ -51,7 +54,6 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     private Optional<MapleMultiTagPoseEstimator.VisionObservation> result = Optional.empty();
-    private OptionalInt nearestTag = OptionalInt.empty();
 
     @Override
     public void periodic() {
@@ -67,26 +69,13 @@ public class AprilTagVision extends SubsystemBase {
         result = multiTagPoseEstimator.estimateRobotPose(
                 inputs.camerasInputs, RobotState.getInstance().getPrimaryEstimatorPose(), getResultsTimeStamp());
         result.ifPresent(RobotState.getInstance()::addVisionObservation);
-        findNearestTag(inputs.camerasInputs);
+        RobotState.getInstance().visionObservationRate =
+                visionHasResultAverage.calculate(result.isPresent() ? 1.0 : 0.0);
 
-        Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/NearestVisibleTag", nearestTag.orElse(-1));
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Results/Estimated Pose", displayVisionPointEstimateResult(result));
         SmartDashboard.putBoolean("Vision Result Trustable", resultPresent);
         Logger.recordOutput(APRIL_TAGS_VISION_PATH + "Results/Presented", resultPresent);
-    }
-
-    private void findNearestTag(AprilTagVisionIO.CameraInputs[] cameraInputs) {
-        nearestTag = OptionalInt.empty();
-        double smallestTagDistanceMeters = Double.POSITIVE_INFINITY;
-        for (AprilTagVisionIO.CameraInputs cameraInput : cameraInputs)
-            for (int i = 0; i < cameraInput.fiducialMarksID.length; i++)
-                if (cameraInput.bestCameraToTargets[i].getTranslation().getNorm() < smallestTagDistanceMeters
-                        && cameraInput.fiducialMarksID[i] != -1) {
-                    nearestTag = OptionalInt.of(cameraInput.fiducialMarksID[i]);
-                    smallestTagDistanceMeters =
-                            cameraInput.bestCameraToTargets[i].getTranslation().getNorm();
-                }
     }
 
     private static final Pose2d EMPTY_DISPLAY = new Pose2d(-114514, -114514, new Rotation2d());
@@ -135,8 +124,4 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     public final Trigger cameraDisconnected = new Trigger(this::hasCameraDisconnection);
-
-    public OptionalInt nearestVisibleTag() {
-        return nearestTag;
-    }
 }

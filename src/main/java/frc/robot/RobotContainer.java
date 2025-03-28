@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.*;
 import frc.robot.commands.drive.*;
+import frc.robot.commands.reefscape.FaceCoralStation;
 import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
@@ -245,8 +246,8 @@ public class RobotContainer {
     private LoggedDashboardChooser<Auto> buildAutoChooser() {
         final LoggedDashboardChooser<Auto> autoSendableChooser = new LoggedDashboardChooser<>("Select Auto");
         autoSendableChooser.addDefaultOption("None", Auto.none());
-        autoSendableChooser.addOption("[Three Coral - Short] <-- LEFT SIDE <-- ", new ThreeCoralShort(false));
-        autoSendableChooser.addOption("[Three Coral - Short] --> RIGHT SIDE -->", new ThreeCoralShort(true));
+        autoSendableChooser.addOption("[Four Coral - Standard] <-- LEFT SIDE <-- ", new FourCoralStandard(false));
+        autoSendableChooser.addOption("[Four Coral - Standard] --> RIGHT SIDE -->", new FourCoralStandard(true));
 
         SmartDashboard.putData("Select Auto", autoSendableChooser.getSendableChooser());
         return autoSendableChooser;
@@ -368,32 +369,73 @@ public class RobotContainer {
         driver.lockChassisWithXFormatButton().whileTrue(drive.lockChassisWithXFormation());
 
         /* auto alignment example, delete it for your project */
+        Command prepareElevator = superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN);
         driver.autoAlignmentButtonLeft()
-                .whileTrue(ReefAlignment.alignmentToSelectedBranch(drive, aprilTagVision, ledStatusLight, false));
+                .and(driver.l4Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L4, false, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
         driver.autoAlignmentButtonRight()
-                .whileTrue(ReefAlignment.alignmentToSelectedBranch(drive, aprilTagVision, ledStatusLight, true));
+                .and(driver.l4Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L4, true, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
+
+        driver.autoAlignmentButtonLeft()
+                .and(driver.l3Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L3,
+                        false,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+        driver.autoAlignmentButtonRight()
+                .and(driver.l3Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L3,
+                        true,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+
+        driver.autoAlignmentButtonLeft()
+                .and(driver.l2Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L2,
+                        false,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+        driver.autoAlignmentButtonRight()
+                .and(driver.l2Button())
+                .onTrue(prepareElevator)
+                .whileTrue(autoAlign(
+                        SuperStructure.SuperStructurePose.SCORE_L2,
+                        true,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .whileTrue(Commands.sequence(
-                                superStructure.moveToPose(SuperStructure.SuperStructurePose.INTAKE),
+                                Commands.waitUntil(
+                                        () -> superStructure.currentPose() == SuperStructure.SuperStructurePose.IDLE),
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
-                .onFalse(coralHolder
-                        .intakeCoralSequence()
-                        .onlyIf(coralHolder.hasCoral)
-                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE)));
-        driver.moveToL2Button()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
-                .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.moveToL3Button()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
-                .onTrue(coralHolder.keepCoralShuffledForever());
-        driver.moveToL4Button().onTrue(moveToL4());
+                .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
+
+        driver.autoRotationButton()
+                .whileTrue(Commands.either(
+                        JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
+                                driveInput,
+                                drive,
+                                () -> FieldMirroringUtils.toCurrentAllianceTranslation(ReefAlignment.REEF_CENTER_BLUE),
+                                null,
+                                JoystickConfigs.DEFAULT_TRANSLATIONAL_SENSITIVITY,
+                                false),
+                        FaceCoralStation.faceCoralStation(drive, driveInput),
+                        coralHolder.hasCoral));
 
         // Retrieve elevator at the start of teleop
         new Trigger(DriverStation::isTeleopEnabled)
@@ -404,7 +446,7 @@ public class RobotContainer {
                 .and(isAlgaeMode.negate())
                 .onTrue(superStructure.retrieveElevator())
                 .onTrue(ledStatusLight
-                        .playAnimation(new LEDAnimation.Breathe(Color.kRed), 0.25, 4)
+                        .playAnimation(new LEDAnimation.Breathe(() -> Color.kRed), 0.25, 4)
                         .ignoringDisable(true));
 
         driver.scoreButton()
@@ -426,18 +468,39 @@ public class RobotContainer {
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
 
         // climbing
-        operator.start().and(operator.b()).onTrue(climb.climbCommand(operator::getLeftY));
-        operator.start().and(operator.x()).onTrue(climb.cancelClimb());
+        operator.start().onTrue(climb.climbCommand(operator::getLeftY));
+        operator.start().onTrue(climb.cancelClimb());
 
-        operator.y().onTrue(ReefAlignment.selectReefPartButton(3).ignoringDisable(true));
-        operator.a().onTrue(ReefAlignment.selectReefPartButton(0).ignoringDisable(true));
-        operator.x().whileTrue(ReefAlignment.lefterTargetButton(0.3).ignoringDisable(true));
-        operator.b().whileTrue(ReefAlignment.righterTargetButton(0.3).ignoringDisable(true));
+        operator.y()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.b()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.a()
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
+                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.x().onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+    }
+
+    public Command autoAlign(
+            SuperStructure.SuperStructurePose scoringPose,
+            boolean isRightSide,
+            AutoAlignment.AutoAlignmentConfigurations autoAlignmentConfig) {
+        return ReefAlignment.alignToNearestBranch(
+                drive,
+                aprilTagVision,
+                ledStatusLight,
+                isRightSide,
+                autoAlignmentConfig,
+                superStructure.moveToPose(scoringPose),
+                coralHolder.keepCoralShuffledForever());
     }
 
     public void configureLEDEffects() {
-        ledStatusLight.setDefaultCommand(ledStatusLight.showEnableDisableState());
-        coralHolder.hasCoral.onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(Color.kYellow), 0.2, 4));
+        ledStatusLight.setDefaultCommand(ledStatusLight.showRobotState());
+        coralHolder.hasCoral.onTrue(
+                ledStatusLight.playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.2, 4));
     }
 
     /**
@@ -498,22 +561,16 @@ public class RobotContainer {
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
 
-    private boolean motorBrakeEnabled = false;
+    public static boolean motorBrakeEnabled = false;
 
     public void setMotorBrake(boolean brakeModeEnabled) {
-        if (this.motorBrakeEnabled == brakeModeEnabled) return;
+        if (motorBrakeEnabled == brakeModeEnabled) return;
 
         System.out.println("Set motor brake: " + brakeModeEnabled);
         drive.setMotorBrake(brakeModeEnabled);
         arm.setMotorBrake(brakeModeEnabled);
         elevator.setMotorBrake(brakeModeEnabled);
-        if (brakeModeEnabled) ledStatusLight.showEnableDisableState().schedule();
-        else
-            ledStatusLight
-                    .playAnimationPeriodically(new LEDAnimation.Breathe(Color.kWhite), 1)
-                    .ignoringDisable(true)
-                    .schedule();
 
-        this.motorBrakeEnabled = brakeModeEnabled;
+        motorBrakeEnabled = brakeModeEnabled;
     }
 }

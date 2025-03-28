@@ -21,8 +21,8 @@ public class SuperStructure {
      */
     public enum SuperStructurePose {
         // Useful poses
-        IDLE(0, Degrees.of(110)),
-        INTAKE(0, Degrees.of(136)),
+        IDLE(0, Degrees.of(136)),
+        PREPARE_TO_RUN(0.05, Degrees.of(110)),
         SCORE_L2(0.22, Degrees.of(110)),
         SCORE_L3(0.64, Degrees.of(110)),
         SCORE_L4(1.21, Degrees.of(102)),
@@ -37,7 +37,7 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.24, Degrees.of(110)),
+        HIGH_SWAP(1.21, Degrees.of(110)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
@@ -63,20 +63,20 @@ public class SuperStructure {
 
     public static List<PoseLink> LINKS = List.of(
             // We can run to intake / l2 / l3 directly from idle
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.INTAKE),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L2),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L3),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.IDLE),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.SCORE_L2),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.SCORE_L3),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.SCORE_L3),
 
             // From a few swap poses, we can go to idle or score l3
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_1),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.LOW_SWAP_2),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.LOW_SWAP_1),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.LOW_SWAP_2),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_1),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.LOW_SWAP_2),
             new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.LOW_SWAP_1),
 
             // From a few poses can we run to high swap
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.HIGH_SWAP),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.HIGH_SWAP),
             new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.HIGH_SWAP),
             new PoseLink(SuperStructurePose.SCORE_L2, SuperStructurePose.HIGH_SWAP),
             new PoseLink(SuperStructurePose.LOW_SWAP_1, SuperStructurePose.HIGH_SWAP),
@@ -97,7 +97,7 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.HIGH_ALGAE),
             new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.IDLE, SuperStructurePose.ALGAE_SWAP_1),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.ALGAE_SWAP_1),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.LOW_ALGAE),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.HIGH_ALGAE),
@@ -181,13 +181,13 @@ public class SuperStructure {
     public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
-        this.goal = this.currentPose = SuperStructurePose.IDLE;
+        this.goal = this.currentPose = SuperStructurePose.PREPARE_TO_RUN;
 
         atReference =
                 new Trigger(() -> elevator.atReference(goal.elevatorHeightMeters) && arm.atReference(goal.armAngle));
         atReference.onTrue(Commands.runOnce(() -> currentPose = goal));
 
-        new Trigger(DriverStation::isTeleop).onTrue(moveToPose(SuperStructurePose.IDLE));
+        new Trigger(DriverStation::isTeleop).onTrue(moveToPose(SuperStructurePose.PREPARE_TO_RUN));
 
         warmUpCommand().schedule();
     }
@@ -212,7 +212,7 @@ public class SuperStructure {
     public Command retrieveElevator() {
         return Commands.deferredProxy(() -> moveToPose(
                 switch (targetPose()) {
-                    case IDLE,
+                    case PREPARE_TO_RUN,
                             SCORE_L2,
                             SCORE_L3,
                             SCORE_L4,
@@ -221,10 +221,10 @@ public class SuperStructure {
                             LOW_SWAP_2,
                             HIGH_SWAP,
                             ALGAE_SWAP_1,
-                            ALGAE_SWAP_3 -> SuperStructure.SuperStructurePose.IDLE;
+                            ALGAE_SWAP_3 -> SuperStructure.SuperStructurePose.PREPARE_TO_RUN;
                     case LOW_ALGAE, HIGH_ALGAE, SCORE_ALGAE, ALGAE_SWAP_2, ALGAE_SWAP_4 -> SuperStructure
                             .SuperStructurePose.SCORE_ALGAE;
-                    case INTAKE -> SuperStructure.SuperStructurePose.INTAKE;
+                    case IDLE -> SuperStructure.SuperStructurePose.IDLE;
                 }));
     }
 
@@ -341,7 +341,7 @@ public class SuperStructure {
 
     private void testTrajectoryGen() {
         long t0 = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) getTrajectory(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L4);
+        for (int i = 0; i < 10; i++) getTrajectory(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.SCORE_L4);
         System.out.println("tried 10 plans, took " + (System.currentTimeMillis() - t0) + " ms");
     }
 

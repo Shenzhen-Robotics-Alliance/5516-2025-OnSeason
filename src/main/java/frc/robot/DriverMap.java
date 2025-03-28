@@ -30,13 +30,15 @@ public interface DriverMap extends Subsystem {
 
     Trigger intakeButton();
 
-    Trigger moveToL2Button();
+    Trigger l2Button();
 
-    Trigger moveToL3Button();
+    Trigger l3Button();
 
-    Trigger moveToL4Button();
+    Trigger l4Button();
 
     Trigger scoreButton();
+
+    Trigger autoRotationButton();
 
     DoubleSupplier translationalAxisX();
 
@@ -124,17 +126,17 @@ public interface DriverMap extends Subsystem {
         }
 
         @Override
-        public Trigger moveToL2Button() {
+        public Trigger l2Button() {
             return xboxController.a();
         }
 
         @Override
-        public Trigger moveToL3Button() {
+        public Trigger l3Button() {
             return xboxController.b();
         }
 
         @Override
-        public Trigger moveToL4Button() {
+        public Trigger l4Button() {
             return xboxController.y();
         }
 
@@ -152,6 +154,11 @@ public interface DriverMap extends Subsystem {
     final class LeftHandedXbox extends DriverXbox {
         public LeftHandedXbox(int port) {
             super(port);
+        }
+
+        @Override
+        public Trigger autoRotationButton() {
+            return xboxController.rightStick();
         }
 
         @Override
@@ -178,6 +185,11 @@ public interface DriverMap extends Subsystem {
     class RightHandedXbox extends DriverXbox {
         public RightHandedXbox(int port) {
             super(port);
+        }
+
+        @Override
+        public Trigger autoRotationButton() {
+            return xboxController.leftStick();
         }
 
         @Override
@@ -254,17 +266,17 @@ public interface DriverMap extends Subsystem {
         }
 
         @Override
-        public Trigger moveToL2Button() {
+        public Trigger l2Button() {
             return ps5Controller.cross();
         }
 
         @Override
-        public Trigger moveToL3Button() {
+        public Trigger l3Button() {
             return ps5Controller.circle();
         }
 
         @Override
-        public Trigger moveToL4Button() {
+        public Trigger l4Button() {
             return ps5Controller.triangle();
         }
 
@@ -283,6 +295,11 @@ public interface DriverMap extends Subsystem {
 
         public LeftHandedPS5(int port) {
             super(port);
+        }
+
+        @Override
+        public Trigger autoRotationButton() {
+            return ps5Controller.R3();
         }
 
         @Override
@@ -310,6 +327,11 @@ public interface DriverMap extends Subsystem {
 
         public RightHandedPS5(int port) {
             super(port);
+        }
+
+        @Override
+        public Trigger autoRotationButton() {
+            return ps5Controller.L3();
         }
 
         @Override

@@ -35,13 +35,13 @@ public class AutoAlignment {
      * creates a precise auto-alignment command NOTE: AutoBuilder must be configured! the command has two steps: 1.
      * path-find to the target pose, roughly 2. accurate auto alignment
      */
-    public static Command pathFindAndAutoAlign(
+    public static Command pathFindAndAutoAlignStatic(
             HolonomicDriveSubsystem driveSubsystem,
             AprilTagVision vision,
             LEDStatusLight statusLight,
             AutoAlignmentTarget target,
             AutoAlignmentConfigurations config,
-            Command... toScheduleBeforePreciseAlignment) {
+            Command... toScheduleAtFinalApproach) {
         Command pathFindToRoughTarget = pathFindToPose(
                         target.roughTarget(), target.faceToTargetDuringRoughApproach(), config)
                 .onlyIf(() -> RobotState.getInstance()
@@ -60,18 +60,20 @@ public class AutoAlignment {
                                 .getTranslation()
                                 .getNorm());
         Command preciseAlignment = preciseAlignment(
-                        driveSubsystem, target.preciseTarget(), target.preciseApproachDirection(), config)
+                        driveSubsystem,
+                        statusLight,
+                        target.preciseTarget(),
+                        target.preciseApproachDirection(),
+                        config,
+                        toScheduleAtFinalApproach)
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()));
 
         return pathFindToRoughTarget
-                .deadlineFor(roughAlignmentLight(statusLight))
-                .andThen(preciseAlignment
-                        .deadlineFor(preciseAlignmentLight(statusLight))
-                        .beforeStarting(() -> {
-                            for (Command toSchedule : toScheduleBeforePreciseAlignment) toSchedule.schedule();
-                        }))
+                .andThen(preciseAlignment)
+                .beforeStarting(autoAlignmentLight(statusLight)::schedule)
                 .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule)
-                .withName("Path Find & Auto Align");
+                .withName("Path Find & Auto Align")
+                .deadlineFor(Commands.print("aligning...").repeatedly());
     }
 
     public static Command followPathAndAutoAlignStatic(
@@ -81,7 +83,7 @@ public class AutoAlignment {
             PathPlannerPath path,
             AutoAlignmentTarget target,
             AutoAlignmentConfigurations config,
-            Command... toScheduleBeforePreciseAlignment) {
+            Command... toScheduleAtFinalApproach) {
         Command followPath = AutoBuilder.followPath(path)
                 .until(() -> RobotState.getInstance()
                                 .getVisionPose()
@@ -91,18 +93,18 @@ public class AutoAlignment {
                         < config.distanceStartPreciseApproach.in(Meters));
 
         Command preciseAlignment = preciseAlignment(
-                        driveSubsystem, target.preciseTarget(), target.preciseApproachDirection(), config)
+                        driveSubsystem,
+                        statusLight,
+                        target.preciseTarget(),
+                        target.preciseApproachDirection(),
+                        config,
+                        toScheduleAtFinalApproach)
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()))
                 .finallyDo(driveSubsystem::stop)
                 .withName("Follow Path & Auto Align");
-        ;
 
         return followPath
-                .andThen(preciseAlignment
-                        .deadlineFor(preciseAlignmentLight(statusLight))
-                        .beforeStarting(() -> {
-                            for (Command toSchedule : toScheduleBeforePreciseAlignment) toSchedule.schedule();
-                        }))
+                .andThen(preciseAlignment)
                 .finallyDo(alignmentComplete(target::preciseTarget, statusLight)::schedule);
     }
 
@@ -151,17 +153,21 @@ public class AutoAlignment {
 
     public static Command preciseAlignment(
             HolonomicDriveSubsystem driveSubsystem,
+            LEDStatusLight statusLight,
             Pose2d preciseTarget,
             Rotation2d preciseTargetApproachDirection,
-            AutoAlignmentConfigurations config) {
-        return Commands.defer(
-                        () -> AutoBuilder.followPath(getPreciseAlignmentPath(
-                                driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
-                                driveSubsystem.getPose(),
-                                preciseTarget,
-                                preciseTargetApproachDirection,
-                                config)),
-                        Set.of(driveSubsystem))
+            AutoAlignmentConfigurations config,
+            Command... toScheduleAtFinalApproach) {
+        Command[] toSchedule = Arrays.copyOf(toScheduleAtFinalApproach, toScheduleAtFinalApproach.length + 1);
+        toSchedule[toScheduleAtFinalApproach.length] = finalApproachLight(statusLight);
+        return driveSubsystem
+                .defer(() -> AutoBuilder.followPath(getPreciseAlignmentPath(
+                        driveSubsystem.getMeasuredChassisSpeedsFieldRelative(),
+                        driveSubsystem.getPose(),
+                        preciseTarget,
+                        preciseTargetApproachDirection,
+                        config,
+                        toSchedule)))
                 .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED));
     }
 
@@ -170,7 +176,8 @@ public class AutoAlignment {
             Pose2d currentRobotPose,
             Pose2d preciseTarget,
             Rotation2d preciseTargetApproachDirection,
-            AutoAlignmentConfigurations config) {
+            AutoAlignmentConfigurations config,
+            Command... toScheduleAtFinalApproach) {
         Translation2d interiorWaypoint = preciseTarget
                 .getTranslation()
                 .plus(new Translation2d(
@@ -196,12 +203,15 @@ public class AutoAlignment {
 
         List<RotationTarget> rotationTargets = List.of(new RotationTarget(1.0, preciseTarget.getRotation()));
 
+        List<EventMarker> events = new ArrayList<>();
+        for (Command toSchedule : toScheduleAtFinalApproach)
+            events.add(new EventMarker("Final Approach", 1.0, toSchedule));
         PathPlannerPath path = new PathPlannerPath(
                 waypoints,
                 rotationTargets,
                 List.of(),
                 List.of(),
-                List.of(),
+                events,
                 constraints,
                 new IdealStartingState(fieldRelativeSpeedsMPS.getNorm(), currentRobotPose.getRotation()),
                 new GoalEndState(config.hitTargetSpeed, preciseTarget.getRotation()),
@@ -211,24 +221,11 @@ public class AutoAlignment {
         return path;
     }
 
-    private static Command roughAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight
-                .playAnimation(new LEDAnimation.Rainbow(), 1)
-                .repeatedly()
-                .asProxy();
-    }
-
-    private static Command preciseAlignmentLight(LEDStatusLight statusLight) {
-        return statusLight
-                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 3)
-                .asProxy();
-    }
-
     private static Command alignmentComplete(Supplier<Pose2d> goalPose, LEDStatusLight statusLight) {
-        return statusLight
-                .playAnimation(new LEDAnimation.ShowColor(Color.kGreen), 0.5)
-                .asProxy()
-                .onlyIf(() -> {
+        return Commands.either(
+                statusLight.playAnimation(new LEDAnimation.ShowColor(() -> Color.kGreen), 0.5),
+                statusLight.playAnimation(new LEDAnimation.ShowColor(() -> Color.kRed), 0.5),
+                () -> {
                     Twist2d error = RobotState.getInstance().getVisionPose().log(goalPose.get());
                     System.out.println("alignment error: " + error);
                     return Math.abs(error.dtheta)
@@ -236,6 +233,19 @@ public class AutoAlignment {
                             && Math.abs(error.dy) <= AUTO_ALIGNMENT_SUCCESS_BIAS_TOLERANCE.in(Meters)
                             && Math.abs(error.dx) <= AUTO_ALIGNMENT_SUCCESS_DISTANCE_TOLERANCE.in(Meters);
                 });
+    }
+
+    private static Command autoAlignmentLight(LEDStatusLight statusLight) {
+        return statusLight
+                .playAnimation(new LEDAnimation.Rainbow(), 1)
+                .repeatedly()
+                .asProxy();
+    }
+
+    private static Command finalApproachLight(LEDStatusLight statusLight) {
+        return statusLight
+                .playAnimationPeriodically(new LEDAnimation.Charging(Color.kHotPink), 2.0)
+                .asProxy();
     }
 
     public record AutoAlignmentConfigurations(

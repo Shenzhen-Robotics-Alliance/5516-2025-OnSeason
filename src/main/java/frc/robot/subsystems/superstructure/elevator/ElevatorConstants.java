@@ -101,7 +101,7 @@ public final class ElevatorConstants {
                         Volts.of(12),
                         Volts.of(-8),
                         MetersPerSecond.of(3),
-                        MetersPerSecondPerSecond.of(7.2),
+                        MetersPerSecondPerSecond.of(12),
                         Centimeters.of(2));
                 case TEAM_6706_COMPBOT -> new ElevatorPIDConstants(
                         0.1,
