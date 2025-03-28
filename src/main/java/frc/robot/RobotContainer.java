@@ -440,6 +440,8 @@ public class RobotContainer {
                 .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
 
         driver.autoRotationButton()
+                .and(driver.autoAlignmentButtonLeft().negate())
+                .and(driver.autoAlignmentButtonRight().negate())
                 .whileTrue(Commands.either(
                         JoystickDriveAndAimAtTarget.driveAndAimAtTarget(
                                 driveInput,

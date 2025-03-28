@@ -205,7 +205,7 @@ public class AutoAlignment {
 
         List<EventMarker> events = new ArrayList<>();
         for (Command toSchedule : toScheduleAtFinalApproach)
-            events.add(new EventMarker("Final Approach", 1.0, toSchedule));
+            events.add(new EventMarker("Final Approach", 1.0, Commands.runOnce(toSchedule::schedule)));
         PathPlannerPath path = new PathPlannerPath(
                 waypoints,
                 rotationTargets,
