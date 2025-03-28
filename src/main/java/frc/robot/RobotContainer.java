@@ -9,6 +9,7 @@ import static edu.wpi.first.units.Units.Seconds;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -369,47 +370,60 @@ public class RobotContainer {
         driver.lockChassisWithXFormatButton().whileTrue(drive.lockChassisWithXFormation());
 
         /* auto alignment example, delete it for your project */
-        Command prepareElevator = superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN);
         driver.autoAlignmentButtonLeft()
                 .and(driver.l4Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
-                        SuperStructure.SuperStructurePose.SCORE_L4, false, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
+                        SuperStructure.SuperStructurePose.SCORE_L4,
+                        ReefAlignment.Side.LEFT,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG));
         driver.autoAlignmentButtonRight()
                 .and(driver.l4Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
-                        SuperStructure.SuperStructurePose.SCORE_L4, true, DriveControlLoops.REEF_ALIGNMENT_CONFIG));
+                        SuperStructure.SuperStructurePose.SCORE_L4,
+                        ReefAlignment.Side.RIGHT,
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG));
 
         driver.autoAlignmentButtonLeft()
                 .and(driver.l3Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
                         SuperStructure.SuperStructurePose.SCORE_L3,
-                        false,
+                        ReefAlignment.Side.LEFT,
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
         driver.autoAlignmentButtonRight()
                 .and(driver.l3Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
                         SuperStructure.SuperStructurePose.SCORE_L3,
-                        true,
+                        ReefAlignment.Side.RIGHT,
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
 
         driver.autoAlignmentButtonLeft()
                 .and(driver.l2Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
                         SuperStructure.SuperStructurePose.SCORE_L2,
-                        false,
+                        ReefAlignment.Side.LEFT,
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
         driver.autoAlignmentButtonRight()
                 .and(driver.l2Button())
-                .onTrue(prepareElevator)
                 .whileTrue(autoAlign(
                         SuperStructure.SuperStructurePose.SCORE_L2,
-                        true,
+                        ReefAlignment.Side.RIGHT,
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
+
+        driver.autoAlignmentButtonLeft()
+                .and(driver.autoAlignmentButtonRight())
+                .whileTrue(Commands.sequence(
+                        Commands.runOnce(
+                                superStructure.moveToPose(SuperStructure.SuperStructurePose.ALGAE_SWAP_2)::schedule),
+                        ReefAlignment.alignToNearestBranch(
+                                drive,
+                                aprilTagVision,
+                                ledStatusLight,
+                                ReefAlignment.Side.CENTER,
+                                DriveControlLoops.ALGAE_ALIGNMENT_CONFIG,
+                                moveToAlgaePose().andThen(coralHolder.runVolts(-3.0, 0))),
+                        backOffWithAlgae().asProxy()));
+        driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(6.0, 0));
+        isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 
@@ -450,7 +464,8 @@ public class RobotContainer {
                         .ignoringDisable(true));
 
         driver.scoreButton()
-                .onTrue(scoreCoral(1.0))
+                .and(isAlgaeMode.negate())
+                .onTrue(scoreCoral(0.8))
                 .onFalse(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
 
         operator.povDown()
@@ -462,9 +477,7 @@ public class RobotContainer {
         operator.rightBumper()
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
-        operator.leftTrigger(0.5).and(isAlgaeMode).onTrue(coralHolder.runVolts(-3, 0));
-        operator.rightTrigger(0.5).and(isAlgaeMode).whileTrue(coralHolder.runVolts(6, 0));
-        isAlgaeMode.onFalse(coralHolder.runVolts(-1.5, 0).withTimeout(0.5));
+
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
 
         // climbing
@@ -485,16 +498,36 @@ public class RobotContainer {
 
     public Command autoAlign(
             SuperStructure.SuperStructurePose scoringPose,
-            boolean isRightSide,
+            ReefAlignment.Side side,
             AutoAlignment.AutoAlignmentConfigurations autoAlignmentConfig) {
         return ReefAlignment.alignToNearestBranch(
-                drive,
-                aprilTagVision,
-                ledStatusLight,
-                isRightSide,
-                autoAlignmentConfig,
-                superStructure.moveToPose(scoringPose),
-                coralHolder.keepCoralShuffledForever());
+                        drive,
+                        aprilTagVision,
+                        ledStatusLight,
+                        side,
+                        autoAlignmentConfig,
+                        superStructure.moveToPose(scoringPose),
+                        coralHolder.keepCoralShuffledForever())
+                .beforeStarting(superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule);
+    }
+
+    public Command moveToAlgaePose() {
+        return Commands.deferredProxy(() -> {
+            int nearestReefId = ReefAlignment.getNearestReefAlignmentTargetId(
+                    RobotState.getInstance().getVisionPose().getTranslation(), ReefAlignment.Side.CENTER);
+            SuperStructure.SuperStructurePose grabAlgaePose =
+                    switch (nearestReefId) {
+                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.HIGH_ALGAE;
+                        default -> SuperStructure.SuperStructurePose.LOW_ALGAE;
+                    };
+            return superStructure.moveToPose(grabAlgaePose);
+        });
+    }
+
+    public Command backOffWithAlgae() {
+        return drive.run(() -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.5, 0, 0)))
+                .raceWith(Commands.waitSeconds(0.5)
+                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE)));
     }
 
     public void configureLEDEffects() {

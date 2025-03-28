@@ -64,6 +64,14 @@ public class DriveControlLoops {
                     MetersPerSecond.of(0.25),
                     MetersPerSecondPerSecond.of(4.8));
 
+    public static final AutoAlignment.AutoAlignmentConfigurations ALGAE_ALIGNMENT_CONFIG =
+            new AutoAlignment.AutoAlignmentConfigurations(
+                    Meters.of(0.5),
+                    MetersPerSecond.of(0.8),
+                    Meters.of(0.8),
+                    MetersPerSecond.of(0.2),
+                    MetersPerSecondPerSecond.of(2.0));
+
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.6),

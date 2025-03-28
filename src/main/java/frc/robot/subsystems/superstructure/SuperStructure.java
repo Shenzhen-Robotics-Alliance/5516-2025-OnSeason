@@ -98,6 +98,7 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.ALGAE_SWAP_1),
+            new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.ALGAE_SWAP_2),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.LOW_ALGAE),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.HIGH_ALGAE),
