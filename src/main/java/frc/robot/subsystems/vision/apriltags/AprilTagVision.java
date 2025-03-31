@@ -23,7 +23,7 @@ import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
     private final AprilTagVisionIO io;
-    private final AprilTagVisionIO.VisionInputs inputs;
+    private final AprilTagVisionIO.CameraInputs[] inputs;
 
     private final MapleMultiTagPoseEstimator multiTagPoseEstimator;
     private final Alert[] camerasDisconnectedAlerts;
@@ -34,7 +34,8 @@ public class AprilTagVision extends SubsystemBase {
 
     public AprilTagVision(AprilTagVisionIO io, List<PhotonCameraProperties> camerasProperties) {
         this.io = io;
-        this.inputs = new AprilTagVisionIO.VisionInputs(camerasProperties.size());
+        this.inputs = new AprilTagVisionIO.CameraInputs[camerasProperties.size()];
+        for (int i = 0; i < inputs.length; i++) inputs[i] = new AprilTagVisionIO.CameraInputs(i);
         this.camerasDisconnectedAlerts = new Alert[camerasProperties.size()];
         this.camerasNoResultAlerts = new Alert[camerasProperties.size()];
         this.camerasNoResultDebouncer = new Debouncer[camerasProperties.size()];
@@ -58,16 +59,15 @@ public class AprilTagVision extends SubsystemBase {
     @Override
     public void periodic() {
         io.updateInputs(inputs);
-        Logger.processInputs(APRIL_TAGS_VISION_PATH + "Inputs", inputs);
+        for (int i = 0; i < inputs.length; i++) Logger.processInputs(APRIL_TAGS_VISION_PATH + "Camera_" + i, inputs[i]);
 
-        for (int i = 0; i < inputs.camerasInputs.length; i++) {
-            this.camerasDisconnectedAlerts[i].set(!inputs.camerasInputs[i].cameraConnected);
+        for (int i = 0; i < inputs.length; i++) {
+            this.camerasDisconnectedAlerts[i].set(!inputs[i].cameraConnected);
             this.camerasNoResultAlerts[i].set((!camerasDisconnectedAlerts[i].get())
-                    && camerasNoResultDebouncer[i].calculate(!inputs.camerasInputs[i].newPipeLineResultAvailable));
+                    && camerasNoResultDebouncer[i].calculate(!inputs[i].newPipeLineResultAvailable));
         }
 
-        result = multiTagPoseEstimator.estimateRobotPose(
-                inputs.camerasInputs, RobotState.getInstance().getPrimaryEstimatorPose(), getResultsTimeStamp());
+        result = multiTagPoseEstimator.estimateRobotPose(inputs, getResultsTimeStamp());
         result.ifPresent(RobotState.getInstance()::addVisionObservation);
         RobotState.getInstance().visionObservationRate =
                 visionHasResultAverage.calculate(result.isPresent() ? 1.0 : 0.0);
@@ -95,11 +95,11 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     private double getResultsTimeStamp() {
-        if (inputs.camerasInputs.length == 0) return Timer.getTimestamp();
+        if (inputs.length == 0) return Timer.getTimestamp();
         double totalTimeStampSeconds = 0, camerasUsed = 0;
-        for (AprilTagVisionIO.CameraInputs cameraInputs : inputs.camerasInputs) {
-            if (cameraInputs.newPipeLineResultAvailable) {
-                totalTimeStampSeconds += cameraInputs.timeStampSeconds;
+        for (AprilTagVisionIO.CameraInputs input : inputs) {
+            if (input.newPipeLineResultAvailable) {
+                totalTimeStampSeconds += input.timeStampSeconds;
                 camerasUsed++;
             }
         }
@@ -118,10 +118,8 @@ public class AprilTagVision extends SubsystemBase {
                 multiTagPoseEstimator::disableFocusMode);
     }
 
-    private boolean hasCameraDisconnection() {
-        for (int i = 0; i < inputs.camerasAmount; i++) if (!inputs.camerasInputs[i].cameraConnected) return true;
+    public final Trigger cameraDisconnected = new Trigger(() -> {
+        for (AprilTagVisionIO.CameraInputs input : AprilTagVision.this.inputs) if (!input.cameraConnected) return true;
         return false;
-    }
-
-    public final Trigger cameraDisconnected = new Trigger(this::hasCameraDisconnection);
+    });
 }
