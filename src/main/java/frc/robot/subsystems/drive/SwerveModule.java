@@ -66,9 +66,7 @@ public class SwerveModule {
         if (configurationFailed.get())
             // if there is a configuration failure, we don't care if its currently connected
             this.moduleHardwareDisconnected.set(false);
-        else
-            this.moduleHardwareDisconnected.set(
-                    !inputs.driveMotorConnected || !inputs.steerMotorConnected || !inputs.steerEncoderConnected);
+        else this.moduleHardwareDisconnected.set(!inputs.hardwareCurrentlyConnected);
     }
 
     private void updateOdometryPositions() {
@@ -163,10 +161,6 @@ public class SwerveModule {
     /** Returns the module positions received this cycle. */
     public SwerveModulePosition[] getOdometryPositions() {
         return odometryPositions;
-    }
-
-    public boolean hasHardwareFaults() {
-        return !(inputs.driveMotorConnected && inputs.steerMotorConnected && inputs.steerEncoderConnected);
     }
 
     public double getTotalSupplyCurrentAmps() {

@@ -15,10 +15,8 @@ public interface ModuleIO {
         public boolean driveMotorConfigurationFailed = false;
         public boolean steerMotorConfigurationFailed = false;
         public boolean steerEncoderConfigurationFailed = false;
-        public boolean driveMotorConnected = false;
-        public boolean steerMotorConnected = false;
-        public boolean steerEncoderConnected = false;
 
+        public boolean hardwareCurrentlyConnected = false;
         public double driveWheelFinalRevolutions = 0.0;
         public double driveWheelFinalVelocityRevolutionsPerSec = 0.0;
         public double driveMotorAppliedVolts = 0.0;

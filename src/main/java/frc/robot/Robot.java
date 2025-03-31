@@ -92,7 +92,7 @@ public class Robot extends LoggedRobot {
         // Performance Optimization
         ReefConstants.loadStatic();
         SignalLogger.enableAutoLogging(false);
-        Thread.currentThread().setPriority(10);
+        Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
         AprilTagFieldLayout.loadField(VisionConstants.CURRENT_FIELD);
     }
 

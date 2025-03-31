@@ -53,9 +53,7 @@ public class ModuleIOTalon implements ModuleIO {
     private final StatusSignal<Current> steerMotorCurrentDrawn;
 
     // Connection debouncers
-    private final Debouncer driveConnectedDebounce = new Debouncer(0.5);
-    private final Debouncer steerConnectedDebounce = new Debouncer(0.5);
-    private final Debouncer steerEncoderConnectedDebounce = new Debouncer(0.5);
+    private final Debouncer hardwareConnectedDebounce = new Debouncer(0.5);
 
     private final boolean driveConfigurationOK, steerConfigurationOK, canCoderConfigurationOK;
 
@@ -152,14 +150,17 @@ public class ModuleIOTalon implements ModuleIO {
         inputs.steerEncoderConfigurationFailed = !canCoderConfigurationOK;
 
         // Refresh all signals
-        var driveStatus = BaseStatusSignal.refreshAll(
-                driveRotterPosition, driveRotterVelocity, driveAppliedVoltage, driveMotorCurrentDrawn);
-        var steerStatus = BaseStatusSignal.refreshAll(
-                steerAbsolutePosition, steerFinalMechanismVelocity, steerAppliedVoltage, steerMotorCurrentDrawn);
-        var steerEncoderStatus = BaseStatusSignal.refreshAll(steerAbsolutePosition);
-        inputs.driveMotorConnected = driveConnectedDebounce.calculate(driveStatus.isOK());
-        inputs.steerMotorConnected = steerConnectedDebounce.calculate(steerStatus.isOK());
-        inputs.steerEncoderConnected = steerEncoderConnectedDebounce.calculate(steerEncoderStatus.isOK());
+        var statusCode = BaseStatusSignal.refreshAll(
+                driveRotterPosition,
+                driveRotterVelocity,
+                driveAppliedVoltage,
+                driveMotorCurrentDrawn,
+                steerAbsolutePosition,
+                steerFinalMechanismVelocity,
+                steerAppliedVoltage,
+                steerMotorCurrentDrawn,
+                steerAbsolutePosition);
+        inputs.hardwareCurrentlyConnected = hardwareConnectedDebounce.calculate(statusCode.isOK());
 
         // Fetch high-frequency drive encoder inputs
         driveRotterPositionRotations.writeToDoubleInput(

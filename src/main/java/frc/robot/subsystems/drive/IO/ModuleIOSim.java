@@ -60,9 +60,7 @@ public class ModuleIOSim implements ModuleIO {
 
     @Override
     public void updateInputs(ModuleIOInputs inputs) {
-        inputs.driveMotorConnected = true;
-        inputs.steerMotorConnected = true;
-        inputs.steerEncoderConnected = true;
+        inputs.hardwareCurrentlyConnected = true;
 
         inputs.driveMotorAppliedVolts = driveMotor.getAppliedVoltage().in(Volts);
         inputs.steerMotorAppliedVolts = steerMotor.getAppliedVoltage().in(Volts);
