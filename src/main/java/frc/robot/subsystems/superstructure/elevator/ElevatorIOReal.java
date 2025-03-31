@@ -84,4 +84,9 @@ public class ElevatorIOReal implements ElevatorIO {
         NeutralModeValue value = brakeModeEnable ? NeutralModeValue.Brake : NeutralModeValue.Coast;
         elevatorTalon.setNeutralMode(value);
     }
+
+    @Override
+    public void zeroEncoder() {
+        elevatorTalon.setPosition(0.0);
+    }
 }

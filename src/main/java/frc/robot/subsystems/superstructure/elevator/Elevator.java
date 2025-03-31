@@ -239,4 +239,8 @@ public class Elevator extends SubsystemBase {
     public void setMotorBrake(boolean brakeModeEnabled) {
         io.setMotorBrake(brakeModeEnabled);
     }
+
+    public void zeroEncoder() {
+        io.zeroEncoder();
+    }
 }

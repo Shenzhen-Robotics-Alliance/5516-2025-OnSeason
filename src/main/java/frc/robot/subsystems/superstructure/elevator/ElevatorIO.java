@@ -28,4 +28,6 @@ public interface ElevatorIO {
     default void setMotorOutput(double volts) {}
 
     default void setMotorBrake(boolean brakeModeEnable) {}
+
+    default void zeroEncoder() {}
 }

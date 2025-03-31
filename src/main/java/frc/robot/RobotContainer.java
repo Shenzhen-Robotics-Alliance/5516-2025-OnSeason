@@ -346,10 +346,25 @@ public class RobotContainer {
     public void configureButtonBindings() {
         SmartDashboard.putData(
                 "Enable Motor Brake",
-                Commands.runOnce(() -> setMotorBrake(true)).ignoringDisable(true));
+                Commands.runOnce(() -> setMotorBrake(true))
+                        .onlyIf(DriverStation::isDisabled)
+                        .beforeStarting(Commands.print("unlocking motor brakes..."))
+                        .andThen(Commands.print("motor brakes unlocked!"))
+                        .ignoringDisable(true));
         SmartDashboard.putData(
                 "Disable Motor Brake",
-                Commands.runOnce(() -> setMotorBrake(false)).ignoringDisable(true));
+                Commands.runOnce(() -> setMotorBrake(false))
+                        .onlyIf(DriverStation::isDisabled)
+                        .beforeStarting(Commands.print("locking motor brakes..."))
+                        .andThen(Commands.print("motor brakes locked!"))
+                        .ignoringDisable(true));
+        SmartDashboard.putData(
+                "Zero Elevator",
+                elevator.runOnce(elevator::zeroEncoder)
+                        .onlyIf(DriverStation::isDisabled)
+                        .beforeStarting(Commands.print("zeroing elevator..."))
+                        .andThen(Commands.print("elevator encoder zeroed!"))
+                        .ignoringDisable(true));
 
         /* joystick drive command */
         final MapleJoystickDriveInput driveInput = driver.getDriveInput();

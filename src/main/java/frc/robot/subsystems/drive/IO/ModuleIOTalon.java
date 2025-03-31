@@ -95,6 +95,11 @@ public class ModuleIOTalon implements ModuleIO {
                         moduleConstants.SteerMotorInverted
                                 ? InvertedValue.Clockwise_Positive
                                 : InvertedValue.CounterClockwise_Positive);
+        var steerCurrentLimit = new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(STEER_CURRENT_LIMIT)
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(10.0);
         var steerGains = moduleConstants.SteerMotorGains;
         var steerFeedBack = new FeedbackConfigs()
                 .withFeedbackRemoteSensorID(moduleConstants.EncoderId)
@@ -103,6 +108,7 @@ public class ModuleIOTalon implements ModuleIO {
         var steerCloseLoop = new ClosedLoopGeneralConfigs();
         steerCloseLoop.ContinuousWrap = true;
         steerConfigurationOK = tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerOutput, timeOutSeconds))
+                && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerCurrentLimit, timeOutSeconds))
                 && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerGains, timeOutSeconds))
                 && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerFeedBack, timeOutSeconds))
                 && tryUntilOk(5, () -> steerTalon.getConfigurator().apply(steerCloseLoop, timeOutSeconds));
