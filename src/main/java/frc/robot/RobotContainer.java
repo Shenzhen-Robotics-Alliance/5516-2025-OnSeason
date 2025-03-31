@@ -338,6 +338,7 @@ public class RobotContainer {
                 .asProxy();
     }
 
+    private boolean hasAlgae = false;
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link Joystick} or {@link XboxController}), and then passing it to
@@ -429,6 +430,7 @@ public class RobotContainer {
 
         driver.autoAlignmentButtonLeft()
                 .and(driver.autoAlignmentButtonRight())
+                .onTrue(Commands.runOnce(() -> hasAlgae = true))
                 .whileTrue(Commands.sequence(
                         Commands.runOnce(
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.ALGAE_SWAP_2)::schedule),
@@ -438,9 +440,12 @@ public class RobotContainer {
                                 ledStatusLight,
                                 ReefAlignment.Side.CENTER,
                                 DriveControlLoops.ALGAE_ALIGNMENT_CONFIG,
-                                moveToAlgaePose().andThen(coralHolder.runVolts(-3.0, 0))),
-                        backOffWithAlgae().asProxy()));
-        driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(6.0, 0));
+                                moveToAlgaePose().andThen(coralHolder.runVolts(-3.0, 0)))))
+                .onFalse(backOffWithAlgae());
+        driver.scoreButton()
+                .and(isAlgaeMode)
+                .whileTrue(coralHolder.runVolts(6.0, 0))
+                .onFalse(Commands.runOnce(() -> hasAlgae = false));
         isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
@@ -448,6 +453,7 @@ public class RobotContainer {
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
+                .and(new Trigger(() -> !hasAlgae))
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .whileTrue(Commands.sequence(
                                 Commands.waitUntil(
