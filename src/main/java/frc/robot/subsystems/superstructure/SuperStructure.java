@@ -182,13 +182,13 @@ public class SuperStructure {
     public SuperStructure(Elevator elevator, Arm arm) {
         this.elevator = elevator;
         this.arm = arm;
-        this.goal = this.currentPose = SuperStructurePose.PREPARE_TO_RUN;
+        this.goal = this.currentPose = SuperStructurePose.IDLE;
 
         atReference =
                 new Trigger(() -> elevator.atReference(goal.elevatorHeightMeters) && arm.atReference(goal.armAngle));
         atReference.onTrue(Commands.runOnce(() -> currentPose = goal));
 
-        new Trigger(DriverStation::isTeleop).onTrue(moveToPose(SuperStructurePose.PREPARE_TO_RUN));
+        new Trigger(DriverStation::isTeleop).onTrue(moveToPose(SuperStructurePose.IDLE));
 
         warmUpCommand().schedule();
     }
@@ -342,7 +342,7 @@ public class SuperStructure {
 
     private void testTrajectoryGen() {
         long t0 = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) getTrajectory(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.SCORE_L4);
+        for (int i = 0; i < 10; i++) getTrajectory(SuperStructurePose.IDLE, SuperStructurePose.SCORE_L4);
         System.out.println("tried 10 plans, took " + (System.currentTimeMillis() - t0) + " ms");
     }
 

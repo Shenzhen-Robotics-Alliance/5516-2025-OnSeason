@@ -78,7 +78,7 @@ public class Arm extends SubsystemBase {
 
         currentStateRad = new TrapezoidProfile.State(
                 HARDWARE_CONSTANTS.ARM_UPPER_HARD_LIMIT().in(Radians), 0);
-        setpoint = SuperStructure.SuperStructurePose.PREPARE_TO_RUN.armAngle;
+        setpoint = SuperStructure.SuperStructurePose.IDLE.armAngle;
 
         hardwareFaultDetected = false;
         encoderCalibrated = false;
