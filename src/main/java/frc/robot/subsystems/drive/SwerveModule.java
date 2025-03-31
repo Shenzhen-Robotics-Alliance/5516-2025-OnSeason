@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.drive.IO.ModuleIO;
 import frc.robot.subsystems.drive.IO.ModuleIOInputsAutoLogged;
 import frc.robot.utils.AlertsManager;
+import org.ironmaple.utils.mathutils.SwerveStateProjection;
 import org.littletonrobotics.junction.Logger;
 
 public class SwerveModule {
@@ -94,8 +95,8 @@ public class SwerveModule {
             SwerveModuleState newSetpoint, Force robotRelativeFeedforwardForceX, Force robotRelativeFeedforwardForceY) {
         newSetpoint = SwerveModuleState.optimize(newSetpoint, getSteerFacing());
 
-        double desiredMotorVelocityRadPerSec =
-                newSetpoint.speedMetersPerSecond / WHEEL_RADIUS.in(Meters) * DRIVE_GEAR_RATIO;
+        double speedMPSProjected = SwerveStateProjection.project(newSetpoint, getSteerFacing());
+        double desiredMotorVelocityRadPerSec = speedMPSProjected / WHEEL_RADIUS.in(Meters) * DRIVE_GEAR_RATIO;
         Translation2d force2d = new Translation2d(
                 robotRelativeFeedforwardForceX.in(Newtons), robotRelativeFeedforwardForceY.in(Newtons));
         // project force to swerve heading
