@@ -58,6 +58,7 @@ import org.ironmaple.simulation.drivesims.configs.DriveTrainSimulationConfig;
 import org.ironmaple.simulation.drivesims.configs.SwerveModuleSimulationConfig;
 import org.ironmaple.utils.FieldMirroringUtils;
 import org.ironmaple.utils.mathutils.MapleCommonMath;
+import org.littletonrobotics.conduit.ConduitApi;
 import org.littletonrobotics.junction.Logger;
 import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -71,7 +72,7 @@ public class RobotContainer {
     public static final boolean SIMULATE_AUTO_PLACEMENT_INACCURACY = true;
 
     // pdp for akit logging
-    public final LoggedPowerDistribution powerDistribution;
+    public final LoggedPowerDistribution powerDistributionLog;
     // Subsystems
     public final SwerveDrive drive;
     public final AprilTagVision aprilTagVision;
@@ -107,7 +108,7 @@ public class RobotContainer {
                 // Real robot, instantiate hardware IO implementations
                 driveSimulation = null;
 
-                powerDistribution = LoggedPowerDistribution.getInstance(1, PowerDistribution.ModuleType.kRev);
+                powerDistributionLog = LoggedPowerDistribution.getInstance(1, PowerDistribution.ModuleType.kRev);
 
                 /* CTRE Chassis: */
                 drive = new SwerveDrive(
@@ -154,7 +155,8 @@ public class RobotContainer {
                         new Pose2d(3, 3, new Rotation2d()));
                 SimulatedArena.getInstance().addDriveTrainSimulation(driveSimulation);
 
-                powerDistribution = LoggedPowerDistribution.getInstance();
+                powerDistributionLog = LoggedPowerDistribution.getInstance();
+
                 // Sim robot, instantiate physics sim IO implementations
                 final ModuleIOSim frontLeft = new ModuleIOSim(driveSimulation.getModules()[0]),
                         frontRight = new ModuleIOSim(driveSimulation.getModules()[1]),
@@ -193,7 +195,8 @@ public class RobotContainer {
             default -> {
                 this.driveSimulation = null;
 
-                powerDistribution = LoggedPowerDistribution.getInstance();
+                powerDistributionLog = LoggedPowerDistribution.getInstance();
+
                 // Replayed robot, disable IO implementations
                 drive = new SwerveDrive(
                         SwerveDrive.DriveType.GENERIC,
@@ -565,6 +568,8 @@ public class RobotContainer {
     private final Alert autoPlacementIncorrect = AlertsManager.create(
             "Expected Autonomous robot placement position does not match reality, IS THE SELECTED AUTO CORRECT?",
             Alert.AlertType.kWarning);
+    private final Alert lowBattery =
+            AlertsManager.create("Battery voltage 12.0, please keep it above 12.5V", Alert.AlertType.kInfo);
     private static final double AUTO_PLACEMENT_TOLERANCE_METERS = 0.25;
     private static final double AUTO_PLACEMENT_TOLERANCE_DEGREES = 5;
 
@@ -592,6 +597,11 @@ public class RobotContainer {
                 || Math.abs(difference.getRotation().getDegrees()) > AUTO_PLACEMENT_TOLERANCE_DEGREES;
         // autoPlacementIncorrect.set(autoPlacementIncorrectDetected && DriverStation.isDisabled());
         autoPlacementIncorrect.set(false);
+
+        double voltage = ConduitApi.getInstance().getPDPVoltage();
+        lowBattery.setText(String.format(
+                "Battery voltage: %.1fV, please try to keep it above 12.5V before going on field", voltage));
+        lowBattery.set(DriverStation.isDisabled() && voltage < 12.5);
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
     }
