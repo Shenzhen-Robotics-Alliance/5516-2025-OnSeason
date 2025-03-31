@@ -137,8 +137,9 @@ public class ReefAlignment {
         return branchIndex;
     }
 
+    private static boolean[] reef = new boolean[12];
+
     public static boolean[] displaySelectedBranch() {
-        boolean[] reef = new boolean[12];
         Arrays.fill(reef, false);
         if (selectedSide == Side.CENTER || selectedSide == Side.LEFT)
             reef[getBranchIndexFromReefPartId(selectedReefPartId, Side.LEFT)] = true;
@@ -148,7 +149,6 @@ public class ReefAlignment {
     }
 
     public static boolean[] displayNearestBranch() {
-        boolean[] reef = new boolean[12];
         Arrays.fill(reef, false);
         Translation2d robotPosition = RobotState.getInstance().getVisionPose().getTranslation();
         if (selectedSide == Side.CENTER || selectedSide == Side.LEFT)

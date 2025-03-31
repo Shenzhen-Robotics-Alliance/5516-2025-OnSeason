@@ -112,7 +112,7 @@ public interface AprilTagVisionIO {
         @Override
         public void toLog(LogTable table) {
             table.put("camerasAmount", camerasAmount);
-            Arrays.stream(camerasInputs).forEach(cameraInputs -> cameraInputs.writeToLog(table));
+            for (CameraInputs cameraInput : camerasInputs) cameraInput.writeToLog(table);
         }
 
         @Override

@@ -101,8 +101,8 @@ public class DriveTrainConstants {
     public static final Supplier<GyroSimulation> gyroSimulationFactory = COTS.ofPigeon2();
 
     /* dead configs, don't change them */
-    public static final int ODOMETRY_CACHE_CAPACITY = 10;
-    public static final double ODOMETRY_FREQUENCY = 250.0;
+    public static final int ODOMETRY_CACHE_CAPACITY = 5;
+    public static final double ODOMETRY_FREQUENCY = 200.0;
     public static final double ODOMETRY_WAIT_TIMEOUT_SECONDS = 0.1;
     public static final int SIMULATION_TICKS_IN_1_PERIOD = 5;
 }

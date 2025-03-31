@@ -15,7 +15,7 @@ import java.util.Arrays;
 import org.littletonrobotics.junction.Logger;
 
 public class LEDStatusLight extends SubsystemBase {
-    private static final int DASHBOARD_DISPLAY_LENGTH = 20;
+    private static final int DASHBOARD_DISPLAY_LENGTH = 8;
     private static AddressableLED led = null;
     private final Color[] ledColors;
     private final Color[] dashboardColors;
@@ -55,7 +55,7 @@ public class LEDStatusLight extends SubsystemBase {
                 views[led].setLED(viewsReversed[led] ? ledColors.length - i - 1 : i, ledColors[i]);
         led.setData(buffer);
         for (int i = 0; i < DASHBOARD_DISPLAY_LENGTH; i++) dashboardColorsHex[i] = dashboardColors[i].toHexString();
-        Logger.recordOutput("Status Light", dashboardColorsHex);
+        if (Robot.LOG_DETAILS) Logger.recordOutput("Status Light", dashboardColorsHex);
     }
 
     public Command playAnimation(LEDAnimation animation, double timeSeconds) {

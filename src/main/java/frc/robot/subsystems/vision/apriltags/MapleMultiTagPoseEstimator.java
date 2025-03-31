@@ -13,7 +13,6 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.Robot;
-import frc.robot.constants.RobotMode;
 import frc.robot.utils.CustomMaths.Statistics;
 import java.util.*;
 import org.littletonrobotics.junction.Logger;
@@ -21,8 +20,6 @@ import org.littletonrobotics.junction.Logger;
 public class MapleMultiTagPoseEstimator {
     private OptionalInt tagToFocus;
     private List<Integer> cameraToFocus;
-    public static final boolean LOG_DETAILED_FILTERING_DATA = Robot.CURRENT_ROBOT_MODE != RobotMode.REAL;
-
     private final AprilTagFieldLayout fieldLayout;
     private final VisionResultsFilter filter;
     private final List<PhotonCameraProperties> camerasProperties;
@@ -152,7 +149,7 @@ public class MapleMultiTagPoseEstimator {
             AprilTagVisionIO.CameraInputs cameraInput,
             PhotonCameraProperties cameraProperty,
             Pose2d currentOdometryPose) {
-        if (!LOG_DETAILED_FILTERING_DATA) return;
+        if (!Robot.LOG_DETAILS) return;
         for (int i = 0; i < cameraInput.fiducialMarksID.length; i++) {
             if (shouldDiscardTagObservation(
                     cameraInput.cameraID,
@@ -204,7 +201,7 @@ public class MapleMultiTagPoseEstimator {
 
         applyFilteringToRawRobotPose3dEstimations();
 
-        if (LOG_DETAILED_FILTERING_DATA) logFilteringData();
+        if (Robot.LOG_DETAILS) logFilteringData();
 
         return getEstimationResultFromValidObservations(timeStampSeconds);
     }
@@ -282,7 +279,7 @@ public class MapleMultiTagPoseEstimator {
     private void logFilteringData() {
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Filtering/CurrentFilterImplementation", filter.getFilterImplementationName());
-        if (!LOG_DETAILED_FILTERING_DATA) return;
+        if (!Robot.LOG_DETAILS) return;
 
         /* these are the detailed filtering data, logging them on RobotRIO1.0 is a bad idea, if you want them, replay the log */
         Logger.recordOutput(

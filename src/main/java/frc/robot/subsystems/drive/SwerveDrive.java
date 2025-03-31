@@ -250,7 +250,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     @Override
     public void runRobotCentricSpeedsWithFeedforwards(ChassisSpeeds speeds, DriveFeedforwards feedforwards) {
-        Logger.recordOutput("SwerveSetpoint/desiredSpeeds", speeds);
+        if (Robot.LOG_DETAILS) Logger.recordOutput("SwerveSetpoint/desiredSpeeds", speeds);
         this.setpoint = new SwerveSetpoint(speeds, getModuleStates(), feedforwards);
         executeSetpoint();
     }
@@ -263,7 +263,8 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
 
     private void executeSetpoint() {
         setpoint = constrainSetpoint(setpoint);
-        Logger.recordOutput("SwerveSetpoint/currentSwerveSpeeds", setpoint.robotRelativeSpeeds());
+        if (Robot.LOG_DETAILS)
+            Logger.recordOutput("SwerveSetpoint/currentSwerveSpeeds", setpoint.robotRelativeSpeeds());
         ChassisSpeeds speeds = setpoint.robotRelativeSpeeds();
 
         OptionalDouble angularVelocityOverride =
@@ -271,9 +272,10 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
         if (angularVelocityOverride.isPresent())
             speeds = new ChassisSpeeds(
                     speeds.vxMetersPerSecond, speeds.vyMetersPerSecond, angularVelocityOverride.getAsDouble());
-        Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverride", speeds);
+        if (Robot.LOG_DETAILS) Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverride", speeds);
         speeds = HolonomicDriveSubsystem.constrainSpeeds(speeds);
-        Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained", speeds);
+        if (Robot.LOG_DETAILS)
+            Logger.recordOutput("SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained", speeds);
 
         SwerveModuleState[] setPointStates = DRIVE_KINEMATICS.toSwerveModuleStates(speeds);
         SwerveDriveKinematics.desaturateWheelSpeeds(setPointStates, CHASSIS_MAX_VELOCITY);
