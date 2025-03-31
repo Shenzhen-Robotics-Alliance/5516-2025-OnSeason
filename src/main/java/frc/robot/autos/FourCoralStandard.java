@@ -59,6 +59,8 @@ public class FourCoralStandard implements Auto {
         int fourthGoal = isRightSide ? 1 : 0;
 
         // Score preloaded
+        commandGroup.addCommands(Commands.runOnce(
+                robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule));
         commandGroup.addCommands(Commands.runOnce(Commands.waitSeconds(0.6).andThen(robot.moveToL4())::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
                 robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4()));

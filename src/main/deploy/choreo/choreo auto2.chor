@@ -7,15 +7,15 @@
    "maxacc":{
     "dimension":"LinAcc",
     "var":{
-     "exp":"6 m / s ^ 2",
-     "val":6.0
+     "exp":"5.5 m / s ^ 2",
+     "val":5.5
     }
    },
    "maxvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"4.5 m / s",
-     "val":4.5
+     "exp":"4 m / s",
+     "val":4.0
     }
    },
    "stationspeed":{

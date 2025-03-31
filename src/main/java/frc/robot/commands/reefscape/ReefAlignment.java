@@ -1,7 +1,7 @@
 package frc.robot.commands.reefscape;
 
-import static edu.wpi.first.units.Units.Centimeters;
 import static edu.wpi.first.units.Units.Meters;
+import static frc.robot.constants.DriveControlLoops.*;
 import static frc.robot.constants.ReefConstants.*;
 
 import com.pathplanner.lib.path.PathPlannerPath;
@@ -25,8 +25,6 @@ import org.ironmaple.utils.FieldMirroringUtils;
 import org.littletonrobotics.junction.Logger;
 
 public class ReefAlignment {
-    public static final Distance ROUGH_APPROACHT_POSE_TO_TARGET_DISTANCE = Meters.of(1);
-    public static final Distance ROUGH_APPROACH_POSE_TO_TARGET_MARGIN = Centimeters.of(15);
     public static final Translation2d REEF_CENTER_BLUE = new Translation2d(4.5, 4);
 
     public enum Side {
