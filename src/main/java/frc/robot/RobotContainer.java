@@ -329,7 +329,7 @@ public class RobotContainer {
         return Commands.deferredProxy(() -> superStructure
                 .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4_COMPLETE)
                 .onlyIf(() -> superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_L4)
-                .alongWith(coralHolder.scoreCoral(scoringTimeOut)));
+                .beforeStarting(coralHolder.scoreCoral(scoringTimeOut)::schedule));
     }
 
     public Command moveToL4() {

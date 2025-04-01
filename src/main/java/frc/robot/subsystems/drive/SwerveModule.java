@@ -17,7 +17,6 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj.Alert;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import frc.robot.subsystems.drive.IO.ModuleIO;
 import frc.robot.subsystems.drive.IO.ModuleIOInputsAutoLogged;
@@ -58,7 +57,6 @@ public class SwerveModule {
 
     public void modulePeriodic() {
         updateOdometryPositions();
-        if (DriverStation.isDisabled()) stop();
 
         configurationFailed.set(inputs.driveMotorConfigurationFailed
                 || inputs.steerMotorConfigurationFailed
