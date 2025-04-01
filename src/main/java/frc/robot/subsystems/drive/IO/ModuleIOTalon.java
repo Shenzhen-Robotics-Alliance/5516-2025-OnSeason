@@ -224,13 +224,16 @@ public class ModuleIOTalon implements ModuleIO {
     public void requestDriveVelocityControl(double desiredMotorVelocityRadPerSec, double feedforwardMotorVoltage) {
         driveTalon.setControl(velocityVoltage
                 .withVelocity(Units.radiansToRotations(desiredMotorVelocityRadPerSec))
-                .withFeedForward(feedforwardMotorVoltage));
+                .withFeedForward(feedforwardMotorVoltage)
+                .withUpdateFreqHz(100.0));
     }
 
     private final PositionVoltage positionVoltage = new PositionVoltage(0.0);
 
     @Override
     public void requestSteerPositionControl(Rotation2d desiredSteerAbsoluteFacing) {
-        steerTalon.setControl(positionVoltage.withPosition(desiredSteerAbsoluteFacing.getRotations()));
+        steerTalon.setControl(positionVoltage
+                .withPosition(desiredSteerAbsoluteFacing.getRotations())
+                .withUpdateFreqHz(200.0));
     }
 }
