@@ -446,7 +446,9 @@ public class RobotContainer {
                 .and(isAlgaeMode)
                 .whileTrue(coralHolder.runVolts(6.0, 0))
                 .onFalse(Commands.runOnce(() -> hasAlgae = false));
-        isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
+        isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0)
+                .withTimeout(0.5)
+                .finallyDo(() -> hasAlgae = false));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 
