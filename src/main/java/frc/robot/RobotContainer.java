@@ -6,6 +6,7 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.Seconds;
+import static frc.robot.subsystems.superstructure.SuperStructure.SuperStructurePose.*;
 
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import edu.wpi.first.math.geometry.*;
@@ -229,14 +230,17 @@ public class RobotContainer {
         SmartDashboard.putData("Select Test", testChooser = buildTestsChooser());
         autoChooser = buildAutoChooser();
 
-        isAlgaeMode = new Trigger(() -> superStructure.currentPose() == SuperStructure.SuperStructurePose.LOW_ALGAE
-                || superStructure.currentPose() == SuperStructure.SuperStructurePose.HIGH_ALGAE
-                || superStructure.currentPose() == SuperStructure.SuperStructurePose.ALGAE_SWAP_2
-                || superStructure.currentPose() == SuperStructure.SuperStructurePose.SCORE_ALGAE
-                || superStructure.targetPose() == SuperStructure.SuperStructurePose.LOW_ALGAE
-                || superStructure.targetPose() == SuperStructure.SuperStructurePose.HIGH_ALGAE
-                || superStructure.targetPose() == SuperStructure.SuperStructurePose.ALGAE_SWAP_2
-                || superStructure.targetPose() == SuperStructure.SuperStructurePose.SCORE_ALGAE);
+        Set<SuperStructure.SuperStructurePose> algaePoses = Set.of(
+                PREPARE_TO_GRAB_LOW_ALGAE,
+                PREPARE_TO_GRAB_HIGH_ALGAE,
+                GRAB_LOW_ALGAE,
+                GRAB_HIGH_ALGAE,
+                ALGAE_SWAP_1,
+                ALGAE_SWAP_2,
+                ALGAE_SWAP_3,
+                ALGAE_SWAP_4,
+                SCORE_ALGAE);
+        isAlgaeMode = new Trigger(() -> algaePoses.contains(superStructure.targetPose()));
         configureButtonBindings();
         configureLEDEffects();
 
@@ -338,7 +342,6 @@ public class RobotContainer {
                 .asProxy();
     }
 
-    private boolean hasAlgae = false;
     /**
      * Use this method to define your button->command mappings. Buttons can be created by instantiating a
      * {@link GenericHID} or one of its subclasses ({@link Joystick} or {@link XboxController}), and then passing it to
@@ -430,7 +433,6 @@ public class RobotContainer {
 
         driver.autoAlignmentButtonLeft()
                 .and(driver.autoAlignmentButtonRight())
-                .onTrue(Commands.runOnce(() -> hasAlgae = true))
                 .whileTrue(Commands.sequence(
                         Commands.runOnce(
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.ALGAE_SWAP_2)::schedule),
@@ -440,22 +442,26 @@ public class RobotContainer {
                                 ledStatusLight,
                                 ReefAlignment.Side.CENTER,
                                 DriveControlLoops.ALGAE_ALIGNMENT_CONFIG,
-                                moveToAlgaePose().andThen(coralHolder.runVolts(-3.0, 0)))))
+                                moveToAlgaePose().andThen(coralHolder.runVolts(-1.2, 0))),
+                        Commands.deferredProxy(() -> superStructure.moveToPose(
+                                switch (superStructure.targetPose()) {
+                                    case PREPARE_TO_GRAB_LOW_ALGAE -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
+                                    case PREPARE_TO_GRAB_HIGH_ALGAE -> SuperStructure.SuperStructurePose
+                                            .GRAB_HIGH_ALGAE;
+                                    default -> superStructure.targetPose();
+                                })),
+                        ledStatusLight
+                                .playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.25, 4)
+                                .asProxy()))
                 .onFalse(backOffWithAlgae());
-        driver.scoreButton()
-                .and(isAlgaeMode)
-                .whileTrue(coralHolder.runVolts(6.0, 0))
-                .onFalse(Commands.runOnce(() -> hasAlgae = false));
-        isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0)
-                .withTimeout(0.5)
-                .finallyDo(() -> hasAlgae = false));
+        driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(6.0, 0));
+        isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
 
         Command flashLEDForIntake =
                 ledStatusLight.playAnimationPeriodically(new LEDAnimation.Charging(Color.kPurple), 4);
         driver.intakeButton()
-                .and(new Trigger(() -> !hasAlgae))
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE))
                 .whileTrue(Commands.sequence(
                                 Commands.waitUntil(
@@ -498,10 +504,10 @@ public class RobotContainer {
 
         operator.povDown()
                 .and(operator.leftBumper().or(isAlgaeMode))
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.LOW_ALGAE));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE));
         operator.povUp()
                 .and(operator.leftBumper().or(isAlgaeMode))
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.HIGH_ALGAE));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE));
         operator.rightBumper()
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
@@ -545,23 +551,24 @@ public class RobotContainer {
                     RobotState.getInstance().getVisionPose().getTranslation(), ReefAlignment.Side.CENTER);
             SuperStructure.SuperStructurePose grabAlgaePose =
                     switch (nearestReefId) {
-                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.HIGH_ALGAE;
-                        default -> SuperStructure.SuperStructurePose.LOW_ALGAE;
+                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE;
+                        default -> SuperStructure.SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE;
                     };
             return superStructure.moveToPose(grabAlgaePose);
         });
     }
 
     public Command backOffWithAlgae() {
-        return drive.run(() -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.5, 0, 0)))
-                .raceWith(Commands.waitSeconds(0.5)
-                        .andThen(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE)));
+        return drive.run(() -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-1.0, 0, 0)))
+                .raceWith(Commands.sequence(Commands.waitSeconds(0.7), superStructure.moveToPose(SCORE_ALGAE)));
     }
 
     public void configureLEDEffects() {
         ledStatusLight.setDefaultCommand(ledStatusLight.showRobotState());
-        coralHolder.hasCoral.onTrue(
-                ledStatusLight.playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.2, 4));
+        coralHolder
+                .hasCoral
+                .and(isAlgaeMode.negate())
+                .onTrue(ledStatusLight.playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.2, 4));
     }
 
     /**
@@ -627,6 +634,8 @@ public class RobotContainer {
         lowBattery.set(DriverStation.isDisabled() && voltage < 12.5);
 
         AlertsManager.updateLEDAndLog(ledStatusLight);
+
+        Logger.recordOutput("Algae Mode On", isAlgaeMode);
     }
 
     public static boolean motorBrakeEnabled = false;

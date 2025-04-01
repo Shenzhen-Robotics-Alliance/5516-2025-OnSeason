@@ -90,8 +90,8 @@ public final class ArmConstants {
                         0.79,
                         0.01,
                         6.0 / Math.toRadians(30),
-                        RotationsPerSecond.of(2),
-                        RotationsPerSecondPerSecond.of(6),
+                        RotationsPerSecond.of(1.5),
+                        RotationsPerSecondPerSecond.of(3),
                         Degrees.of(3));
                 case TEAM_6706_COMPBOT -> new ArmPIDConstants(
                         0.05,

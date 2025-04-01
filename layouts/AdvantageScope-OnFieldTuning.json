@@ -44,7 +44,6 @@
             "/AdvantageKit/RealOutputs/Reef",
             "/AdvantageKit/RealOutputs/Reef/RobotToSelectedBranchTag",
             "/AdvantageKit/RealOutputs/SwerveStates",
-            "/RealOutputs/Vision",
             "/RealOutputs/Vision/AprilTags",
             "/RealOutputs/Vision/AprilTags/Filtering",
             "/RealOutputs/SwerveStates",
@@ -55,7 +54,6 @@
             "/RealOutputs/SwerveSetpoint",
             "/RealOutputs/SwerveSetpoint/executedSpeedsWithRotationalOverride",
             "/RealOutputs/SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained",
-            "/RealOutputs",
             "/Drive",
             "/RealOutputs/LoggedRobot",
             "/PowerDistribution",
@@ -64,7 +62,7 @@
           ]
         },
         "tabs": {
-          "selected": 9,
+          "selected": 4,
           "tabs": [
             {
               "type": 0,
@@ -115,7 +113,7 @@
                 "cameraPosition": [
                   -11.734501886941919,
                   2.5349125838870825,
-                  -0.9484207538574022
+                  -0.9484207538574128
                 ],
                 "cameraTarget": [
                   0,
@@ -348,7 +346,7 @@
                 "leftSources": [
                   {
                     "type": "smooth",
-                    "logKey": "/SystemStats/BatteryVoltage",
+                    "logKey": "/PowerDistribution/Voltage",
                     "logType": "Number",
                     "visible": true,
                     "options": {
@@ -659,6 +657,15 @@
                 "sources": [
                   {
                     "type": "independent",
+                    "logKey": "/RealOutputs/LoggedRobot/GCTimeMS",
+                    "logType": "Number",
+                    "visible": true,
+                    "options": {
+                      "color": "#af2437"
+                    }
+                  },
+                  {
+                    "type": "independent",
                     "logKey": "/Drive/OdometryThread/OdometryTicksCountInPreviousRobotPeriod",
                     "logType": "Number",
                     "visible": true,
@@ -673,15 +680,6 @@
                     "visible": true,
                     "options": {
                       "color": "#2b66a2"
-                    }
-                  },
-                  {
-                    "type": "independent",
-                    "logKey": "/RealOutputs/LoggedRobot/GCTimeMS",
-                    "logType": "Number",
-                    "visible": true,
-                    "options": {
-                      "color": "#af2437"
                     }
                   }
                 ],
