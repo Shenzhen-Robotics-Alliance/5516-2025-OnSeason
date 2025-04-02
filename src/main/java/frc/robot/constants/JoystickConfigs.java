@@ -2,7 +2,7 @@ package frc.robot.constants;
 
 /** Configs for the driver's joystick See {@link frc.robot.utils.MapleJoystickDriveInput} */
 public class JoystickConfigs {
-    public static final double DEFAULT_TRANSLATIONAL_SENSITIVITY = 0.5;
+    public static final double DEFAULT_TRANSLATIONAL_SENSITIVITY = 0.75;
     public static final double DEFAULT_ROTATIONAL_SENSITIVITY = 0.7;
 
     /**

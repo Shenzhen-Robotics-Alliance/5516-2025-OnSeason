@@ -22,9 +22,9 @@ public class SuperStructure {
     public enum SuperStructurePose {
         // Useful poses
         IDLE(0, Degrees.of(136)),
-        PREPARE_TO_RUN(0.05, Degrees.of(110)),
-        SCORE_L2(0.22, Degrees.of(110)),
-        SCORE_L3(0.64, Degrees.of(110)),
+        PREPARE_TO_RUN(0.05, Degrees.of(112)),
+        SCORE_L2(0.22, Degrees.of(112)),
+        SCORE_L3(0.64, Degrees.of(112)),
         SCORE_L4(1.24, Degrees.of(102)),
         SCORE_L4_COMPLETE(1.31, Degrees.of(98)),
 
@@ -33,11 +33,11 @@ public class SuperStructure {
         // Allow Arm to swing down at zero height
 
         // At 0.3 meters height, allow arm to swing up and down
-        LOW_SWAP_1(0.3, Degrees.of(110)),
+        LOW_SWAP_1(0.3, Degrees.of(112)),
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.21, Degrees.of(110)),
+        HIGH_SWAP(1.21, Degrees.of(112)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
@@ -49,9 +49,9 @@ public class SuperStructure {
         GRAB_LOW_ALGAE(0.60, Degrees.of(-25)),
         GRAB_HIGH_ALGAE(1.00, Degrees.of(-25)),
         SCORE_ALGAE(0.15, Degrees.of(-45)),
-        ALGAE_SWAP_1(0.3, Degrees.of(110)),
+        ALGAE_SWAP_1(0.3, Degrees.of(112)),
         ALGAE_SWAP_2(0.3, Degrees.of(-45)),
-        ALGAE_SWAP_3(0.9, Degrees.of(110)),
+        ALGAE_SWAP_3(0.9, Degrees.of(112)),
         ALGAE_SWAP_4(0.9, Degrees.of(-45));
 
         public final double elevatorHeightMeters;

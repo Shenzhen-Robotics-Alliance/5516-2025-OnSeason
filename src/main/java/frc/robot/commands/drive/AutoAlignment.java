@@ -206,11 +206,19 @@ public class AutoAlignment {
         List<EventMarker> events = new ArrayList<>();
         for (Command toSchedule : toScheduleAtFinalApproach)
             events.add(new EventMarker("Final Approach", 1.0, Commands.runOnce(toSchedule::schedule)));
+        ConstraintsZone stopInTheEnd = new ConstraintsZone(
+                1.85,
+                2.0,
+                new PathConstraints(
+                        config.hitTargetSpeed(),
+                        config.preciseAlignmentMaxAcceleration(),
+                        ANGULAR_VELOCITY_SOFT_CONSTRAIN_LOW,
+                        ANGULAR_ACCELERATION_SOFT_CONSTRAIN_LOW));
         PathPlannerPath path = new PathPlannerPath(
                 waypoints,
                 rotationTargets,
                 List.of(),
-                List.of(),
+                List.of(stopInTheEnd),
                 events,
                 constraints,
                 new IdealStartingState(fieldRelativeSpeedsMPS.getNorm(), currentRobotPose.getRotation()),
