@@ -21,10 +21,10 @@
     0.038
   ],
   "cameras": [
-    {"name":"FrontLeftLowerCam","position":[0.02,0.29,0.55],"fov":72.0,"rotations":[{"axis":"y","degrees":28.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
-    {"name":"FrontRightLowerCam","position":[0.02,-0.29,0.55],"fov":72.0,"rotations":[{"axis":"y","degrees":28.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
-    {"name":"FrontLeftUpperCam","position":[0.02,0.29,0.59],"fov":58,"rotations":[{"axis":"y","degrees":20},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
-    {"name":"FrontRightUpperCam","position":[0.02,-0.29,0.59],"fov":58,"rotations":[{"axis":"y","degrees":20},{"axis":"z","degrees":0.0}],"resolution":[1280,800]}
+    {"name":"FrontLeftLowerCam","position":[0.02,0.27,0.57],"fov":72.0,"rotations":[{"axis":"y","degrees":28.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontRightLowerCam","position":[0.02,-0.27,0.57],"fov":72.0,"rotations":[{"axis":"y","degrees":28.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontLeftUpperCam","position":[0.02,0.27,0.61],"fov":58,"rotations":[{"axis":"y","degrees":18.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]},
+    {"name":"FrontRightUpperCam","position":[0.02,-0.27,0.61],"fov":58,"rotations":[{"axis":"y","degrees":18.0},{"axis":"z","degrees":0.0}],"resolution":[1280,800]}
   ],
   "components": [
     {
