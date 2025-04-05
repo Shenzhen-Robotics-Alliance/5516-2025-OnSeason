@@ -32,6 +32,7 @@ public class Elevator extends SubsystemBase {
 
     // Alerts
     private final Alert elevatorHardwareFaultsAlert;
+    private final Alert elevatorFollowerDisconnectedAlert;
     private final Alert elevatorExceedLimitAlert;
 
     /** Debounce for hardware faults */
@@ -62,6 +63,8 @@ public class Elevator extends SubsystemBase {
         this.elevatorExceedLimitAlert.set(false);
         this.elevatorHardwareFaultsAlert =
                 AlertsManager.create("Elevator hardware faults detected!", Alert.AlertType.kError);
+        this.elevatorFollowerDisconnectedAlert =
+                AlertsManager.create("Elevator follower motor disconnected", Alert.AlertType.kError);
         this.hardwareFaultDebouncer = new Debouncer(0.3, Debouncer.DebounceType.kRising);
         this.elevatorHardwareFaultsAlert.set(false);
 
@@ -194,6 +197,7 @@ public class Elevator extends SubsystemBase {
 
         // Update Alerts
         hardwareFaultDetected = hardwareFaultDebouncer.calculate(!inputs.hardwareConnected);
+        elevatorFollowerDisconnectedAlert.set(!inputs.followerConnected);
         elevatorHardwareFaultsAlert.set(hardwareFaultDetected);
         if (getHeightMeters() < -PID_CONSTANTS.TOLERANCE().in(Meters)) {
             elevatorExceedLimitAlert.setText("Elevator height exceeds lower limit: " + getHeightMeters() + " Meters");

@@ -25,18 +25,6 @@ public final class ArmConstants {
 
     public static final ArmHardwareConstants HARDWARE_CONSTANTS =
             switch (Robot.CURRENT_ROBOT) {
-                case TEAM_5516_DEVBOT_HYDROXIDE_I -> new ArmHardwareConstants(
-                        Centimeters.of(26.0),
-                        Kilograms.of(4.0),
-                        DCMotor.getKrakenX60(1),
-                        44.0 / 16.0 * 48.0 / 20.0 * 9.0,
-                        Degrees.of(136.0),
-                        Degrees.of(-48.0),
-                        Rotations.of(0.0),
-                        0,
-                        false,
-                        4,
-                        false);
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmHardwareConstants(
                         Centimeters.of(26.0),
                         Kilograms.of(3.0),
@@ -49,7 +37,19 @@ public final class ArmConstants {
                         false,
                         4,
                         true);
-                case TEAM_6706_COMPBOT -> new ArmHardwareConstants(
+                case TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new ArmHardwareConstants(
+                        Centimeters.of(26.0),
+                        Kilograms.of(3.0),
+                        DCMotor.getKrakenX60(1),
+                        44.0 / 16.0 * 15.0,
+                        Degrees.of(136.0),
+                        Degrees.of(-48.0),
+                        Rotations.of(0.260),
+                        9,
+                        false,
+                        3,
+                        true);
+                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new ArmHardwareConstants(
                         Centimeters.of(26.0),
                         Kilograms.of(4.0),
                         DCMotor.getKrakenX60(1),
@@ -75,16 +75,7 @@ public final class ArmConstants {
 
     public static final ArmPIDConstants PID_CONSTANTS =
             switch (Robot.CURRENT_ROBOT) {
-                case TEAM_5516_DEVBOT_HYDROXIDE_I -> new ArmPIDConstants(
-                        0.05,
-                        0.3,
-                        1.13,
-                        0.01,
-                        9.0 / Math.toRadians(30),
-                        RotationsPerSecond.of(1.8),
-                        RotationsPerSecondPerSecond.of(4),
-                        Degrees.of(3));
-                case TEAM_5516_COMPBOT_HYDROXIDE_II -> new ArmPIDConstants(
+                case TEAM_5516_COMPBOT_HYDROXIDE_II, TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new ArmPIDConstants(
                         0.03,
                         0.30,
                         0.79,
@@ -93,7 +84,7 @@ public final class ArmConstants {
                         RotationsPerSecond.of(1.5),
                         RotationsPerSecondPerSecond.of(3),
                         Degrees.of(3));
-                case TEAM_6706_COMPBOT -> new ArmPIDConstants(
+                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new ArmPIDConstants(
                         0.05,
                         0.33,
                         0.76,

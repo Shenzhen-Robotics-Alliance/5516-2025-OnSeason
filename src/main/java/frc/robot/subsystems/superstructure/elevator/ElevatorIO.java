@@ -8,6 +8,8 @@ public interface ElevatorIO {
         /** Whether the CAN communications between the rio and the motor are good. */
         public boolean hardwareConnected = false;
 
+        public boolean followerConnected = false;
+
         /** The relative encoder angle, measured by the relative encoder. Gearing is NOT considered. */
         public double encoderAngleRad = 0.0;
 
