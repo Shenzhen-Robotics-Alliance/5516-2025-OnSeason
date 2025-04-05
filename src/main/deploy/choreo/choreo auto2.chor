@@ -4,18 +4,11 @@
  "type":"Swerve",
  "variables":{
   "expressions":{
-   "approachacc":{
-    "dimension":"LinAcc",
-    "var":{
-     "exp":"3 m / s ^ 2",
-     "val":3.0
-    }
-   },
    "lowacc":{
     "dimension":"LinAcc",
     "var":{
-     "exp":"2.5 m / s ^ 2",
-     "val":2.5
+     "exp":"2 m / s ^ 2",
+     "val":2.0
     }
    },
    "maxacc":{
