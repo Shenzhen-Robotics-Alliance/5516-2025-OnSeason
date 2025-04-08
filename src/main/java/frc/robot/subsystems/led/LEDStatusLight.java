@@ -26,6 +26,7 @@ public class LEDStatusLight extends SubsystemBase {
 
     public LEDStatusLight(int port, int lengthOfEachSide, boolean... viewsReversed) {
         if (Robot.isSimulation()) Arrays.fill(viewsReversed, true);
+        viewsReversed = new boolean[] {true, true};
         this.viewsReversed = viewsReversed;
 
         int length = lengthOfEachSide * viewsReversed.length;

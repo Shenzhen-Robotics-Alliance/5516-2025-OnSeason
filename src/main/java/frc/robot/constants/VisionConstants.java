@@ -118,7 +118,7 @@ public class VisionConstants {
                 case TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> List.of(
                         new PhotonCameraProperties(
                                 "FrontLeftLowerCam",
-                                Hertz.of(35),
+                                Hertz.of(30),
                                 Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
@@ -133,7 +133,7 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontRightLowerCam",
-                                Hertz.of(35),
+                                Hertz.of(30),
                                 Milliseconds.of(35),
                                 Milliseconds.of(5),
                                 Degrees.of(72),
@@ -148,8 +148,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontLeftUpperCam",
-                                Hertz.of(20),
-                                Milliseconds.of(50),
+                                Hertz.of(18),
+                                Milliseconds.of(60),
                                 Milliseconds.of(10),
                                 Degrees.of(58),
                                 0.9,
@@ -163,8 +163,8 @@ public class VisionConstants {
                                 Degrees.zero()),
                         new PhotonCameraProperties(
                                 "FrontRightUpperCam",
-                                Hertz.of(20),
-                                Milliseconds.of(50),
+                                Hertz.of(18),
+                                Milliseconds.of(60),
                                 Milliseconds.of(10),
                                 Degrees.of(58),
                                 0.9,
