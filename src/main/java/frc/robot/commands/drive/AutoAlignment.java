@@ -207,7 +207,7 @@ public class AutoAlignment {
         for (Command toSchedule : toScheduleAtFinalApproach)
             events.add(new EventMarker("Final Approach", 1.0, Commands.runOnce(toSchedule::schedule)));
         ConstraintsZone stopInTheEnd = new ConstraintsZone(
-                1.85,
+                1.90,
                 2.0,
                 new PathConstraints(
                         config.hitTargetSpeed(),

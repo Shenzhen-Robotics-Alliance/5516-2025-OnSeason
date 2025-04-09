@@ -30,7 +30,7 @@ public class DriveControlLoops {
             new MaplePIDController.MaplePIDConfig(3, 0.5, 0, 0.03, 0, false, 0);
 
     public static final Time ROTATIONAL_LOOKAHEAD_TIME_VISION = Milliseconds.of(40);
-    public static final Time TRANSLATIONAL_LOOKAHEAD_TIME_VISION = Milliseconds.of(70);
+    public static final Time TRANSLATIONAL_LOOKAHEAD_TIME_VISION = Milliseconds.of(60);
     public static final Time ROTATIONAL_LOOKAHEAD_TIME_SENSOR_LESS = Milliseconds.of(20);
     public static final Time TRANSLATIONAL_LOOKAHEAD_TIME_SENSOR_LESS = Milliseconds.of(20);
 
@@ -47,34 +47,34 @@ public class DriveControlLoops {
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_AUTONOMOUS =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.1),
-                    MetersPerSecond.of(1.4),
+                    MetersPerSecond.of(2.4),
                     Meters.of(0.24),
                     MetersPerSecond.of(0.2),
-                    MetersPerSecondPerSecond.of(2.0));
+                    MetersPerSecondPerSecond.of(3.2));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.4),
-                    MetersPerSecond.of(1.4),
+                    MetersPerSecond.of(2.0),
                     Meters.of(0.8),
                     MetersPerSecond.of(0.2),
-                    MetersPerSecondPerSecond.of(2.0));
+                    MetersPerSecondPerSecond.of(3.2));
 
     public static final AutoAlignment.AutoAlignmentConfigurations REEF_ALIGNMENT_CONFIG_FAST =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.4),
-                    MetersPerSecond.of(2.0),
-                    Meters.of(0.6),
+                    MetersPerSecond.of(2.4),
+                    Meters.of(0.5),
                     MetersPerSecond.of(0.2),
-                    MetersPerSecondPerSecond.of(3.2));
+                    MetersPerSecondPerSecond.of(4.0));
 
     public static final AutoAlignment.AutoAlignmentConfigurations ALGAE_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0.5),
-                    MetersPerSecond.of(0.8),
+                    MetersPerSecond.of(1.0),
                     Meters.of(0.8),
                     MetersPerSecond.of(0.2),
-                    MetersPerSecondPerSecond.of(2.0));
+                    MetersPerSecondPerSecond.of(2.5));
 
     public static final AutoAlignment.AutoAlignmentConfigurations STATION_ALIGNMENT_CONFIG =
             new AutoAlignment.AutoAlignmentConfigurations(

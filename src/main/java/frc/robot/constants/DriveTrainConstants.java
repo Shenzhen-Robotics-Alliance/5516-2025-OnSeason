@@ -42,7 +42,7 @@ public class DriveTrainConstants {
     public static final Current DRIVE_OVER_CURRENT_PROTECTION = Amps.of(65);
     public static final Time DRIVE_OVERHEAT_PROTECTION_TIME = Seconds.of(1);
     public static final Current DRIVE_OVERHEAT_PROTECTION_CURRENT = Amps.of(45);
-    public static final Current STEER_CURRENT_LIMIT = Amps.of(15);
+    public static final Current STEER_CURRENT_LIMIT = Amps.of(45.0);
 
     public static final Current OVER_CURRENT_WARNING = Amps.of(240);
 

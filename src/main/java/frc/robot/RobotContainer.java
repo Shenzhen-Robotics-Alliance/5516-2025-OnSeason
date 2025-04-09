@@ -492,7 +492,7 @@ public class RobotContainer {
         // Retrieve elevator when robot is about to tip
         drive.driveTrainTipping
                 .and(isAlgaeMode.negate())
-                .onTrue(superStructure.retrieveElevator())
+                .onTrue(superStructure.retrieveElevator().onlyIf(DriverStation::isTeleopEnabled))
                 .onTrue(ledStatusLight
                         .playAnimation(new LEDAnimation.Breathe(() -> Color.kRed), 0.25, 4)
                         .ignoringDisable(true));

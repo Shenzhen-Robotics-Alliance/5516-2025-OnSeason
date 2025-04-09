@@ -74,7 +74,7 @@ public class SwerveDrive extends SubsystemBase implements HolonomicDriveSubsyste
     private final Debouncer robotTippingDebouncer = new Debouncer(0.25, Debouncer.DebounceType.kBoth);
 
     private boolean robotTipping = false;
-    private static final Angle TIP_OVER_THRESHOLD = Degrees.of(2.4);
+    private static final Angle TIP_OVER_THRESHOLD = Degrees.of(5.0);
     public Trigger driveTrainTipping = new Trigger(() -> robotTipping);
 
     private final SwerveSetpointGenerator setpointGenerator;

@@ -99,7 +99,7 @@ public class ModuleIOTalon implements ModuleIO {
                 .withStatorCurrentLimitEnable(true)
                 .withStatorCurrentLimit(STEER_CURRENT_LIMIT)
                 .withSupplyCurrentLimitEnable(true)
-                .withSupplyCurrentLimit(10.0);
+                .withSupplyCurrentLimit(30.0);
         var steerGains = moduleConstants.SteerMotorGains;
         var steerFeedBack = new FeedbackConfigs()
                 .withFeedbackRemoteSensorID(moduleConstants.EncoderId)
