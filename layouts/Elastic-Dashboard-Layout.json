@@ -141,6 +141,7 @@
             "properties": {
               "topic": "/CameraPublisher/frontleftlowervision_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
+              "rotation_turns": 0,
               "compression": 50,
               "fps": 5,
               "resolution": [
@@ -159,6 +160,7 @@
             "properties": {
               "topic": "/CameraPublisher/frontrightuppervision_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
+              "rotation_turns": 0,
               "compression": 50,
               "fps": 5,
               "resolution": [
@@ -177,6 +179,7 @@
             "properties": {
               "topic": "/CameraPublisher/frontrightlowervision_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
+              "rotation_turns": 0,
               "compression": 50,
               "fps": 5,
               "resolution": [
@@ -195,6 +198,7 @@
             "properties": {
               "topic": "/CameraPublisher/frontleftuppervision_Port_1182_Output_MJPEG_Server",
               "period": 0.06,
+              "rotation_turns": 0,
               "compression": 50,
               "fps": 5,
               "resolution": [
@@ -373,6 +377,46 @@
                 }
               }
             ]
+          },
+          {
+            "title": "Elevator",
+            "x": 1152.0,
+            "y": 512.0,
+            "width": 256.0,
+            "height": 256.0,
+            "type": "List Layout",
+            "properties": {
+              "label_position": "TOP"
+            },
+            "children": [
+              {
+                "title": "Measured Height (Meters)",
+                "x": 0.0,
+                "y": 0.0,
+                "width": 128.0,
+                "height": 128.0,
+                "type": "Text Display",
+                "properties": {
+                  "topic": "/AdvantageKit/RealOutputs/Elevator/Measured Height (Meters)",
+                  "period": 0.06,
+                  "data_type": "double",
+                  "show_submit_button": false
+                }
+              },
+              {
+                "title": "Zero Elevator",
+                "x": 1152.0,
+                "y": 640.0,
+                "width": 256.0,
+                "height": 128.0,
+                "type": "Command",
+                "properties": {
+                  "topic": "/SmartDashboard/Zero Elevator",
+                  "period": 0.06,
+                  "show_type": false
+                }
+              }
+            ]
           }
         ],
         "containers": [
@@ -499,7 +543,7 @@
             "title": "Disable Motor Brake",
             "x": 384.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
@@ -510,26 +554,13 @@
           },
           {
             "title": "Enable Motor Brake",
-            "x": 896.0,
+            "x": 768.0,
             "y": 128.0,
-            "width": 256.0,
+            "width": 384.0,
             "height": 128.0,
             "type": "Command",
             "properties": {
               "topic": "/SmartDashboard/Enable Motor Brake",
-              "period": 0.06,
-              "show_type": false
-            }
-          },
-          {
-            "title": "Zero Elevator",
-            "x": 640.0,
-            "y": 128.0,
-            "width": 256.0,
-            "height": 128.0,
-            "type": "Command",
-            "properties": {
-              "topic": "/SmartDashboard/Zero Elevator",
               "period": 0.06,
               "show_type": false
             }

@@ -191,7 +191,7 @@ public class Arm extends SubsystemBase {
         double errorRad = Rotation2d.fromRadians(currentStateRad.position)
                 .minus(new Rotation2d(setpoint))
                 .getRadians();
-        return Math.abs(errorRad) < PID_CONSTANTS.TOLERANCE().in(Radians);
+        return Math.abs(errorRad) < Math.toDegrees(0.1);
     }
 
     /**

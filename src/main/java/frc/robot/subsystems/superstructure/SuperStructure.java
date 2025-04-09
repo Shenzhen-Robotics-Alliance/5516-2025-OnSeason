@@ -22,7 +22,7 @@ public class SuperStructure {
     public enum SuperStructurePose {
         // Useful poses
         IDLE(0, Degrees.of(136)),
-        PREPARE_TO_RUN(0.05, Degrees.of(112)),
+        PREPARE_TO_RUN(0.07, Degrees.of(112)),
         SCORE_L2(0.22, Degrees.of(112)),
         SCORE_L3(0.64, Degrees.of(112)),
         SCORE_L4(1.24, Degrees.of(102)),

@@ -162,8 +162,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public boolean atReference(double heightSetpointMeters) {
-        return Math.abs(currentStateMeters.position - heightSetpointMeters)
-                < PID_CONSTANTS.TOLERANCE().in(Meters);
+        return Math.abs(currentStateMeters.position - heightSetpointMeters) < 0.01;
     }
 
     /**
