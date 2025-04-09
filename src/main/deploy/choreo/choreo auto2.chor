@@ -7,8 +7,8 @@
    "lowacc":{
     "dimension":"LinAcc",
     "var":{
-     "exp":"2 m / s ^ 2",
-     "val":2.0
+     "exp":"3 m / s ^ 2",
+     "val":3.0
     }
    },
    "maxacc":{
@@ -28,27 +28,27 @@
    "stationspeed":{
     "dimension":"LinVel",
     "var":{
-     "exp":"2 m / s",
-     "val":2.0
+     "exp":"1.8 m / s",
+     "val":1.8
     }
    },
    "transvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1 m / s",
-     "val":1.0
+     "exp":"1.8 m / s",
+     "val":1.8
     }
    }
   },
   "poses":{
    "station":{
     "x":{
-     "exp":"1.2 m",
-     "val":1.2
+     "exp":"1.4 m",
+     "val":1.4
     },
     "y":{
-     "exp":"7.55 m",
-     "val":7.55
+     "exp":"7.35 m",
+     "val":7.35
     },
     "heading":{
      "exp":"-53.5 deg",
