@@ -47,9 +47,11 @@ public class FourCoralStandard implements Auto {
     @Override
     public Command getAutoCommand(RobotContainer robot) throws IOException, ParseException {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
-        Command intakeCoral = robot.coralHolder
-                .intakeCoralSequence()
-                .andThen(robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN));
+        Command intakeCoral = Commands.sequence(
+                robot.coralHolder.intakeCoralSequence().asProxy(),
+                robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)
+                        .asProxy()
+                        .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
         Command scoreCoral = robot.scoreCoral(SCORING_TIME.in(Seconds));
         NamedCommands.registerCommand("ElevatorUp", robot.moveToL4());
 
@@ -59,11 +61,14 @@ public class FourCoralStandard implements Auto {
         int fourthGoal = isRightSide ? 1 : 0;
 
         // Score preloaded
-        commandGroup.addCommands(Commands.runOnce(
-                robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule));
-        commandGroup.addCommands(Commands.runOnce(Commands.waitSeconds(0.80).andThen(robot.moveToL4())::schedule));
+        Command superStructMovement = Commands.sequence(
+                Commands.runOnce(
+                        robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule),
+                Commands.waitSeconds(0.68),
+                Commands.runOnce(robot.moveToL4()::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlign(
-                robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4()));
+                        robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4())
+                .deadlineFor(superStructMovement));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));

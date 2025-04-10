@@ -7,8 +7,8 @@
    "lowacc":{
     "dimension":"LinAcc",
     "var":{
-     "exp":"3 m / s ^ 2",
-     "val":3.0
+     "exp":"2 m / s ^ 2",
+     "val":2.0
     }
    },
    "maxacc":{
@@ -28,15 +28,15 @@
    "stationspeed":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1.8 m / s",
-     "val":1.8
+     "exp":"2 m / s",
+     "val":2.0
     }
    },
    "transvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1.8 m / s",
-     "val":1.8
+     "exp":"1.5 m / s",
+     "val":1.5
     }
    }
   },
@@ -79,8 +79,8 @@
    }
   },
   "mass":{
-   "exp":"50 kg",
-   "val":50.0
+   "exp":"62 kg",
+   "val":62.0
   },
   "inertia":{
    "exp":"6 kg m ^ 2",
@@ -99,8 +99,8 @@
    "val":544.5427266222308
   },
   "tmax":{
-   "exp":"1 N * m",
-   "val":1.0
+   "exp":"1.2 N * m",
+   "val":1.2
   },
   "cof":{
    "exp":"1.3",

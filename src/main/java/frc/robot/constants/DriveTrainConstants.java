@@ -20,7 +20,7 @@ public class DriveTrainConstants {
     /** numbers that needs to be changed to fit each robot TODO: change these numbers to match your robot */
     public static final double WHEEL_COEFFICIENT_OF_FRICTION = 1.5;
 
-    public static final Mass ROBOT_MASS = Kilograms.of(57); // robot weight with bumpers
+    public static final Mass ROBOT_MASS = Kilograms.of(62); // robot weight with bumpers
 
     /** TODO: change motor type to match your robot */
     public static final DCMotor DRIVE_MOTOR_MODEL = DCMotor.getKrakenX60(1);
