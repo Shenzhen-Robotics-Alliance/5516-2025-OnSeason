@@ -333,12 +333,15 @@ public class RobotContainer {
     }
 
     public Command moveToL4() {
-        Command shuffleCoralDuringElevatorMovement = Commands.waitSeconds(0.3)
-                .andThen(coralHolder.keepCoralShuffledForever());
+        Command shuffleCoralDuringElevatorMovement =
+                Commands.waitSeconds(0.3).andThen(coralHolder.keepCoralShuffledForever());
         return superStructure
                 .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
-                .beforeStarting(coralHolder.moveCoralToPlace().onlyIf(coralHolder.hasCoral).withTimeout(1.0))
                 .deadlineFor(shuffleCoralDuringElevatorMovement.onlyIf(coralHolder.hasCoral))
+                .beforeStarting(coralHolder
+                        .moveCoralToPlace()
+                        .onlyIf(coralHolder.hasCoral)
+                        .withTimeout(1.0))
                 .asProxy();
     }
 
