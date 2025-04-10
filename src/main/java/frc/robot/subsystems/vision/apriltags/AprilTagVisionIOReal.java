@@ -1,7 +1,6 @@
 package frc.robot.subsystems.vision.apriltags;
 
 import java.util.List;
-import java.util.Optional;
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonPipelineResult;
 
@@ -24,8 +23,6 @@ public class AprilTagVisionIOReal implements AprilTagVisionIO {
         for (int i = 0; i < cameras.length; i++) updateCameraInput(cameras[i], inputs[i]);
     }
 
-    private Optional<PhotonPipelineResult> cachedResult = Optional.empty();
-
     private void updateCameraInput(PhotonCamera camera, CameraInputs cameraInput) {
         if (!camera.isConnected()) {
             cameraInput.markAsDisconnected();
@@ -33,14 +30,8 @@ public class AprilTagVisionIOReal implements AprilTagVisionIO {
         }
 
         List<PhotonPipelineResult> results = camera.getAllUnreadResults();
-        if (results.isEmpty()) {
-            cameraInput.markAsConnectedButNoResult();
-            cachedResult.ifPresent(cameraInput::readFromPhotonPipeLine);
-            cachedResult = Optional.empty();
-        } else {
-            cameraInput.readFromPhotonPipeLine(results.get(0));
-            cachedResult = results.size() > 1 ? Optional.of(results.get(1)) : Optional.empty();
-        }
+        if (results.isEmpty()) cameraInput.markAsConnectedButNoResult();
+        else cameraInput.readFromPhotonPipeLine(results.get(0));
     }
 
     @Override

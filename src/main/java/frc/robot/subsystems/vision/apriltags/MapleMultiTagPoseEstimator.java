@@ -134,10 +134,11 @@ public class MapleMultiTagPoseEstimator {
                 .minus(cameraToTargetTranslationDirection)
                 .getMeasure();
         boolean angleTooBig = tagAngle.abs(Radians) > MAX_TAG_ANGLE.in(Radians);
-        String logPath = APRIL_TAGS_VISION_PATH + "Filtering/TagObservations/Camera-" + cameraID + "/Tag-" + tagID;
-        Logger.recordOutput(logPath + "/Ambiguity", tagAmbiguity);
-        Logger.recordOutput(logPath + "/TagAngle (Deg)", tagAngle.abs(Degrees));
-
+        if (Robot.LOG_DETAILS) {
+            String logPath = APRIL_TAGS_VISION_PATH + "Filtering/TagObservations/Camera-" + cameraID + "/Tag-" + tagID;
+            Logger.recordOutput(logPath + "/Ambiguity", tagAmbiguity);
+            Logger.recordOutput(logPath + "/TagAngle (Deg)", tagAngle.abs(Degrees));
+        }
         return tooFar || tooMuchAmbiguity || angleTooBig;
     }
 
@@ -271,6 +272,10 @@ public class MapleMultiTagPoseEstimator {
     private void logFilteringData() {
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Filtering/CurrentFilterImplementation", filter.getFilterImplementationName());
+        Logger.recordOutput(
+                APRIL_TAGS_VISION_PATH + "Filtering/VisibleFieldTargets",
+                observedVisionTargetPoseInFieldLayout.toArray(Pose3d[]::new));
+
         if (!Robot.LOG_DETAILS) return;
 
         /* these are the detailed filtering data, logging them on RobotRIO1.0 is a bad idea, if you want them, replay the log */
@@ -283,9 +288,6 @@ public class MapleMultiTagPoseEstimator {
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Filtering/InvalidPoseEstimations",
                 invalidRobotPoseEstimations.toArray(Pose3d[]::new));
-        Logger.recordOutput(
-                APRIL_TAGS_VISION_PATH + "Filtering/VisibleFieldTargets",
-                observedVisionTargetPoseInFieldLayout.toArray(Pose3d[]::new));
         Logger.recordOutput(
                 APRIL_TAGS_VISION_PATH + "Filtering/AprilTagsObservedPositions/",
                 observedAprilTagsPoses.toArray(Pose3d[]::new));

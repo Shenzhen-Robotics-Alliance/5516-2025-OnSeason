@@ -31,7 +31,7 @@ public class Robot extends LoggedRobot {
     }
 
     public static final double defaultPeriodSecs = 0.02;
-    public static final boolean LOG_DETAILS = true; // isSimulation();
+    public static final boolean LOG_DETAILS = isSimulation();
     private static final RobotMode JAVA_SIM_MODE = RobotMode.SIM;
     public static final RobotMode CURRENT_ROBOT_MODE = isReal() ? RobotMode.REAL : JAVA_SIM_MODE;
     public static final RobotName CURRENT_ROBOT = RobotName.TEAM_5516_CHAMPBOT_HYDROXIDE_IV;
