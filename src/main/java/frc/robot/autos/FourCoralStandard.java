@@ -49,7 +49,8 @@ public class FourCoralStandard implements Auto {
         final SequentialCommandGroup commandGroup = new SequentialCommandGroup();
         Command intakeCoral = Commands.sequence(
                 robot.coralHolder.intakeCoralSequence().asProxy(),
-                robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)
+                robot.superStructure
+                        .moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)
                         .asProxy()
                         .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming));
         Command scoreCoral = robot.scoreCoral(SCORING_TIME.in(Seconds));

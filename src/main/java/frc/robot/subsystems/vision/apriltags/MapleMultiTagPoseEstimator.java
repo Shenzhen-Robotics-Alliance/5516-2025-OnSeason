@@ -144,7 +144,7 @@ public class MapleMultiTagPoseEstimator {
 
     private void calculateVisibleTagsPosesForLog(
             AprilTagVisionIO.CameraInputs cameraInput, PhotonCameraProperties cameraProperty) {
-        if (!Robot.LOG_DETAILS) return;
+        fieldLayout.getTagPose(cameraInput.bestTargetTagID).ifPresent(observedVisionTargetPoseInFieldLayout::add);
         if (shouldDiscardTagObservation(
                 cameraInput.cameraID,
                 cameraInput.bestTargetTagID,
@@ -152,7 +152,6 @@ public class MapleMultiTagPoseEstimator {
                 cameraInput.bestTargetCameraToTarget,
                 cameraInput.bestTargetAmbiguity)) return;
 
-        fieldLayout.getTagPose(cameraInput.bestTargetTagID).ifPresent(observedVisionTargetPoseInFieldLayout::add);
         observedAprilTagsPoses.add(calculateObservedAprilTagTargetPose(
                 cameraInput.bestTargetCameraToTarget,
                 cameraProperty.robotToCamera,
@@ -194,7 +193,7 @@ public class MapleMultiTagPoseEstimator {
 
         applyFilteringToRawRobotPose3dEstimations();
 
-        if (Robot.LOG_DETAILS) logFilteringData();
+        logFilteringData();
 
         return getEstimationResultFromValidObservations(timeStampSeconds);
     }

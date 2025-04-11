@@ -85,6 +85,7 @@ public class AutoAlignment {
             AutoAlignmentConfigurations config,
             Command... toScheduleAtFinalApproach) {
         Command followPath = AutoBuilder.followPath(path)
+                .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED))
                 .until(() -> RobotState.getInstance()
                                 .getVisionPose()
                                 .getTranslation()
@@ -147,6 +148,7 @@ public class AutoAlignment {
                                 .minus(targetPose.getTranslation())
                                 .getNorm()
                         < config.distanceStartPreciseApproach.in(Meters))
+                .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED))
                 .finallyDo(deactivateChassisHeadingController)
                 .finallyDo(resetDriveCommandRotationMaintenance);
     }

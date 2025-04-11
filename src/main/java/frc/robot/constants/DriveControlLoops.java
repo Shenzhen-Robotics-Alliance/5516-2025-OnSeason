@@ -48,7 +48,7 @@ public class DriveControlLoops {
             new AutoAlignment.AutoAlignmentConfigurations(
                     Meters.of(0),
                     MetersPerSecond.of(2.0),
-                    Meters.of(0.24),
+                    Meters.of(0.15),
                     MetersPerSecond.of(0.2),
                     MetersPerSecondPerSecond.of(3.0));
 

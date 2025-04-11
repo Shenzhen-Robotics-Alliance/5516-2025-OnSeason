@@ -37,7 +37,7 @@ public class SuperStructure {
         LOW_SWAP_2(0.3, Degrees.of(55)),
 
         // Swap pose to run to L4
-        HIGH_SWAP(1.21, Degrees.of(112)),
+        HIGH_SWAP(1.20, Degrees.of(112)),
 
         // Legacy L4 Scoring Poses (for dev bot)
         //        SCORE_L4_LEGACY(1.32, Degrees.of(85)),
