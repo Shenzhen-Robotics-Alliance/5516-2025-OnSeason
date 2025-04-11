@@ -28,8 +28,8 @@
    "maxvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"4.5 m / s",
-     "val":4.5
+     "exp":"4 m / s",
+     "val":4.0
     }
    },
    "stationspeed":{
@@ -42,8 +42,8 @@
    "transvel":{
     "dimension":"LinVel",
     "var":{
-     "exp":"1.5 m / s",
-     "val":1.5
+     "exp":"1.2 m / s",
+     "val":1.2
     }
    }
   },

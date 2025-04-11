@@ -20,6 +20,7 @@ import frc.robot.subsystems.led.LEDAnimation;
 import frc.robot.subsystems.led.LEDStatusLight;
 import frc.robot.subsystems.vision.apriltags.AprilTagVision;
 import frc.robot.utils.ChassisHeadingController;
+import frc.robot.utils.PathUtils;
 import java.util.*;
 import java.util.function.Supplier;
 
@@ -85,23 +86,27 @@ public class AutoAlignment {
             AutoAlignmentConfigurations config,
             Command... toScheduleAtFinalApproach) {
         Command followPath = AutoBuilder.followPath(path)
-                .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED))
                 .until(() -> RobotState.getInstance()
                                 .getVisionPose()
                                 .getTranslation()
                                 .minus(target.roughTarget().getTranslation())
                                 .getNorm()
-                        < config.distanceStartPreciseApproach.in(Meters));
+                        < config.distanceStartPreciseApproach.in(Meters))
+                .asProxy();
 
-        Command preciseAlignment = preciseAlignment(
-                        driveSubsystem,
-                        statusLight,
-                        target.preciseTarget(),
-                        target.preciseApproachDirection(),
+        Command[] toSchedule = Arrays.copyOf(toScheduleAtFinalApproach, toScheduleAtFinalApproach.length + 1);
+        toSchedule[toScheduleAtFinalApproach.length] = finalApproachLight(statusLight);
+        Command preciseAlignment = AutoBuilder.followPath(getPreciseAlignmentPath(
+                        new ChassisSpeeds(),
+                        PathUtils.getEndingPose(path),
+                        target.preciseTarget,
+                        target.preciseApproachDirection,
                         config,
-                        toScheduleAtFinalApproach)
+                        toSchedule))
+                .deadlineFor(RobotState.getInstance().withNavigationMode(RobotState.NavigationMode.VISION_GUIDED))
                 .deadlineFor(vision.focusOnTarget(target.tagIdToFocus(), target.cameraToFocus()))
                 .finallyDo(driveSubsystem::stop)
+                .asProxy()
                 .withName("Follow Path & Auto Align");
 
         return followPath

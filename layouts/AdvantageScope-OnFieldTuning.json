@@ -50,7 +50,6 @@
             "/RealOutputs/Elevator/PID",
             "/RealOutputs/Arm/PID",
             "/Arm",
-            "/RealOutputs/RobotState",
             "/RealOutputs/SwerveSetpoint",
             "/RealOutputs/SwerveSetpoint/executedSpeedsWithRotationalOverride",
             "/RealOutputs/SwerveSetpoint/executedSpeedsWithRotationalOverrideConstrained",
@@ -58,11 +57,18 @@
             "/RealOutputs/LoggedRobot",
             "/PowerDistribution",
             "/DriverStation",
-            "/SystemStats"
+            "/SystemStats",
+            "/ReplayOutputs/Vision",
+            "/ReplayOutputs/Vision/AprilTags",
+            "/ReplayOutputs/Vision/AprilTags/Filtering",
+            "/ReplayOutputs/Vision/AprilTags/Filtering/TagObservations/Camera-0",
+            "/ReplayOutputs/RobotState",
+            "/RealOutputs",
+            "/RealOutputs/Vision"
           ]
         },
         "tabs": {
-          "selected": 4,
+          "selected": 3,
           "tabs": [
             {
               "type": 0,
@@ -121,7 +127,7 @@
                   0
                 ]
               },
-              "controlsHeight": 200
+              "controlsHeight": 353
             },
             {
               "type": 3,
@@ -175,12 +181,13 @@
                     }
                   },
                   {
-                    "type": "robot",
+                    "type": "ghost",
                     "logKey": "/RealOutputs/RobotState/PrimaryEstimatorPoseWith3dRot",
                     "logType": "Pose3d",
                     "visible": true,
                     "options": {
-                      "model": "WCP CC"
+                      "model": "WCP CC",
+                      "color": "#ff00ff"
                     }
                   },
                   {
@@ -201,35 +208,6 @@
                     }
                   },
                   {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "model": "Drivetrain Only",
-                      "color": "#ff0000"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "model": "Drivetrain Only",
-                      "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "aprilTag",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/AprilTagsObservedPositions/",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "family": "36h11"
-                    }
-                  },
-                  {
                     "type": "trajectory",
                     "logKey": "/RealOutputs/RobotState/Trajectory",
                     "logType": "Pose2d[]",
@@ -247,6 +225,15 @@
                     "options": {
                       "variant": "Coral"
                     }
+                  },
+                  {
+                    "type": "aprilTag",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/AprilTagsObservedPositions/",
+                    "logType": "Pose3d[]",
+                    "visible": true,
+                    "options": {
+                      "family": "36h11"
+                    }
                   }
                 ],
                 "game": "2025 Field (Welded)",
@@ -257,14 +244,14 @@
                 "cameraIndex": -1,
                 "orbitFov": 50,
                 "cameraPosition": [
-                  -9.590372470183198,
-                  4.26773490179805,
-                  -3.45652098275664
+                  -9.33732669954014,
+                  5.946142717637965,
+                  -6.52541628709942
                 ],
                 "cameraTarget": [
-                  -2.408651126453302,
-                  -3.8850863762523122,
-                  4.040437317059565
+                  -3.6647518060820476,
+                  -2.133284766945019,
+                  2.2378448410122633
                 ]
               },
               "controlsHeight": 317
@@ -276,7 +263,7 @@
                 "sources": [
                   {
                     "type": "robot",
-                    "logKey": "/RealOutputs/FieldSimulation/RobotPosition",
+                    "logKey": "/ReplayOutputs/RobotState/PrimaryEstimatorPose",
                     "logType": "Pose2d",
                     "visible": true,
                     "options": {}
@@ -308,24 +295,6 @@
                     "visible": true,
                     "options": {
                       "color": "#00ffff"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#00ff00"
-                    }
-                  },
-                  {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
-                    "logType": "Pose3d[]",
-                    "visible": true,
-                    "options": {
-                      "color": "#ff0000"
                     }
                   }
                 ],
@@ -683,7 +652,7 @@
                     }
                   }
                 ],
-                "timeRange": "live-10",
+                "timeRange": "auto",
                 "rangeMin": 0,
                 "rangeMax": 40,
                 "stepSize": 1
@@ -708,5 +677,5 @@
     }
   ],
   "satellites": [],
-  "version": "4.1.4"
+  "version": "4.1.6"
 }

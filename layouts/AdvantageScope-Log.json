@@ -19,7 +19,6 @@
             "/AdvantageKit/RealOutputs/ModuleFeedforwards",
             "/AdvantageKit/RealOutputs/Vision",
             "/ReplayOutputs/Vision/AprilTags",
-            "/ReplayOutputs/Vision/AprilTags/Filtering",
             "/RealOutputs/Vision/AprilTags/Filtering",
             "/ReplayOutputs/Alerts/errors",
             "/ReplayOutputs/Alerts/infos",
@@ -29,8 +28,6 @@
             "/RealOutputs/Vision/AprilTags",
             "/RealOutputs/SuperStructure",
             "/RealOutputs/Arm",
-            "/ReplayOutputs",
-            "/SystemStats",
             "/Drive/OdometryThread/MeasurementTimeStamps",
             "/RealOutputs/Logger",
             "/RealOutputs/Elevator",
@@ -41,11 +38,12 @@
             "/Drive",
             "/RealOutputs/RobotState",
             "/RealOutputs/RobotState/PrimaryEstimatorPose",
-            "/RealOutputs/Alerts"
+            "/RealOutputs/Alerts",
+            "/ReplayOutputs/Vision"
           ]
         },
         "tabs": {
-          "selected": 10,
+          "selected": 3,
           "tabs": [
             {
               "type": 0,
@@ -134,8 +132,17 @@
                     }
                   },
                   {
+                    "type": "gamePiece",
+                    "logKey": "/RealOutputs/CoralInRobot",
+                    "logType": "Pose3d",
+                    "visible": true,
+                    "options": {
+                      "variant": "Coral"
+                    }
+                  },
+                  {
                     "type": "aprilTag",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/AprilTagsObservedPositions/",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/AprilTagsObservedPositions/",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
@@ -144,7 +151,7 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
@@ -154,21 +161,12 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
                     "logType": "Pose3d[]",
                     "visible": true,
                     "options": {
                       "model": "Drivetrain Only",
                       "color": "#ff0000"
-                    }
-                  },
-                  {
-                    "type": "gamePiece",
-                    "logKey": "/RealOutputs/CoralInRobot",
-                    "logType": "Pose3d",
-                    "visible": true,
-                    "options": {
-                      "variant": "Coral"
                     }
                   }
                 ],
@@ -235,15 +233,6 @@
                     }
                   },
                   {
-                    "type": "ghost",
-                    "logKey": "/RealOutputs/RobotState/VisionSensitivePose",
-                    "logType": "Pose2d",
-                    "visible": false,
-                    "options": {
-                      "color": "#00ffff"
-                    }
-                  },
-                  {
                     "type": "trajectory",
                     "logKey": "/RealOutputs/RobotState/Trajectory",
                     "logType": "Pose2d[]",
@@ -255,18 +244,18 @@
                   },
                   {
                     "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/ValidPoseEstimationsSingleTags",
                     "logType": "Pose3d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#00ff00"
                     }
                   },
                   {
                     "type": "ghost",
-                    "logKey": "/RealOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
+                    "logKey": "/ReplayOutputs/Vision/AprilTags/Filtering/InvalidPoseEstimations",
                     "logType": "Pose3d[]",
-                    "visible": false,
+                    "visible": true,
                     "options": {
                       "color": "#ff0000"
                     }
@@ -692,18 +681,6 @@
       }
     }
   ],
-  "satellites": [
-    {
-      "x": 215,
-      "y": 241,
-      "width": 659,
-      "height": 682,
-      "state": {
-        "type": 9,
-        "visualizer": null
-      },
-      "uuid": "z0au5mcgywja7btyn22hazbgmlyinuqr"
-    }
-  ],
-  "version": "4.1.4"
+  "satellites": [],
+  "version": "4.1.6"
 }

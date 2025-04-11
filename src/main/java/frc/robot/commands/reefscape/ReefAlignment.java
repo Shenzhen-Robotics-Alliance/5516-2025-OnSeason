@@ -206,27 +206,25 @@ public class ReefAlignment {
                 .repeatedly();
     }
 
-    public static Command followPathAndAlign(
+    public static Command followPathAndAlignStatic(
             RobotContainer robot, PathPlannerPath path, int targetId, Command... toScheduleBeforePreciseAlignment) {
-        return Commands.deferredProxy(() -> {
-            BranchTarget branchTarget = (FieldMirroringUtils.isSidePresentedAsRed()
-                            ? REEF_ALIGNMENT_POSITIONS_RED
-                            : REEF_ALIGNMENT_POSITIONS_BLUE)
-                    [targetId];
-            return AutoAlignment.followPathAndAutoAlignStatic(
-                            robot.drive,
-                            robot.aprilTagVision,
-                            robot.ledStatusLight,
-                            path,
-                            branchTarget.autoAlignmentTarget(),
-                            DriveControlLoops.REEF_ALIGNMENT_CONFIG_AUTONOMOUS,
-                            toScheduleBeforePreciseAlignment)
-                    .beforeStarting(() -> {
-                        selectedReefPartId = targetId / 2;
-                        selectedSide = targetId % 2 == 0 ? Side.LEFT : Side.RIGHT;
-                    })
-                    .finallyDo(() -> selectedSide = Side.CENTER);
-        });
+        BranchTarget branchTarget = (FieldMirroringUtils.isSidePresentedAsRed()
+                        ? REEF_ALIGNMENT_POSITIONS_RED
+                        : REEF_ALIGNMENT_POSITIONS_BLUE)
+                [targetId];
+        return AutoAlignment.followPathAndAutoAlignStatic(
+                        robot.drive,
+                        robot.aprilTagVision,
+                        robot.ledStatusLight,
+                        path,
+                        branchTarget.autoAlignmentTarget(),
+                        DriveControlLoops.REEF_ALIGNMENT_CONFIG_AUTONOMOUS,
+                        toScheduleBeforePreciseAlignment)
+                .beforeStarting(() -> {
+                    selectedReefPartId = targetId / 2;
+                    selectedSide = targetId % 2 == 0 ? Side.LEFT : Side.RIGHT;
+                })
+                .finallyDo(() -> selectedSide = Side.CENTER);
     }
 
     public static Command alignmentToSelectedBranch(

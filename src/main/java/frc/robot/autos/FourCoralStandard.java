@@ -67,7 +67,7 @@ public class FourCoralStandard implements Auto {
                         robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule),
                 Commands.waitSeconds(0.68),
                 Commands.runOnce(robot.moveToL4()::schedule));
-        commandGroup.addCommands(ReefAlignment.followPathAndAlign(
+        commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                         robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4())
                 .deadlineFor(superStructMovement));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
@@ -86,7 +86,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(waitForIntake(robot));
 
         // Score second
-        commandGroup.addCommands(ReefAlignment.followPathAndAlign(
+        commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                 robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, robot.moveToL4()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
@@ -104,7 +104,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(waitForIntake(robot));
 
         // Score Third
-        commandGroup.addCommands(ReefAlignment.followPathAndAlign(
+        commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                 robot, Auto.getChoreoPath("place third", isRightSide), thirdGoal, robot.moveToL4()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
@@ -122,7 +122,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(waitForIntake(robot));
 
         // Score Fourth
-        commandGroup.addCommands(ReefAlignment.followPathAndAlign(
+        commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                 robot, Auto.getChoreoPath("place fourth", isRightSide), fourthGoal, robot.moveToL4()));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
