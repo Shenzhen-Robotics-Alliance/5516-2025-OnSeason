@@ -22,8 +22,7 @@ public final class CoralHolderConstants {
             switch (Robot.CURRENT_ROBOT) {
                 case TEAM_5516_COMPBOT_HYDROXIDE_II -> new HardwareConstants(
                         1, false, 1, 0, new int[] {5, 6}, new boolean[] {false, true});
-                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new HardwareConstants(
-                        18, true, 0, 1, new int[0], new boolean[0]);
+                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new HardwareConstants(18, true, 0, 1, new int[0], new boolean[0]);
                 case TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new HardwareConstants(
                         4, false, 0, 1, new int[] {5, 6}, new boolean[] {false, true});
             };
@@ -34,7 +33,7 @@ public final class CoralHolderConstants {
             switch (Robot.CURRENT_ROBOT) {
                 case TEAM_5516_COMPBOT_HYDROXIDE_II, TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new VoltageSettings(
                         3.5, 8.0, -1.5, 1.5);
-                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new VoltageSettings(5.0, 8.0, -1.0, 1.5);
+                case TEAM_6706_COMPBOT_HYDROXIDE_III -> new VoltageSettings(3.0, 8.0, -1.0, 1.5);
             };
 
     public static final Distance FIRST_SENSOR_THRESHOLD = Centimeters.of(3);

@@ -89,7 +89,7 @@ public final class ArmConstants {
                         0.33,
                         0.76,
                         0.01,
-                        0.0,
+                        6.0 / Math.toRadians(30),
                         RotationsPerSecond.of(1),
                         RotationsPerSecondPerSecond.of(5),
                         Degrees.of(3));
