@@ -21,9 +21,10 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class FourCoralStandard implements Auto {
-    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.5);
+    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(1.0);
     public static final Time WAIT_FOR_SUPER_STRUCTURE_TIMEOUT = Seconds.of(0.5);
     public static final Time SCORING_TIME = Seconds.of(0.6);
+    public static final Time SCORING_MOVEBACK_TIME = Seconds.of(0.2);
 
     private final boolean isRightSide;
 
@@ -33,7 +34,7 @@ public class FourCoralStandard implements Auto {
 
     private static Command runRobotBackwardsSlow(RobotContainer robot) {
         return robot.drive
-                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-1.0, 0, 0)))
+                .run(() -> robot.drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-0.5, 0, 0)))
                 .asProxy();
     }
 
@@ -65,7 +66,7 @@ public class FourCoralStandard implements Auto {
         Command superStructMovement = Commands.sequence(
                 Commands.runOnce(
                         robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule),
-                Commands.waitSeconds(0.68),
+                Commands.waitSeconds(0.72),
                 Commands.runOnce(robot.moveToL4()::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                         robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4())
@@ -73,7 +74,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
-        commandGroup.addCommands(Commands.waitSeconds(0.15));
+        commandGroup.addCommands(Commands.waitTime(SCORING_MOVEBACK_TIME));
 
         // Grab second
         commandGroup.addCommands(
@@ -91,7 +92,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
-        commandGroup.addCommands(Commands.waitSeconds(0.15));
+        commandGroup.addCommands(Commands.waitTime(SCORING_MOVEBACK_TIME));
 
         // Grab third
         commandGroup.addCommands(
@@ -109,7 +110,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
-        commandGroup.addCommands(Commands.waitSeconds(0.15));
+        commandGroup.addCommands(Commands.waitTime(SCORING_MOVEBACK_TIME));
 
         // Grab Fourth
         commandGroup.addCommands(
@@ -127,7 +128,7 @@ public class FourCoralStandard implements Auto {
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
-        commandGroup.addCommands(Commands.waitSeconds(0.15));
+        commandGroup.addCommands(Commands.waitTime(SCORING_MOVEBACK_TIME));
 
         // Move back
         commandGroup.addCommands(robot.drive
