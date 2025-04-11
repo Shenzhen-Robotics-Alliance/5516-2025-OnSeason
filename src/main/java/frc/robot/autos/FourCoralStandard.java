@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.RobotState;
@@ -21,7 +22,7 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 
 public class FourCoralStandard implements Auto {
-    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(1.0);
+    public static final Time WAIT_FOR_CORAL_TIMEOUT = Seconds.of(0.6);
     public static final Time WAIT_FOR_SUPER_STRUCTURE_TIMEOUT = Seconds.of(0.5);
     public static final Time SCORING_TIME = Seconds.of(0.6);
     public static final Time SCORING_MOVEBACK_TIME = Seconds.of(0.2);
@@ -38,11 +39,17 @@ public class FourCoralStandard implements Auto {
                 .asProxy();
     }
 
-    private static Command waitForIntake(RobotContainer robot) {
-        return Commands.waitUntil(robot.coralHolder.hasCoral.and(() -> Robot.CURRENT_ROBOT_MODE != RobotMode.SIM))
-                .withTimeout(WAIT_FOR_CORAL_TIMEOUT)
-                .deadlineFor(runRobotBackwardsSlow(robot))
-                .deadlineFor(Commands.print("waiting for coral...").repeatedly());
+    private Command waitForIntake(RobotContainer robot, boolean mirror) throws IOException, ParseException {
+        Trigger hasCoralTrigger = Robot.CURRENT_ROBOT_MODE == RobotMode.SIM
+                ? robot.coralHolder.hasCoral.and(new Trigger(() -> true))
+                : robot.coralHolder.hasCoral;
+        Command robotMovementSequence = Commands.sequence(
+                runRobotBackwardsSlow(robot).withTimeout(WAIT_FOR_CORAL_TIMEOUT),
+                followChoreoPath("shake intake", RobotState.NavigationMode.SENSOR_LESS_ODOMETRY, mirror),
+                runRobotBackwardsSlow(robot).withTimeout(WAIT_FOR_CORAL_TIMEOUT));
+        return Commands.waitSeconds(0.25)
+                .andThen(Commands.waitUntil(hasCoralTrigger))
+                .raceWith(robotMovementSequence);
     }
 
     @Override
@@ -66,7 +73,7 @@ public class FourCoralStandard implements Auto {
         Command superStructMovement = Commands.sequence(
                 Commands.runOnce(
                         robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule),
-                Commands.waitSeconds(0.72),
+                Commands.waitSeconds(0.60),
                 Commands.runOnce(robot.moveToL4()::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                         robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4())
@@ -84,7 +91,7 @@ public class FourCoralStandard implements Auto {
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
-        commandGroup.addCommands(waitForIntake(robot));
+        commandGroup.addCommands(waitForIntake(robot, isRightSide));
 
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
@@ -102,7 +109,7 @@ public class FourCoralStandard implements Auto {
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
-        commandGroup.addCommands(waitForIntake(robot));
+        commandGroup.addCommands(waitForIntake(robot, isRightSide));
 
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
@@ -120,7 +127,7 @@ public class FourCoralStandard implements Auto {
                                 .withInterruptBehavior(Command.InterruptionBehavior.kCancelIncoming)
                                 .finallyDo(intakeCoral::schedule)
                                 .asProxy()));
-        commandGroup.addCommands(waitForIntake(robot));
+        commandGroup.addCommands(waitForIntake(robot, isRightSide));
 
         // Score Fourth
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
