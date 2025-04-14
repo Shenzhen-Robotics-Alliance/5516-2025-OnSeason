@@ -76,7 +76,7 @@ public class FourCoralStandard implements Auto {
                 Commands.waitSeconds(0.60),
                 Commands.runOnce(robot.moveToL4()::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
-                        robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal, robot.moveToL4())
+                        robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal)
                 .deadlineFor(superStructMovement));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
@@ -95,7 +95,7 @@ public class FourCoralStandard implements Auto {
 
         // Score second
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
-                robot, Auto.getChoreoPath("place second", isRightSide), secondGoal, robot.moveToL4()));
+                robot, Auto.getChoreoPath("place second", isRightSide), secondGoal));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
@@ -113,7 +113,7 @@ public class FourCoralStandard implements Auto {
 
         // Score Third
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
-                robot, Auto.getChoreoPath("place third", isRightSide), thirdGoal, robot.moveToL4()));
+                robot, Auto.getChoreoPath("place third", isRightSide), thirdGoal));
         commandGroup.addCommands(Commands.waitUntil(robot.superStructure.atReference)
                 .withTimeout(WAIT_FOR_SUPER_STRUCTURE_TIMEOUT.in(Seconds)));
         commandGroup.addCommands(Commands.runOnce(scoreCoral::schedule));
