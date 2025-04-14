@@ -62,13 +62,13 @@ public final class ElevatorConstants {
                         Inches.of(0.25),
                         22,
                         2,
-                        4.0 * 60.0 / 36.0,
-                        DCMotor.getKrakenX60(2),
-                        Kilograms.of(7.0),
+                        5.0 * 60.0 / 36.0,
+                        DCMotor.getKrakenX60(1),
+                        Kilograms.of(9.0),
                         Meters.of(1.30),
-                        1,
-                        false,
-                        OptionalInt.of(2),
+                        2,
+                        true,
+                        OptionalInt.empty(),
                         true);
             };
 
@@ -102,15 +102,15 @@ public final class ElevatorConstants {
                         Centimeters.of(2));
                 case TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new ElevatorPIDConstants(
                         0.02,
-                        0.37,
-                        2.75,
-                        0.04,
+                        0.76,
+                        3.58,
+                        0.09,
                         7.5 / 0.2,
                         3.0 / 0.2,
                         Volts.of(12),
                         Volts.of(-8),
-                        MetersPerSecond.of(3),
-                        MetersPerSecondPerSecond.of(12),
+                        MetersPerSecond.of(3.0),
+                        MetersPerSecondPerSecond.of(12.0),
                         Centimeters.of(2));
                 case TEAM_6706_COMPBOT_HYDROXIDE_III -> new ElevatorPIDConstants(
                         0.1,
