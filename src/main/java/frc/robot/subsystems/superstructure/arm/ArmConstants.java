@@ -44,7 +44,7 @@ public final class ArmConstants {
                         44.0 / 16.0 * 15.0,
                         Degrees.of(136.0),
                         Degrees.of(-48.0),
-                        Rotations.of(0.260),
+                        Rotations.of(0.943),
                         9,
                         false,
                         3,

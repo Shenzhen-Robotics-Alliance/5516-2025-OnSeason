@@ -73,7 +73,7 @@ public class FourCoralStandard implements Auto {
         Command superStructMovement = Commands.sequence(
                 Commands.runOnce(
                         robot.superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule),
-                Commands.waitSeconds(0.60),
+                Commands.waitSeconds(0.70),
                 Commands.runOnce(robot.moveToL4()::schedule));
         commandGroup.addCommands(ReefAlignment.followPathAndAlignStatic(
                         robot, Auto.getChoreoPath("place preload", isRightSide), firstGoal)
