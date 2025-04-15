@@ -25,8 +25,8 @@ public class SuperStructure {
         PREPARE_TO_RUN(0.07, Degrees.of(112)),
         SCORE_L2(0.22, Degrees.of(112)),
         SCORE_L3(0.64, Degrees.of(112)),
-        SCORE_L4(1.24, Degrees.of(98)),
-        SCORE_L4_COMPLETE(1.28, Degrees.of(94)),
+        SCORE_L4(1.22, Degrees.of(98)),
+        SCORE_L4_COMPLETE(1.30, Degrees.of(98)),
 
         // Swap poses that serve as interior waypoints
         // (don't run them)
@@ -46,8 +46,8 @@ public class SuperStructure {
 
         PREPARE_TO_GRAB_LOW_ALGAE(0.40, Degrees.of(-45)),
         PREPARE_TO_GRAB_HIGH_ALGAE(0.80, Degrees.of(-45)),
-        GRAB_LOW_ALGAE(0.60, Degrees.of(-25)),
-        GRAB_HIGH_ALGAE(1.00, Degrees.of(-25)),
+        GRAB_LOW_ALGAE(0.65, Degrees.of(-10)),
+        GRAB_HIGH_ALGAE(1.05, Degrees.of(-10)),
         SCORE_ALGAE(0.15, Degrees.of(-45)),
         ALGAE_SWAP_1(0.3, Degrees.of(112)),
         ALGAE_SWAP_2(0.3, Degrees.of(-45)),

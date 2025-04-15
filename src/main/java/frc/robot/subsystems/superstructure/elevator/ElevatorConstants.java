@@ -65,7 +65,7 @@ public final class ElevatorConstants {
                         5.0 * 60.0 / 36.0,
                         DCMotor.getKrakenX60(1),
                         Kilograms.of(9.0),
-                        Meters.of(1.30),
+                        Meters.of(1.32),
                         2,
                         true,
                         OptionalInt.empty(),

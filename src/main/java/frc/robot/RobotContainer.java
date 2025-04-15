@@ -287,6 +287,7 @@ public class RobotContainer {
         try {
             this.autonomousCommand = selectedAuto.getAutoCommand(this);
             configureAutoTriggers(new PathPlannerAuto(autonomousCommand, selectedAuto.getStartingPoseAtBlueAlliance()));
+            System.out.println("Auto updated to: " + selectedAuto.getClass());
         } catch (Exception e) {
             this.autonomousCommand = Commands.none();
             DriverStation.reportError(

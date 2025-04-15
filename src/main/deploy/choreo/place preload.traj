@@ -132,5 +132,5 @@
   "splits":[0]
  },
  "events":[
-   {"name":"ElevatorUp", "from":{"target":2, "targetTimestamp":1.05601, "offset":{"exp":"-0.35 s", "val":-0.35}}, "event":{"type":"named", "data":{"name":"ElevatorUp"}}}]
+   {"name":"ElevatorUp", "from":{"target":2, "targetTimestamp":1.05601, "offset":{"exp":"-0.4 s", "val":-0.4}}, "event":{"type":"named", "data":{"name":"ElevatorUp"}}}]
 }
