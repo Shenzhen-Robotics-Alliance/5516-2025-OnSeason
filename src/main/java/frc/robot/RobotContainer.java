@@ -29,6 +29,7 @@ import frc.robot.commands.reefscape.ReefAlignment;
 import frc.robot.constants.*;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.climb.Climb;
+import frc.robot.subsystems.climb.ClimbIOReal;
 import frc.robot.subsystems.coralholder.CoralHolder;
 import frc.robot.subsystems.coralholder.CoralHolderIOReal;
 import frc.robot.subsystems.coralholder.CoralHolderIOSim;
@@ -130,7 +131,7 @@ public class RobotContainer {
                         RobotState.getInstance()::getPrimaryEstimatorPose,
                         arm::getArmAngle,
                         elevator::getHeightMeters);
-                climb = new Climb(new Climb.ClimbIOReal());
+                climb = new Climb(new ClimbIOReal());
             }
 
             case SIM -> {
@@ -190,7 +191,7 @@ public class RobotContainer {
                         arm::getArmAngle,
                         elevator::getHeightMeters);
 
-                climb = new Climb(new Climb.ClimbIO() {});
+                climb = new Climb((inputs) -> {});
             }
 
             default -> {
@@ -218,7 +219,7 @@ public class RobotContainer {
                         arm::getArmAngle,
                         elevator::getHeightMeters);
 
-                climb = new Climb(new Climb.ClimbIO() {});
+                climb = new Climb((inputs) -> {});
             }
         }
 
@@ -527,10 +528,6 @@ public class RobotContainer {
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
         driver.backOffButton().whileTrue(coralHolder.runVolts(1, -8));
 
-        // climbing
-        operator.start().onTrue(climb.climbCommand(operator::getLeftY));
-        operator.start().onTrue(climb.cancelClimb());
-
         operator.y()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
                 .onTrue(coralHolder.keepCoralShuffledForever());
@@ -541,6 +538,14 @@ public class RobotContainer {
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L2))
                 .onTrue(coralHolder.keepCoralShuffledForever());
         operator.x().onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.IDLE));
+
+        operator.start()
+                .whileTrue(Commands.sequence(
+                        climb.prepareClimbCommand(),
+                        Commands.runOnce(ledStatusLight.playAnimation(
+                                new LEDAnimation.Breathe(() -> Color.kPurple), 0.25, 8)::schedule)));
+        operator.rightTrigger(0.5).whileTrue(climb.climbCommand());
+        operator.back().whileTrue(climb.cancelClimb());
     }
 
     public Command autoAlign(
