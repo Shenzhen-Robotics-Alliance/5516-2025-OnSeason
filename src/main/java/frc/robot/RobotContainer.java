@@ -427,9 +427,7 @@ public class RobotContainer {
                         ReefAlignment.Side.RIGHT,
                         DriveControlLoops.REEF_ALIGNMENT_CONFIG_FAST));
 
-        driver.autoAlignmentButtonLeft()
-                .and(driver.autoAlignmentButtonRight())
-                .whileTrue(Commands.sequence(
+        Command algaeSequence = Commands.sequence(
                         Commands.runOnce(
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.ALGAE_SWAP_2)::schedule),
                         ReefAlignment.alignToNearestBranch(
@@ -441,15 +439,33 @@ public class RobotContainer {
                                 moveToAlgaePose().andThen(coralHolder.runVolts(-1.2, 0))),
                         Commands.deferredProxy(() -> superStructure.moveToPose(
                                 switch (superStructure.targetPose()) {
-                                    case PREPARE_TO_GRAB_LOW_ALGAE -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
-                                    case PREPARE_TO_GRAB_HIGH_ALGAE -> SuperStructure.SuperStructurePose
-                                            .GRAB_HIGH_ALGAE;
+                                    case GRAB_LOW_ALGAE -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
+                                    case GRAB_HIGH_ALGAE -> SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE;
                                     default -> superStructure.targetPose();
                                 })),
                         ledStatusLight
                                 .playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.25, 4)
-                                .asProxy()))
-                .onFalse(backOffWithAlgae());
+                                .asProxy())
+                .finallyDo(backOffWithAlgae()::schedule);
+        Command scoreL1Sequence = Commands.sequence(
+                Commands.runOnce(superStructure.moveToPose(SCORE_L1)::schedule),
+                Commands.runOnce(
+                        coralHolder.keepCoralShuffledForever().beforeStarting(Commands.waitSeconds(0.2))::schedule),
+                ReefAlignment.alignToNearestBranch(
+                        drive,
+                        aprilTagVision,
+                        ledStatusLight,
+                        ReefAlignment.Side.CENTER,
+                        DriveControlLoops.ALGAE_ALIGNMENT_CONFIG),
+                Commands.runOnce(superStructure.moveToPose(SCORE_L1_COMPLETE)::schedule),
+                Commands.runOnce(coralHolder.scoreCoral(1.0)::schedule));
+        LoggedDashboardChooser<Command> centerAlignmentCommand =
+                new LoggedDashboardChooser<>("Center Alignment Action");
+        centerAlignmentCommand.addDefaultOption("Obtain Algae", algaeSequence);
+        centerAlignmentCommand.addOption("Score L1", scoreL1Sequence);
+        driver.autoAlignmentButtonLeft()
+                .and(driver.autoAlignmentButtonRight())
+                .whileTrue(Commands.deferredProxy(centerAlignmentCommand::get));
         driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(6.0, 0));
         isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
 
@@ -465,7 +481,7 @@ public class RobotContainer {
                                 coralHolder.intakeCoralSequence().beforeStarting(flashLEDForIntake::schedule))
                         .finallyDo(flashLEDForIntake::cancel))
                 // move coral in place before retrieving arm
-                .onFalse(coralHolder.intakeCoralSequence().onlyIf(coralHolder.hasCoral));
+                .onFalse(coralHolder.moveCoralToPlace().onlyIf(coralHolder.hasCoral));
 
         driver.autoRotationButton()
                 .and(driver.autoAlignmentButtonLeft().negate())
@@ -509,6 +525,7 @@ public class RobotContainer {
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
 
         operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
+        driver.backOffButton().whileTrue(coralHolder.runVolts(1, -8));
 
         // climbing
         operator.start().onTrue(climb.climbCommand(operator::getLeftY));
@@ -547,8 +564,8 @@ public class RobotContainer {
                     RobotState.getInstance().getVisionPose().getTranslation(), ReefAlignment.Side.CENTER);
             SuperStructure.SuperStructurePose grabAlgaePose =
                     switch (nearestReefId) {
-                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE;
-                        default -> SuperStructure.SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE;
+                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE;
+                        default -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
                     };
             return superStructure.moveToPose(grabAlgaePose);
         });

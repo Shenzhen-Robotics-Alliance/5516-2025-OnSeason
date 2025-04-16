@@ -23,6 +23,8 @@ public class SuperStructure {
         // Useful poses
         IDLE(0, Degrees.of(137.5)),
         PREPARE_TO_RUN(0.07, Degrees.of(112)),
+        SCORE_L1(0.24, Degrees.of(50)),
+        SCORE_L1_COMPLETE(0.40, Degrees.of(50)),
         SCORE_L2(0.22, Degrees.of(112)),
         SCORE_L3(0.64, Degrees.of(112)),
         SCORE_L4(1.22, Degrees.of(98)),
@@ -111,6 +113,12 @@ public class SuperStructure {
             new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.ALGAE_SWAP_3),
             new PoseLink(SuperStructurePose.SCORE_L4, SuperStructurePose.ALGAE_SWAP_3),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_3, SuperStructurePose.ALGAE_SWAP_4),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.GRAB_LOW_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.GRAB_HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.SCORE_L1),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_L1),
+            new PoseLink(SuperStructurePose.SCORE_L1, SuperStructurePose.SCORE_L1_COMPLETE),
+            new PoseLink(SuperStructurePose.SCORE_L1_COMPLETE, SuperStructurePose.ALGAE_SWAP_2));
 
     /**
      * Represents a link between two super structure poses
@@ -228,6 +236,7 @@ public class SuperStructure {
                     case GRAB_LOW_ALGAE, GRAB_HIGH_ALGAE, SCORE_ALGAE, ALGAE_SWAP_2, ALGAE_SWAP_4 -> SuperStructure
                             .SuperStructurePose.SCORE_ALGAE;
                     case IDLE -> SuperStructure.SuperStructurePose.IDLE;
+                    case SCORE_L1, SCORE_L1_COMPLETE -> SuperStructurePose.SCORE_L1;
                 }));
     }
 
