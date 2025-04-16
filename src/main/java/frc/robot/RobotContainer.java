@@ -231,15 +231,7 @@ public class RobotContainer {
         autoChooser = buildAutoChooser();
 
         Set<SuperStructure.SuperStructurePose> algaePoses = Set.of(
-                PREPARE_TO_GRAB_LOW_ALGAE,
-                PREPARE_TO_GRAB_HIGH_ALGAE,
-                GRAB_LOW_ALGAE,
-                GRAB_HIGH_ALGAE,
-                ALGAE_SWAP_1,
-                ALGAE_SWAP_2,
-                ALGAE_SWAP_3,
-                ALGAE_SWAP_4,
-                SCORE_ALGAE);
+                GRAB_LOW_ALGAE, GRAB_HIGH_ALGAE, ALGAE_SWAP_1, ALGAE_SWAP_2, ALGAE_SWAP_3, ALGAE_SWAP_4, SCORE_ALGAE);
         isAlgaeMode = new Trigger(() -> algaePoses.contains(superStructure.targetPose()));
         configureButtonBindings();
         configureLEDEffects();

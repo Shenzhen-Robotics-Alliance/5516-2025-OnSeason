@@ -21,7 +21,7 @@ public class SuperStructure {
      */
     public enum SuperStructurePose {
         // Useful poses
-        IDLE(0, Degrees.of(136)),
+        IDLE(0, Degrees.of(137.5)),
         PREPARE_TO_RUN(0.07, Degrees.of(112)),
         SCORE_L2(0.22, Degrees.of(112)),
         SCORE_L3(0.64, Degrees.of(112)),
@@ -44,15 +44,13 @@ public class SuperStructure {
         //        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
         //        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
 
-        PREPARE_TO_GRAB_LOW_ALGAE(0.40, Degrees.of(-45)),
-        PREPARE_TO_GRAB_HIGH_ALGAE(0.80, Degrees.of(-45)),
-        GRAB_LOW_ALGAE(0.65, Degrees.of(-10)),
-        GRAB_HIGH_ALGAE(1.05, Degrees.of(-10)),
-        SCORE_ALGAE(0.15, Degrees.of(-45)),
+        GRAB_LOW_ALGAE(0.64, Degrees.of(-50)),
+        GRAB_HIGH_ALGAE(0.94, Degrees.of(-50)),
+        SCORE_ALGAE(0.10, Degrees.of(-40)),
         ALGAE_SWAP_1(0.3, Degrees.of(112)),
-        ALGAE_SWAP_2(0.3, Degrees.of(-45)),
+        ALGAE_SWAP_2(0.3, Degrees.of(-40)),
         ALGAE_SWAP_3(0.9, Degrees.of(112)),
-        ALGAE_SWAP_4(0.9, Degrees.of(-45));
+        ALGAE_SWAP_4(0.9, Degrees.of(-40));
 
         public final double elevatorHeightMeters;
         public final Angle armAngle;
@@ -96,25 +94,23 @@ public class SuperStructure {
             // SuperStructurePose.HIGH_SWAP_LEGACY),
             //            new PoseLink(SuperStructurePose.HIGH_SWAP_LEGACY, SuperStructurePose.SCORE_L4_LEGACY)
 
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE, SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE),
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE, SuperStructurePose.GRAB_HIGH_ALGAE),
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE, SuperStructurePose.GRAB_LOW_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_LOW_ALGAE, SuperStructurePose.GRAB_HIGH_ALGAE),
             new PoseLink(SuperStructurePose.GRAB_LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.GRAB_HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
-            new PoseLink(SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_HIGH_ALGAE, SuperStructurePose.GRAB_HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_LOW_ALGAE, SuperStructurePose.GRAB_LOW_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_LOW_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
+            new PoseLink(SuperStructurePose.GRAB_HIGH_ALGAE, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.ALGAE_SWAP_1),
             new PoseLink(SuperStructurePose.PREPARE_TO_RUN, SuperStructurePose.ALGAE_SWAP_2),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_1, SuperStructurePose.ALGAE_SWAP_2),
-            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE),
-            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.GRAB_LOW_ALGAE),
+            new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.GRAB_HIGH_ALGAE),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_2, SuperStructurePose.SCORE_ALGAE),
             new PoseLink(SuperStructurePose.SCORE_L3, SuperStructurePose.ALGAE_SWAP_3),
             new PoseLink(SuperStructurePose.SCORE_L4, SuperStructurePose.ALGAE_SWAP_3),
             new PoseLink(SuperStructurePose.ALGAE_SWAP_3, SuperStructurePose.ALGAE_SWAP_4),
-            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.PREPARE_TO_GRAB_LOW_ALGAE),
-            new PoseLink(SuperStructurePose.ALGAE_SWAP_4, SuperStructurePose.PREPARE_TO_GRAB_HIGH_ALGAE));
 
     /**
      * Represents a link between two super structure poses
@@ -229,13 +225,8 @@ public class SuperStructure {
                             HIGH_SWAP,
                             ALGAE_SWAP_1,
                             ALGAE_SWAP_3 -> SuperStructure.SuperStructurePose.PREPARE_TO_RUN;
-                    case PREPARE_TO_GRAB_LOW_ALGAE,
-                            PREPARE_TO_GRAB_HIGH_ALGAE,
-                            GRAB_LOW_ALGAE,
-                            GRAB_HIGH_ALGAE,
-                            SCORE_ALGAE,
-                            ALGAE_SWAP_2,
-                            ALGAE_SWAP_4 -> SuperStructure.SuperStructurePose.SCORE_ALGAE;
+                    case GRAB_LOW_ALGAE, GRAB_HIGH_ALGAE, SCORE_ALGAE, ALGAE_SWAP_2, ALGAE_SWAP_4 -> SuperStructure
+                            .SuperStructurePose.SCORE_ALGAE;
                     case IDLE -> SuperStructure.SuperStructurePose.IDLE;
                 }));
     }

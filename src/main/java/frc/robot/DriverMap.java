@@ -30,6 +30,8 @@ public interface DriverMap extends Subsystem {
 
     Trigger intakeButton();
 
+    Trigger backOffButton();
+
     Trigger l2Button();
 
     Trigger l3Button();
@@ -123,6 +125,11 @@ public interface DriverMap extends Subsystem {
         @Override
         public Trigger intakeButton() {
             return xboxController.leftTrigger(0.5);
+        }
+
+        @Override
+        public Trigger backOffButton() {
+            return xboxController.back();
         }
 
         @Override
@@ -263,6 +270,11 @@ public interface DriverMap extends Subsystem {
         @Override
         public Trigger intakeButton() {
             return ps5Controller.L2();
+        }
+
+        @Override
+        public Trigger backOffButton() {
+            return ps5Controller.touchpad();
         }
 
         @Override
