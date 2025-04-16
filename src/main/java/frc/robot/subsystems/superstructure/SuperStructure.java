@@ -23,8 +23,8 @@ public class SuperStructure {
         // Useful poses
         IDLE(0, Degrees.of(137.5)),
         PREPARE_TO_RUN(0.07, Degrees.of(112)),
-        SCORE_L1(0.24, Degrees.of(50)),
-        SCORE_L1_COMPLETE(0.40, Degrees.of(50)),
+        SCORE_L1(0.24, Degrees.of(60)),
+        SCORE_L1_COMPLETE(0.40, Degrees.of(60)),
         SCORE_L2(0.22, Degrees.of(112)),
         SCORE_L3(0.64, Degrees.of(112)),
         SCORE_L4(1.22, Degrees.of(98)),

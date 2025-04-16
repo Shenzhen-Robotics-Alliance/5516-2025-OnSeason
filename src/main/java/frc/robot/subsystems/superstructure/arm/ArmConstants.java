@@ -18,7 +18,7 @@ public final class ArmConstants {
             Angle ARM_UPPER_HARD_LIMIT,
             Angle ARM_LOWER_HARD_LIMIT,
             Angle ABSOLUTE_ENCODER_READING_AT_UPPER_LIM,
-            int ABSOLUTE_ENCODER_CHANNEL,
+            int ABSOLUTE_ENCODER_ID,
             boolean ABSOLUTE_ENCODER_INVERTED,
             int ARM_MOTOR_ID,
             boolean ARM_MOTOR_INVERTED) {}
@@ -44,9 +44,9 @@ public final class ArmConstants {
                         44.0 / 16.0 * 15.0,
                         Degrees.of(136.0),
                         Degrees.of(-48.0),
-                        Rotations.of(0.943),
-                        9,
-                        false,
+                        Rotations.of(-0.300),
+                        21,
+                        true,
                         3,
                         true);
                 case TEAM_6706_COMPBOT_HYDROXIDE_III -> new ArmHardwareConstants(
