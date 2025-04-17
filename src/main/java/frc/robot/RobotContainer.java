@@ -328,7 +328,7 @@ public class RobotContainer {
 
     public Command moveToL4() {
         Command shuffleCoralDuringElevatorMovement =
-                Commands.waitSeconds(0.3).andThen(coralHolder.keepCoralShuffledForever());
+                Commands.waitSeconds(0.5).andThen(coralHolder.shuffleCoralSequence());
         return superStructure
                 .moveToPose(SuperStructure.SuperStructurePose.SCORE_L4)
                 .deadlineFor(shuffleCoralDuringElevatorMovement.onlyIf(coralHolder.hasCoral))
@@ -527,9 +527,7 @@ public class RobotContainer {
 
         driver.backOffButton().whileTrue(coralHolder.runVolts(1, -8));
 
-        operator.y()
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L4))
-                .onTrue(coralHolder.keepCoralShuffledForever());
+        operator.y().onTrue(moveToL4());
         operator.b()
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_L3))
                 .onTrue(coralHolder.keepCoralShuffledForever());
@@ -557,8 +555,11 @@ public class RobotContainer {
                         ledStatusLight,
                         side,
                         autoAlignmentConfig,
-                        superStructure.moveToPose(scoringPose),
-                        coralHolder.keepCoralShuffledForever())
+                        scoringPose == SCORE_L4
+                                ? moveToL4()
+                                : superStructure
+                                        .moveToPose(scoringPose)
+                                        .deadlineFor(coralHolder.shuffleCoralSequence()))
                 .beforeStarting(superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_TO_RUN)::schedule);
     }
 

@@ -18,7 +18,7 @@ public class ReefConstants {
             ? Centimeters.of(37.3)
             // for real robot (measure this on field)
             // "AdvantageKit/RealOutputs/RobotToSelectedBranchTarget" - X Axis
-            : Centimeters.of(35.5);
+            : Centimeters.of(34.5);
 
     // "AdvantageKit/RealOutputs/RobotToSelectedBranchTarget" - Y Axis - Take Absolute Value
     public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_BLUE = new ReefAlignment.BranchTarget[] {

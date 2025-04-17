@@ -33,7 +33,7 @@ public final class CoralHolderConstants {
     public static final VoltageSettings VOLTAGE_SETTINGS =
             switch (Robot.CURRENT_ROBOT) {
                 case TEAM_5516_COMPBOT_HYDROXIDE_II, TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new VoltageSettings(
-                        3.5, 8.0, -1.5, 2.0);
+                        4.0, 8.0, -1, 1.35);
                 case TEAM_6706_COMPBOT_HYDROXIDE_III -> new VoltageSettings(3.0, 8.0, -1.0, 1.5);
             };
 
