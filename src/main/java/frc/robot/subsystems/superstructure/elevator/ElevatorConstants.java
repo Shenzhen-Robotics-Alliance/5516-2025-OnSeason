@@ -102,9 +102,9 @@ public final class ElevatorConstants {
                         Centimeters.of(2));
                 case TEAM_5516_CHAMPBOT_HYDROXIDE_IV -> new ElevatorPIDConstants(
                         0.02,
-                        0.76,
-                        3.58,
-                        0.09,
+                        0.93,
+                        3.50,
+                        0.10,
                         7.5 / 0.2,
                         3.0 / 0.2,
                         Volts.of(12),

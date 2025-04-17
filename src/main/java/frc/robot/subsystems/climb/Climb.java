@@ -34,7 +34,7 @@ public class Climb extends SubsystemBase {
     public Command prepareClimbCommand() {
         return Commands.sequence(
                         runOnce(() -> io.setFlipServo(true)),
-                        run(() -> io.setMotorOutput(10.0)).until(() -> inputs.climbAbsolutePosition >= 0.28),
+                        run(() -> io.setMotorOutput(10.0)).until(() -> inputs.climbAbsolutePosition >= 0.29),
                         Commands.runOnce(() -> climbReady = true))
                 .until(() -> !inputs.hardwareConnected)
                 .finallyDo(() -> io.setMotorOutput(0.0));

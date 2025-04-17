@@ -232,7 +232,13 @@ public class RobotContainer {
         autoChooser = buildAutoChooser();
 
         Set<SuperStructure.SuperStructurePose> algaePoses = Set.of(
-                GRAB_LOW_ALGAE, GRAB_HIGH_ALGAE, ALGAE_SWAP_1, ALGAE_SWAP_2, ALGAE_SWAP_3, ALGAE_SWAP_4, SCORE_ALGAE);
+                PREPARE_LOW_ALGAE,
+                PREPARE_HIGH_ALGAE,
+                ALGAE_SWAP_1,
+                ALGAE_SWAP_2,
+                ALGAE_SWAP_3,
+                ALGAE_SWAP_4,
+                SCORE_ALGAE);
         isAlgaeMode = new Trigger(() -> algaePoses.contains(superStructure.targetPose()));
         configureButtonBindings();
         configureLEDEffects();
@@ -437,11 +443,14 @@ public class RobotContainer {
                                 ledStatusLight,
                                 ReefAlignment.Side.CENTER,
                                 DriveControlLoops.ALGAE_ALIGNMENT_CONFIG,
-                                moveToAlgaePose().andThen(coralHolder.runVolts(-1.2, 0))),
+                                moveToPrepareAlgaePose().andThen(coralHolder.runVolts(-1.2, 0))),
+                        moveToAlgaePose()
+                                .beforeStarting(() -> drive.runOnce(
+                                        () -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(0.1, 0, 0)))),
                         Commands.deferredProxy(() -> superStructure.moveToPose(
                                 switch (superStructure.targetPose()) {
-                                    case GRAB_LOW_ALGAE -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
-                                    case GRAB_HIGH_ALGAE -> SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE;
+                                    case PREPARE_LOW_ALGAE -> SuperStructure.SuperStructurePose.PREPARE_LOW_ALGAE;
+                                    case PREPARE_HIGH_ALGAE -> SuperStructure.SuperStructurePose.PREPARE_HIGH_ALGAE;
                                     default -> superStructure.targetPose();
                                 })),
                         ledStatusLight
@@ -517,10 +526,10 @@ public class RobotContainer {
 
         operator.povDown()
                 .and(operator.leftBumper().or(isAlgaeMode))
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_LOW_ALGAE));
         operator.povUp()
                 .and(operator.leftBumper().or(isAlgaeMode))
-                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE));
+                .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.PREPARE_HIGH_ALGAE));
         operator.rightBumper()
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
@@ -538,7 +547,7 @@ public class RobotContainer {
 
         operator.start()
                 .whileTrue(Commands.sequence(
-                        climb.prepareClimbCommand().alongWith(superStructure.moveToPose(GRAB_LOW_ALGAE)),
+                        climb.prepareClimbCommand().alongWith(superStructure.moveToPose(PREPARE_LOW_ALGAE)),
                         Commands.runOnce(ledStatusLight.playAnimation(
                                 new LEDAnimation.Breathe(() -> Color.kPurple), 0.25, 8)::schedule)));
         operator.rightTrigger(0.5).whileTrue(climb.climbCommand());
@@ -569,8 +578,21 @@ public class RobotContainer {
                     RobotState.getInstance().getVisionPose().getTranslation(), ReefAlignment.Side.CENTER);
             SuperStructure.SuperStructurePose grabAlgaePose =
                     switch (nearestReefId) {
-                        case 12, 14, 16 -> SuperStructure.SuperStructurePose.GRAB_HIGH_ALGAE;
-                        default -> SuperStructure.SuperStructurePose.GRAB_LOW_ALGAE;
+                        case 12, 14, 16 -> GRAB_HIGH_ALGAE;
+                        default -> GRAB_LOW_ALGAE;
+                    };
+            return superStructure.moveToPose(grabAlgaePose);
+        });
+    }
+
+    public Command moveToPrepareAlgaePose() {
+        return Commands.deferredProxy(() -> {
+            int nearestReefId = ReefAlignment.getNearestReefAlignmentTargetId(
+                    RobotState.getInstance().getVisionPose().getTranslation(), ReefAlignment.Side.CENTER);
+            SuperStructure.SuperStructurePose grabAlgaePose =
+                    switch (nearestReefId) {
+                        case 12, 14, 16 -> PREPARE_HIGH_ALGAE;
+                        default -> PREPARE_LOW_ALGAE;
                     };
             return superStructure.moveToPose(grabAlgaePose);
         });
