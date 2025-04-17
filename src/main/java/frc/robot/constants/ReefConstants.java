@@ -24,34 +24,34 @@ public class ReefConstants {
     public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_BLUE = new ReefAlignment.BranchTarget[] {
         // lower side
         ReefAlignment.BranchTarget.measured(
-                18, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                18, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                18, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                18, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // lower right
         ReefAlignment.BranchTarget.measured(
-                17, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                17, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                17, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                17, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper right
         ReefAlignment.BranchTarget.measured(
-                22, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                22, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                22, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                22, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper side
         ReefAlignment.BranchTarget.measured(
-                21, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                21, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                21, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                21, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper left
         ReefAlignment.BranchTarget.measured(
-                20, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                20, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                20, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                20, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // lower left
         ReefAlignment.BranchTarget.measured(
-                19, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                19, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                19, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                19, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // algae
         ReefAlignment.BranchTarget.measured(
                 18, ReefAlignment.Side.CENTER, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(0.0)),
@@ -69,31 +69,31 @@ public class ReefConstants {
 
     public static final ReefAlignment.BranchTarget[] REEF_ALIGNMENT_POSITIONS_RED = new ReefAlignment.BranchTarget[] {
         // lower side
-        ReefAlignment.BranchTarget.measured(7, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+        ReefAlignment.BranchTarget.measured(7, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                7, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                7, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // lower right
-        ReefAlignment.BranchTarget.measured(8, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+        ReefAlignment.BranchTarget.measured(8, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                8, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                8, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper right
-        ReefAlignment.BranchTarget.measured(9, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+        ReefAlignment.BranchTarget.measured(9, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                9, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                9, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper side
         ReefAlignment.BranchTarget.measured(
-                10, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                10, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                10, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                10, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // upper left
         ReefAlignment.BranchTarget.measured(
-                11, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+                11, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                11, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                11, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // lower left
-        ReefAlignment.BranchTarget.measured(6, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.0)),
+        ReefAlignment.BranchTarget.measured(6, ReefAlignment.Side.LEFT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(17.8)),
         ReefAlignment.BranchTarget.measured(
-                6, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(16.2)),
+                6, ReefAlignment.Side.RIGHT, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(14.0)),
         // algae
         ReefAlignment.BranchTarget.measured(
                 7, ReefAlignment.Side.CENTER, ROBOT_TO_TARGET_DISTANCE, Centimeters.of(0.0)),

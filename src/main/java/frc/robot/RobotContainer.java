@@ -525,7 +525,6 @@ public class RobotContainer {
                 .and(isAlgaeMode)
                 .onTrue(superStructure.moveToPose(SuperStructure.SuperStructurePose.SCORE_ALGAE));
 
-        operator.back().whileTrue(coralHolder.runVolts(-0.5, -6));
         driver.backOffButton().whileTrue(coralHolder.runVolts(1, -8));
 
         operator.y()
@@ -541,7 +540,7 @@ public class RobotContainer {
 
         operator.start()
                 .whileTrue(Commands.sequence(
-                        climb.prepareClimbCommand(),
+                        climb.prepareClimbCommand().alongWith(superStructure.moveToPose(GRAB_LOW_ALGAE)),
                         Commands.runOnce(ledStatusLight.playAnimation(
                                 new LEDAnimation.Breathe(() -> Color.kPurple), 0.25, 8)::schedule)));
         operator.rightTrigger(0.5).whileTrue(climb.climbCommand());

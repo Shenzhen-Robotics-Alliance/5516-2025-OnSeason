@@ -25,7 +25,7 @@ public class Climb extends SubsystemBase {
 
     public Command climbCommand() {
         return run(() -> io.setMotorOutput(-4.0))
-                .until(() -> inputs.climbAbsolutePosition <= 0.0)
+                .until(() -> inputs.climbAbsolutePosition <= 0.05)
                 .until(() -> !inputs.hardwareConnected)
                 .finallyDo(() -> io.setMotorOutput(0.0))
                 .onlyIf(() -> climbReady);

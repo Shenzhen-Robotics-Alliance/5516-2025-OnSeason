@@ -64,7 +64,7 @@ public final class ClimbIOReal implements ClimbIO {
 
     @Override
     public void setFlipServo(boolean activated) {
-        servo.set(activated ? 0.5 : 0.2);
+        servo.set(activated ? 0.95 : 0.35);
     }
 
     @Override
