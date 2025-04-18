@@ -240,6 +240,7 @@ public class RobotContainer {
                 ALGAE_SWAP_4,
                 SCORE_ALGAE);
         isAlgaeMode = new Trigger(() -> algaePoses.contains(superStructure.targetPose()));
+        elevator.setIsAlgaeModeSwitch(isAlgaeMode.and(() -> algaePoses.contains(superStructure.currentPose())));
         configureButtonBindings();
         configureLEDEffects();
 

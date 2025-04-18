@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Robot;
 import frc.robot.RobotState;
 import frc.robot.utils.AlertsManager;
@@ -28,7 +29,8 @@ public class Elevator extends SubsystemBase {
     private final ElevatorFeedforward feedforwardController;
     private final PIDController strongFeedbackController;
     private final PIDController weakFeedbackController;
-    private final TrapezoidProfile profile;
+    private final TrapezoidProfile fasterProfile;
+    private final TrapezoidProfile slowerProfile;
 
     // Alerts
     private final Alert elevatorHardwareFaultsAlert;
@@ -47,17 +49,23 @@ public class Elevator extends SubsystemBase {
     /** The desired height. */
     private double heightSetpointMeters;
 
+    private Trigger isAlgaeModeSwitch;
+
     public Elevator(ElevatorIO io) {
         this.io = io;
+        this.isAlgaeModeSwitch = new Trigger(() -> false);
         this.inputs = new ElevatorInputsAutoLogged();
 
         this.feedforwardController =
                 new ElevatorFeedforward(PID_CONSTANTS.kS(), PID_CONSTANTS.kG(), PID_CONSTANTS.kV(), PID_CONSTANTS.kA());
         this.strongFeedbackController = new PIDController(PID_CONSTANTS.kP_STRONG(), 0, 0);
         this.weakFeedbackController = new PIDController(PID_CONSTANTS.kP_WEAK(), 0, 0);
-        this.profile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+        this.fasterProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
                 PID_CONSTANTS.VELOCITY_CONSTRAIN().in(MetersPerSecond),
                 PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(MetersPerSecondPerSecond)));
+        this.slowerProfile = new TrapezoidProfile(new TrapezoidProfile.Constraints(
+                PID_CONSTANTS.VELOCITY_CONSTRAIN().in(MetersPerSecond) * ALGAE_MODE_SPEED_FACTOR,
+                PID_CONSTANTS.ACCELERATION_CONSTRAIN().in(MetersPerSecondPerSecond) * ALGAE_MODE_SPEED_FACTOR));
 
         this.elevatorExceedLimitAlert = AlertsManager.create("", Alert.AlertType.kError);
         this.elevatorExceedLimitAlert.set(false);
@@ -72,6 +80,10 @@ public class Elevator extends SubsystemBase {
         this.heightSetpointMeters = 0.0;
 
         io.setMotorBrake(true);
+    }
+
+    public void setIsAlgaeModeSwitch(Trigger isAlgaeModeSwitch) {
+        this.isAlgaeModeSwitch = isAlgaeModeSwitch;
     }
 
     /**
@@ -92,9 +104,10 @@ public class Elevator extends SubsystemBase {
 
     /** Runs the control loops on the elevator to achieve the setpoint. */
     private void executeControlLoops(double dtSeconds) {
-        dtSeconds = MathUtil.clamp(dtSeconds, 0, 0.1);
+        dtSeconds = MathUtil.clamp(dtSeconds, 0, 0.10);
 
         TrapezoidProfile.State goalState = new TrapezoidProfile.State(heightSetpointMeters, 0);
+        TrapezoidProfile profile = isAlgaeModeSwitch.getAsBoolean() ? slowerProfile : fasterProfile;
         currentStateMeters = profile.calculate(dtSeconds, currentStateMeters, goalState);
 
         double accelerationMPSSq = (currentStateMeters.velocity - previousVelocityMPS) / Robot.defaultPeriodSecs;

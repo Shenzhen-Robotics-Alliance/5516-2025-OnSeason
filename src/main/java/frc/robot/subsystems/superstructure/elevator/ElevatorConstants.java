@@ -12,6 +12,8 @@ public final class ElevatorConstants {
     public static final Distance HEIGHT_THRESHOLD_ENABLE_LOW_SPEED_MODE = Centimeters.of(45);
     public static final LinearVelocity ELEVATOR_MOVING_VELOCITY_THRESHOLD = MetersPerSecond.of(0.03);
 
+    public static final double ALGAE_MODE_SPEED_FACTOR = 0.5;
+
     // Current Limits (shared across all robots)
     public static final Current STATOR_CURRENT_LIMIT = Amps.of(80);
     public static final Current SUPPLY_CURRENT_LIMIT = Amps.of(60);
