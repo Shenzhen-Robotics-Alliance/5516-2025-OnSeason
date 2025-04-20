@@ -46,10 +46,10 @@ public class SuperStructure {
         //        HIGH_SWAP_LEGACY(1.32, Degrees.of(55)),
         //        PREPARE_TO_RUN_UP_LEGACY(0, Degrees.of(55);
 
-        PREPARE_LOW_ALGAE(0.42, Degrees.of(-60)),
-        PREPARE_HIGH_ALGAE(0.94, Degrees.of(-60)),
-        GRAB_LOW_ALGAE(0.50, Degrees.of(-50)),
-        GRAB_HIGH_ALGAE(1.02, Degrees.of(-50)),
+        PREPARE_LOW_ALGAE(0.45, Degrees.of(-45)),
+        PREPARE_HIGH_ALGAE(0.85, Degrees.of(-45)),
+        GRAB_LOW_ALGAE(0.55, Degrees.of(-45)),
+        GRAB_HIGH_ALGAE(0.95, Degrees.of(-45)),
         SCORE_ALGAE(0.10, Degrees.of(-40)),
         ALGAE_SWAP_1(0.20, Degrees.of(112)),
         ALGAE_SWAP_2(0.20, Degrees.of(-40)),

@@ -234,6 +234,8 @@ public class RobotContainer {
         Set<SuperStructure.SuperStructurePose> algaePoses = Set.of(
                 PREPARE_LOW_ALGAE,
                 PREPARE_HIGH_ALGAE,
+                GRAB_LOW_ALGAE,
+                GRAB_HIGH_ALGAE,
                 ALGAE_SWAP_1,
                 ALGAE_SWAP_2,
                 ALGAE_SWAP_3,
@@ -438,22 +440,17 @@ public class RobotContainer {
         Command algaeSequence = Commands.sequence(
                         Commands.runOnce(
                                 superStructure.moveToPose(SuperStructure.SuperStructurePose.ALGAE_SWAP_2)::schedule),
+                        Commands.runOnce(coralHolder.runVolts(-1.5, 0)::schedule),
                         ReefAlignment.alignToNearestBranch(
                                 drive,
                                 aprilTagVision,
                                 ledStatusLight,
                                 ReefAlignment.Side.CENTER,
                                 DriveControlLoops.ALGAE_ALIGNMENT_CONFIG,
-                                moveToPrepareAlgaePose().andThen(coralHolder.runVolts(-1.2, 0))),
+                                moveToPrepareAlgaePose()),
                         moveToAlgaePose()
                                 .beforeStarting(() -> drive.runOnce(
-                                        () -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(0.1, 0, 0)))),
-                        Commands.deferredProxy(() -> superStructure.moveToPose(
-                                switch (superStructure.targetPose()) {
-                                    case PREPARE_LOW_ALGAE -> SuperStructure.SuperStructurePose.PREPARE_LOW_ALGAE;
-                                    case PREPARE_HIGH_ALGAE -> SuperStructure.SuperStructurePose.PREPARE_HIGH_ALGAE;
-                                    default -> superStructure.targetPose();
-                                })),
+                                        () -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(0.2, 0, 0)))),
                         ledStatusLight
                                 .playAnimation(new LEDAnimation.Breathe(() -> Color.kYellow), 0.25, 4)
                                 .asProxy())
@@ -477,7 +474,7 @@ public class RobotContainer {
         driver.autoAlignmentButtonLeft()
                 .and(driver.autoAlignmentButtonRight())
                 .whileTrue(Commands.deferredProxy(centerAlignmentCommand::get));
-        driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(6.0, 0));
+        driver.scoreButton().and(isAlgaeMode).whileTrue(coralHolder.runVolts(3.0, 0));
         isAlgaeMode.onFalse(coralHolder.runVolts(6.0, 0).withTimeout(0.5));
 
         coralHolder.setDefaultCommand(coralHolder.runIdle());
@@ -548,9 +545,10 @@ public class RobotContainer {
 
         operator.start()
                 .whileTrue(Commands.sequence(
-                        climb.prepareClimbCommand().alongWith(superStructure.moveToPose(PREPARE_LOW_ALGAE)),
+                        climb.prepareClimbCommand(),
                         Commands.runOnce(ledStatusLight.playAnimation(
-                                new LEDAnimation.Breathe(() -> Color.kPurple), 0.25, 8)::schedule)));
+                                new LEDAnimation.Breathe(() -> Color.kPurple), 0.25, 8)::schedule),
+                        superStructure.moveToPose(PREPARE_LOW_ALGAE)));
         operator.rightTrigger(0.5).whileTrue(climb.climbCommand());
         operator.back().whileTrue(climb.cancelClimb());
     }
@@ -601,7 +599,7 @@ public class RobotContainer {
 
     public Command backOffWithAlgae() {
         return drive.run(() -> drive.runRobotCentricChassisSpeeds(new ChassisSpeeds(-1.0, 0, 0)))
-                .raceWith(Commands.sequence(Commands.waitSeconds(0.7), superStructure.moveToPose(SCORE_ALGAE)));
+                .raceWith(Commands.sequence(Commands.waitSeconds(0.3), superStructure.moveToPose(SCORE_ALGAE)));
     }
 
     public void configureLEDEffects() {
